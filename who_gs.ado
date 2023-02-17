@@ -10,18 +10,10 @@ capture program drop who_gs_value2zscore
 
 program define who_gs_getLMS
 	args xvar sex acronym
-		
-	// Merge who_gs_coeffs to get lambda/mu/sigma
-	tempvar coeffs_dir 
-	generate `coeffs_dir' = "datasets_ref"
-	local who_coeffs_str "xxx\who_gs_coeffs.dta" 
-	local i = `coeffs_dir'
-	global wazfile: subinstr local who_coeffs_str "xxx" "`i'"
-	
-	gen n = _n
-	merge 1:1 xvar sex acronym using "$wazfile", nogenerate keep(1 3)
-	sort n
-	drop n
+	tempvar sort
+	generate `sort' = _n
+	merge 1:1 xvar sex acronym using "who_gs_coeffs.dta", nogenerate keep(1 3)
+	sort `sort'
 end
 
 program define who_gs_value2zscore

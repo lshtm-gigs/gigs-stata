@@ -13,21 +13,8 @@ capture program drop ig_vpns_eqns
 
 program define ig_nbs_getMSNT
 	args gest_age sex acronym
-	if (missing(`gest_age') | missing(`sex')  | missing(`acronym')) {
-		di "Error - You must specify 3 arguments: "
-		di "	gest_age sex acronym"
-		exit
-	}
-	
-	// Merge in_nbs_coeffs to get mu/sigma/nu/tau
-	tempvar coeffs_dir 
-	generate `coeffs_dir' = "datasets_ref"
-	local nbs_coeffs_str "xxx\ig_nbs_coeffs.dta" 
-	local i = `coeffs_dir'
-	global wazfile: subinstr local nbs_coeffs_str "xxx" "`i'"
-	
 	gen n = _n
-	merge 1:1 gest_age sex acronym using "$wazfile", nogenerate keep(1 3)
+	merge 1:1 gest_age sex acronym using "ig_nbs_coeffs.dta", nogenerate keep(1 3)
 	sort n
 	drop n
 end
