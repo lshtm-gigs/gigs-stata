@@ -37,7 +37,7 @@ program define ig_png_eqns
 		if `acronym' == "hcfa"
 end
 
-program define ig_png_value2percentile, rclass
+program define ig_png_value2percentile
 	args measurement pma_weeks sex acronym
 	ig_png_eqns `pma_weeks' `sex' `acronym'
 	

@@ -3,7 +3,7 @@ Classify size for gestational age, stunting, wasting and weight for age using
 WHO Growth Standards and the INTERGROWTH-21st standards as appropriate.
 */
 *! Author: Simon Parker
-*! version 0.0.0.1	17/02/2023
+*! version 0.0.1	17/02/2023
 capture program drop classify_sga
 capture program drop classify_stunting
 capture program drop classify_wasting
@@ -56,12 +56,12 @@ end
 program define classify_wasting
 	args weight_kg lenht_cm sex lenht_method
 	
-	capture generate double xvar = `lenht_cm'
-	capture generate sex = `sex'
-	capture generate acronym = ""
-	capture replace acronym = "wfh" if `lenht_method' == "H"
-	capture replace acronym = "wfl" if `lenht_method' == "L"
-	who_gs_value2zscore weight_kg xvar sex acronym
+	tempvar acronym xvar
+	capture generate double `xvar' = `lenht_cm'
+	capture generate `acronym' = ""
+	capture replace `acronym' = "wfh" if `lenht_method' == "H"
+	capture replace `acronym' = "wfl" if `lenht_method' == "L"
+	who_gs_value2zscore `weight_kg' `xvar' `sex' `acronym'
 	
  	tempvar z_scores
  	generate `z_scores' = z_out
@@ -72,29 +72,32 @@ program define classify_wasting
 	replace wasting = "normal" if abs(`z_scores') < 2
 	replace wasting = "overweight" if `z_scores' >= 2
 	replace wasting = "implausible" if abs(`z_scores') > 5
-	replace wasting = "" if acronym == ""
-	drop xvar acronym
+	replace wasting = "" if `acronym' == ""
+	drop xvar
 end
 
 program define classify_wfa
-	args weight_kg lenht_cm sex lenht_method
+	args weight_kg age_days ga_at_birth sex
 	
-	capture generate double xvar = `lenht_cm'
-	capture generate sex = `sex'
-	capture generate acronym = ""
-	capture replace acronym = "wfh" if `lenht_method' == "H"
-	capture replace acronym = "wfl" if `lenht_method' == "L"
-	who_gs_value2zscore weight_kg xvar sex acronym
+	tempvar pma_weeks acronym z_out
+	generate `pma_weeks' = round(`age_days' / 7)
+	generate `acronym' = "wfa"
+	generate double `z_out' = .
+    
+	ig_png_value2zscore `weight_kg' `pma_weeks' `sex' `acronym'
+	rename z_out z_PNG
 	
+	who_gs_value2zscore `weight_kg' `pma_weeks' `sex' `acronym'
+	rename z_out z_WHO
+
  	tempvar z_scores
- 	generate `z_scores' = z_out
-	drop z_out
+ 	generate `z_scores' = z_PNG if (`pma_weeks' >= 27 & `pma_weeks' <= 64) & `ga_at_birth' >= 26 & `ga_at_birth' < 37 & age_days / 7 > 64,
+	replace `z_scores' = z_WHO if `z_scores' == .
 	generate str8 wasting = ""
-	replace wasting = "wasting" if `z_scores' <= -2
-	replace wasting = "wasting_severe" if `z_scores' <= -3
+	replace wasting = "underweight" if `z_scores' <= -2
+	replace wasting = "underweight_severe" if `z_scores' <= -3
 	replace wasting = "normal" if abs(`z_scores') < 2
 	replace wasting = "overweight" if `z_scores' >= 2
 	replace wasting = "implausible" if abs(`z_scores') > 5
-	replace wasting = "" if acronym == ""
 	drop xvar acronym
 end
