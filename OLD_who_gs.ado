@@ -9,7 +9,6 @@ capture program drop who_gs_zscore2value
 capture program drop who_gs_value2zscore
 
 program define who_gs_getLMS
-	args xvar sex acronym
 	tempvar sort
 	generate `sort' = _n
 	merge 1:1 xvar sex acronym using "who_gs_coeffs.dta", nogenerate keep(1 3)

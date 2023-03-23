@@ -37,7 +37,7 @@ program define ig_png_eqns
 		if `acronym' == "hcfa"
 end
 
-program define ig_png_value2percentile, rclass
+program define ig_png_value2percentile
 	args measurement pma_weeks sex acronym
 	ig_png_eqns `pma_weeks' `sex' `acronym'
 	
@@ -45,11 +45,11 @@ program define ig_png_value2percentile, rclass
 	// The z-scores are converted by normal() to percentiles
 	tempvar p_logarithmic p_linear p_out
 	generate `p_logarithmic' = normal((log(`measurement') - png_median) / png_stddev)
-	generate `p_linear' = normal((`measurement' - png_median) / png_stddev) if acronym == "hcfa"
+	generate `p_linear' = normal((`measurement' - png_median) / png_stddev) if `acronym' == "hcfa"
 	
 	generate p_out = .
-	replace p_out = `p_logarithmic' if `acronym' != "hcfa"
-	replace p_out = `p_linear' if `acronym' == "hcfa"
+	replace p_out = `p_logarithmic' if `acronym' != "hcfa" & `pma_weeks' >= 27 & `pma_weeks' <= 64
+	replace p_out = `p_linear' if `acronym' == "hcfa" & `pma_weeks' >= 27 & `pma_weeks' <= 64
 	drop png_median png_stddev
 end
 
@@ -67,8 +67,10 @@ program define ig_png_percentile2value
 	display `p' invnormal(`p')
 	// Use VPNS medians + standard deviations to get z-scores
 	// The z-scores are converted by normal() to percentiles
-	generate q_out = exp(png_median + (invnormal(`p') * png_stddev)) if acronym != "hcfa"
-	replace q_out = png_median + invnormal(`p') * png_stddev if acronym == "hcfa"
+	generate q_out = exp(png_median + (invnormal(`p') * png_stddev)) if acronym != "hcfa" ///
+		& `pma_weeks' >= 27 & `pma_weeks' <= 64
+	replace q_out = png_median + invnormal(`p') * png_stddev if acronym == "hcfa" ///
+		& `pma_weeks' >= 27 & `pma_weeks' <= 64
 	drop png_median png_stddev
 end
 
