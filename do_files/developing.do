@@ -7,7 +7,7 @@ capture frame change default
 // capture frame drop nbs_data
 // frame create nbs_data
 // frame change nbs_data
-do "ig_nbs.ado"
+// do "ig_nbs.ado"
 // use "datasets_dummy/ig_nbs_vpns_tester.dta", clear
 //
 // ig_nbs_percentile2value p gest_age sex acronym
