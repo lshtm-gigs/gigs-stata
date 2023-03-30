@@ -4,17 +4,17 @@ capture frame change default
 //	http://fmwww.bc.edu/repec/bocode/s/sscsubmit.html
 
 // // Using INTERGROWTH-21st NBS dummy data
-capture frame drop nbs_data
-frame create nbs_data
-frame change nbs_data
-use "datasets_dummy/ig_nbs_vpns_tester.dta", clear
-do "_gig_nbs.ado"
-local acro = "wfga"
-qui drop if acronym != "`acro'"
-egen test_v2p = ig_nbs(measurement, "`acro'", "v2p"), gest_age(gest_age) sex(sex) sexcode(m=M, f=F)
-egen test_v2z = ig_nbs(measurement, "`acro'", "v2z"), gest_age(gest_age) sex(sex) sexcode(m=M, f=F)
-egen test_p2v = ig_nbs(p, "`acro'", "p2v"), gest_age(gest_age) sex(sex) sexcode(m=M, f=F)
-egen test_z2v = ig_nbs(z, "`acro'", "z2v"), gest_age(gest_age) sex(sex) sexcode(m=M, f=F)
+// capture frame drop nbs_data
+// frame create nbs_data
+// frame change nbs_data
+// use "datasets_dummy/ig_nbs_vpns_tester.dta", clear
+// do "_gig_nbs.ado"
+// local acro = "wfga"
+// qui drop if acronym != "`acro'"
+// egen test_v2p = ig_nbs(measurement, "`acro'", "v2p"), gest_age(gest_age) sex(sex) sexcode(m=M, f=F)
+// egen test_v2z = ig_nbs(measurement, "`acro'", "v2z"), gest_age(gest_age) sex(sex) sexcode(m=M, f=F)
+// egen test_p2v = ig_nbs(p, "`acro'", "p2v"), gest_age(gest_age) sex(sex) sexcode(m=M, f=F)
+// egen test_z2v = ig_nbs(z, "`acro'", "z2v"), gest_age(gest_age) sex(sex) sexcode(m=M, f=F)
 
 // // Using INTERGROWTH-21st PNG dummy data
 // capture frame drop png_data
@@ -50,3 +50,14 @@ egen test_z2v = ig_nbs(z, "`acro'", "z2v"), gest_age(gest_age) sex(sex) sexcode(
 // use "datasets_dummy/classify_stunting_tester.dta", clear
 // // do "_gig_classify.ado"
 // egen stunted = classify_stunting(lenht)
+
+// Using dummy wfga data
+capture frame drop nbs_data
+frame create nbs_data
+frame change nbs_data
+use "datasets_dummy/ig_nbs_vpns_tester.dta", clear
+do "_gclassify_sga.ado"
+local acro = "wfga"
+qui drop if acronym != "`acro'"
+qui drop acronym
+egen str sga = classify_sga(measurement, "`acro'"), gest_age(gest_age) sex(sex) sexcode(m=M, f=F)

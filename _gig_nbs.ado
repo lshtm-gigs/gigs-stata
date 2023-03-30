@@ -6,7 +6,7 @@ program define _gig_nbs
 	preserve
 
 	gettoken type 0 : 0
-	gettoken return    0 : 0
+	gettoken return 0 : 0
 	gettoken eqs  0 : 0
 
 	gettoken paren 0 : 0, parse("(), ")
