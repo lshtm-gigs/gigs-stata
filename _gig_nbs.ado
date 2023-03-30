@@ -83,13 +83,47 @@ program define _gig_nbs
 	
 	qui generate `type' `return' = .
 	if inlist("`acronym'", "wfga", "lfga", "hcfga") {
+		// Find reference LMS coeffecients
+		local basename = "ig_nbsGAMLSS_" + "`acronym'" + ".dta"
+		qui findfile "`basename'"
+		local filepath = "`r(fn)'"
+		
+		// Initialise new variables for merging
+		foreach var in gest_age sex mu sigma nu tau {
+			capture confirm new var ig_nbs_GAMLSS_`var'
+			if _rc {
+				di as error "whoLMS_`var' is used by ig_nbs - rename your " /*
+				*/ as error " variable"
+				exit 110
+			}
+		}
+		
+		qui {
+			gen double nbsMSNT_gest_age = `gest_age'
+			gen byte nbsMSNT_sex = 1 if `sex' == "`male'"
+			replace nbsMSNT_sex = 0 if `sex' == "`female'"
+		}
+		
+		// Find reference GAMLSS coeffecients
+		local basename = "ig_nbsGAMLSS_" + "`acronym'" + ".dta"
+		qui findfile "`basename'"
+		local filepath = "`r(fn)'"
+		
 		tempvar n
 		gen `n' = _n
 		// TODO: Make merging on column names flexible
-		qui merge 1:1 gest_age sex acronym using "ig_nbs_coeffs.dta", ///
-		    nogenerate keep(1 3)
+		qui merge 1:1 nbsMSNT_gest_age nbsMSNT_sex using "`filepath'", ///
+			nogenerate keep(1 3)
 		sort `n'
-		drop `n'
+		drop  nbsMSNT_gest_age nbsMSNT_sex `n'
+		qui {
+			tempvar mu sigma nu tau
+			gen double `mu' = nbsMSNT_mu
+			gen double `sigma' = nbsMSNT_sigma
+			gen double `nu' = nbsMSNT_nu
+			gen double `tau' = nbsMSNT_tau
+			drop nbsMSNT_mu nbsMSNT_sigma nbsMSNT_nu nbsMSNT_tau
+		}
 		
 		tempvar sex_as_numeric median gest_age_weeks vpns_median vpns_stddev
 		qui {
@@ -118,23 +152,23 @@ program define _gig_nbs
 			tempvar q cdf p_pST3 p_out
 			qui {
 				gen `q' = `input'
-				gen `cdf' = 2 * t(tau, nu * (`q' - mu) / sigma) if `q' < mu		
-				replace `cdf' = 1 + 2 * nu ^ 2 * ///
-					(t(tau, (`q' - mu) / (sigma * nu)) - 0.5) if `q' >= mu 
-				generate `p_pST3' = `cdf' / (1 + nu * nu)
-			}
-			drop mu sigma nu tau
+				gen `cdf' = 2 * t(`tau', `nu' * (`q' - `mu') / `sigma') ///
+					if `q' < `mu'		
+				replace `cdf' = 1 + 2 * `nu' ^ 2 * ///
+					(t(`tau', (`q' - `mu') / (`sigma' * `nu')) - 0.5) ///
+					if `q' >= `mu' 
+				generate `p_pST3' = `cdf' / (1 + `nu' ^ 2)
 			
-			qui {
 				tempvar p_vpns 
 				generate `p_vpns' = ///
 					normal((`q' - `vpns_median') / `vpns_stddev')
 				replace `p_vpns' = ///
 					normal((log(`q') - `vpns_median') / `vpns_stddev') ///
 					if "`acronym'" == "wfga"
-				qui generate `p_out' = `p_pST3' if `p_pST3' != .
-				qui replace `p_out' = `p_vpns' if `p_vpns' != . & `p_pST3' == .
-				qui replace `return' = `p_out'
+				
+				generate `p_out' = `p_pST3' if `p_pST3' != .
+				replace `p_out' = `p_vpns' if `p_vpns' != . & `p_pST3' == .
+				replace `return' = `p_out'
 			}
 			if "`conversion'" == "v2z" {
 				qui replace `return' = invnormal(`p_out')
@@ -151,12 +185,12 @@ program define _gig_nbs
 					
 			tempvar q_qST3
 			qui {
-				generate `q_qST3' = mu + (sigma / nu) * ///
-					invt(tau, `p' * (1 + nu^2 ) / 2) if `p' < (1 / (1 + nu ^ 2))
-				replace `q_qST3' = mu + (sigma * nu) * ///
-					invt(tau, (p * (1 + nu^2) - 1) / (2 * nu^2) + 0.5) ///
-					if `p' >= (1 / (1 + nu^2))
-				drop mu sigma nu tau
+				generate `q_qST3' = `mu' + (`sigma' / `nu') * ///
+					invt(`tau', `p' * (1 + `nu' ^ 2) / 2) ///
+					if `p' < (1 / (1 + `nu' ^ 2))
+				replace `q_qST3' = `mu' + (`sigma' * `nu') * ///
+					invt(`tau', (p * (1 + `nu'^2) - 1) / (2 * `nu'^2) + 0.5) ///
+					if `p' >= (1 / (1 + `nu'^2))
 			}
 			
 			tempvar z q_vpns
@@ -170,7 +204,7 @@ program define _gig_nbs
 			qui gen `q_out' = `q_qST3'
 			qui replace `q_out' = `q_vpns' if `q_vpns' != . & `q_qST3' == .
 			qui replace `return' = `q_out'
- 	}
+		}
 	}
 	else if "`acronym'" == "wlrfga" {
 		tempvar sex_as_numeric mu sigma ga
@@ -204,7 +238,6 @@ program define _gig_nbs
 			qui {
 				gen double `q' = `input'
 				gen double `z' = (`q' - `mu') / `sigma'
-				noi li `q' `ga' `sex' `mu' `sigma' `z'
 				replace `return' = `z'
 			}
 			if "`conversion'" == "v2p" {

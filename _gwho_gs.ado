@@ -100,15 +100,14 @@ program define _gwho_gs
 
 	tempvar n
 	gen `n' = _n
-	// TODO: Make merging on column names flexible
 	qui merge 1:1 whoLMS_xvar whoLMS_sex using "`filepath'", nogenerate keep(1 3)
 	sort `n'
 	drop whoLMS_sex whoLMS_xvar `n'
 	qui {
 		tempvar L M S
-		gen `L' = whoLMS_L
-		gen `M' = whoLMS_M
-		gen `S' = whoLMS_S
+		gen double `L' = whoLMS_L
+		gen double `M' = whoLMS_M
+		gen double `S' = whoLMS_S
 		drop whoLMS_L whoLMS_M whoLMS_S
 	}
 
@@ -116,20 +115,22 @@ program define _gwho_gs
 	if "`conversion'" == "v2p" | "`conversion'" == "v2z" {
 		tempvar _z z_out
 		qui {
-			generate `_z'  = (abs((`input'  / `M') ^ `L') - 1) / (`S' * `L')
+			gen double `_z' = (abs((`input'  / `M') ^ `L') - 1) / (`S' * `L')
 			replace `_z' = log(`input' / `M') / `S' if `L' == 0
 			
 			tempvar _sd3neg _sd2neg _sd2pos _sd3pos
-			gen `_sd2pos' = `M' * (1 + `L' * `S' * 2) ^ (1/`L')
-			gen `_sd3pos' = `M' * (1 + `L' * `S' * 3) ^ (1/`L')
+			gen double `_sd2pos' = `M' * (1 + `L' * `S' * 2) ^ (1/`L')
+			gen double `_sd3pos' = `M' * (1 + `L' * `S' * 3) ^ (1/`L')
 			replace `_z' = 3 + (`input' - `_sd3pos')/(`_sd3pos' - `_sd2pos') /*
 			*/	if `_z' > 3
 	
-			gen `_sd3neg' = `M' * (1 + `L' * `S' * -3) ^ (1 / `L')
-			gen `_sd2neg' = `M' * (1 + `L' * `S' * -2) ^ (1 / `L')
+			gen double `_sd3neg' = `M' * (1 + `L' * `S' * -3) ^ (1 / `L')
+			gen double `_sd2neg' = `M' * (1 + `L' * `S' * -2) ^ (1 / `L')
 			replace `_z' = -3 + (`input' - `_sd3neg')/(`_sd2neg' - `_sd3neg') /*
 			*/	if `_z' < -3
 			replace `return' = `_z'
+			
+			noi li `L' `M' `S' `_z' `return'			
 		}
 		if "`conversion'" == "v2p" {
 			qui replace `return' = normal(`_z')
