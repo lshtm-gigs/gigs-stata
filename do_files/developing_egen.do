@@ -29,7 +29,7 @@ capture frame change default
 // egen test_p2v = ig_png(p, "`acro'", "p2v"), pma_weeks(pma_weeks) sex(sex) sexcode(m=M, f=F)
 // egen test_z2v = ig_png(z, "`acro'", "z2v"), pma_weeks(pma_weeks) sex(sex) sexcode(m=M, f=F)
 
-// Using INTERGROWTH-21st PNG dummy data
+// Using WHO GS dummy data
 capture frame drop who_data
 frame create who_data
 frame change who_data
@@ -41,3 +41,14 @@ egen test_v2p = who_gs(measurement, "`acro'", "v2p"), xvar(x_var) sex(sex) sexco
 egen test_v2z = who_gs(measurement, "`acro'", "v2z"), xvar(x_var) sex(sex) sexcode(m=M, f=F)
 egen test_p2v = who_gs(p, "`acro'", "p2v"), xvar(x_var) sex(sex) sexcode(m=M, f=F)
 egen test_z2v = who_gs(z, "`acro'", "z2v"), xvar(x_var) sex(sex) sexcode(m=M, f=F)
+qui drop acronym
+
+// // Using dummy stunting data
+// capture frame drop classify_stunting
+// frame create classify_stunting
+// frame change classify_stunting
+// use "datasets_dummy/classify_stunting_tester.dta", clear
+// do "_gig_nbs.ado"
+// local acro = "wlrfga"
+// qui drop if acronym != "`acro'"
+// egen stunted = classify_stunting(measurement, "`acro'", "v2p")

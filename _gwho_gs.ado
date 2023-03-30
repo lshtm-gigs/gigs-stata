@@ -134,7 +134,6 @@ program define _gwho_gs
 		if "`conversion'" == "v2p" {
 			qui replace `return' = normal(`_z')
 		}
-		li `return'
 	}
 	else if "`conversion'" == "p2v" | "`conversion'" == "z2v" {
 		tempvar z _q q_out
