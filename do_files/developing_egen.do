@@ -43,15 +43,7 @@ capture frame change default
 // egen test_z2v = who_gs(z, "`acro'", "z2v"), xvar(x_var) sex(sex) sexcode(m=M, f=F)
 // qui drop acronym
 
-// Using dummy stunting data
-// capture frame drop classify_stunting
-// frame create classify_stunting
-// frame change classify_stunting
-// use "datasets_dummy/classify_stunting_tester.dta", clear
-// // do "_gig_classify.ado"
-// egen stunted = classify_stunting(lenht)
-
-// Using dummy wfga data
+// Using SGA dummy data
 capture frame drop nbs_data
 frame create nbs_data
 frame change nbs_data
@@ -61,3 +53,11 @@ local acro = "wfga"
 qui drop if acronym != "`acro'"
 qui drop acronym
 egen str sga = classify_sga(measurement, "`acro'"), gest_age(gest_age) sex(sex) sexcode(m=M, f=F)
+
+// Using dummy stunting data
+// capture frame drop classify_stunting
+// frame create classify_stunting
+// frame change classify_stunting
+// use "datasets_dummy/classify_stunting_tester.dta", clear
+// // do "_gclassify_stunting.ado"
+// egen stunted = classify_stunting(lenht, ga_at_birth, pma_days, sex, len_method)
