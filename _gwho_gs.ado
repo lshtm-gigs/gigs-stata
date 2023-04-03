@@ -128,9 +128,7 @@ program define _gwho_gs
 			gen double `_sd2neg' = `M' * (1 + `L' * `S' * -2) ^ (1 / `L')
 			replace `_z' = -3 + (`input' - `_sd3neg')/(`_sd2neg' - `_sd3neg') /*
 			*/	if `_z' < -3
-			replace `return' = `_z'
-			
-			noi li `L' `M' `S' `_z' `return'			
+			replace `return' = `_z'		
 		}
 		if "`conversion'" == "v2p" {
 			qui replace `return' = normal(`_z')

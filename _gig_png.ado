@@ -73,12 +73,7 @@ program define _gig_png
  	} 
 	else Badsyntax	
 
-	tempvar check_sex
-    qui generate `check_sex' = `sex' == "`male'" | `sex' == "`female'"
-	
-	tempvar check_age
-	qui generate `check_age' = `pma_weeks' >= 27 & `pma_weeks' < 64
-	qui generate `type' `return' = .
+		qui generate `type' `return' = .
 	tempvar sex_as_numeric median stddev 
 	qui {
 		gen `sex_as_numeric' = 1 if `sex' == "`male'"
@@ -123,6 +118,9 @@ program define _gig_png
 		} 
 	}
 
+	qui replace `return' = . if !(`pma_weeks' >= 27 & `pma_weeks' < 64)
+	qui replace `return' = . if !(`sex' == "`male'" | `sex' == "`female'")
+	
 	restore, not 
 end
 

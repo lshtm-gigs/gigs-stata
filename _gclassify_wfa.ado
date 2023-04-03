@@ -1,28 +1,88 @@
 capture program drop _gclassify_wfa
 *! version 0.1.0 (SJxx-x: dmxxxx)
 program define _gclassify_wfa
-	args weight_kg age_days ga_at_birth sex
+	version 16
+	preserve
 	
-	tempvar pma_weeks acronym z_out
-	generate `pma_weeks' = round(`age_days' / 7)
-	generate `acronym' = "wfa"
-	generate double `z_out' = .
-    
-	ig_png_value2zscore `weight_kg' `pma_weeks' `sex' `acronym'
-	rename z_out z_PNG
+	gettoken type 0 : 0
+	gettoken return 0 : 0
+	gettoken eqs  0 : 0
 	
-	who_gs_value2zscore `weight_kg' `pma_weeks' `sex' `acronym'
-	rename z_out z_WHO
+	gettoken paren 0 : 0, parse("(), ")
+	
+	gettoken weight_kg 0 : 0, parse("(), ")
 
- 	tempvar z_scores
- 	generate `z_scores' = z_PNG if (`pma_weeks' >= 27 & `pma_weeks' <= 64) & ///
-		`ga_at_birth' >= 26 & `ga_at_birth' < 37 & age_days / 7 > 64,
-	replace `z_scores' = z_WHO if `z_scores' == .
-	generate str8 wasting = ""
-	replace wasting = "underweight" if `z_scores' <= -2
-	replace wasting = "underweight_severe" if `z_scores' <= -3
-	replace wasting = "normal" if abs(`z_scores') < 2
-	replace wasting = "overweight" if `z_scores' >= 2
-	replace wasting = "implausible" if abs(`z_scores') > 5
-	drop xvar acronym
+	gettoken paren 0 : 0, parse("(), ")
+	if `"`paren'"' != ")" {
+		error 198
+	}
+	
+	capture assert inlist("`type'", "str")
+	if _rc {
+	    di as error "classify_wasting() can only return a variable of type str."
+		exit 198
+	}
+	
+	if `"`by'"' != "" {
+		_egennoby classify_wfa() `"`by'"'
+		/* NOTREACHED */
+	}
+	
+	syntax [if] [in], GA_at_birth(varname numeric) PMA_days(varname) ///
+		sex(varname) SEXCode(string) 
+	
+	local 1 `sexcode'
+	local 1 : subinstr local 1 "," " ", all
+	tokenize `"`1'"', parse("= ")
+	
+ 	if "`1'" == substr("male", 1, length("`1'")) {
+		if "`2'" ~= "=" | "`5'" ~= "=" | /*
+		*/ "`4'" ~= substr("female", 1, length("`4'")) | /*
+		*/ "`7'" ~= "" {
+ 			WFASex_Badsyntax
+ 		}
+ 		local male "`3'"
+  		local female "`6'"
+	} 
+	else if "`1'" == substr("female",1,length("`1'")) {
+	    if "`2'" ~= "=" | "`5'" ~= "=" | /*
+ 		*/ "`4'" ~= substr("male", 1, length("`4'") | /*
+ 		*/ "`7'" ~= "" {
+ 			WFASex_Badsyntax
+ 		}
+ 		local male "`6'"
+ 		local female "`3'"
+ 	} 
+	else WFASex_Badsyntax	
+	
+	tempvar pma_weeks acronym z_WHO z_PNG z
+	generate `pma_weeks' = round(`pma_days' / 7)
+	qui {
+		egen `z_PNG' = ig_png(`weight_kg', "wfa", "v2z"), pma_weeks(`pma_weeks') ///
+			sex(`sex') sexcode(m="`male'", f="`female'")
+		egen `z_WHO' = who_gs(`weight_kg', "wfa", "v2z"), xvar(`pma_days') ///
+			sex(`sex') sexcode(m="`male'", f="`female'")
+			
+		tempvar z
+ 	
+		gen double `z' = `z_PNG' if `ga_at_birth' >= 26 & `ga_at_birth' < 37 ///
+			& `pma_days' / 7 < 64
+		replace `z' = `z_WHO' if `z' == .
+
+		generate `type' `return' = ""
+		replace `return' = "underweight" if `z' <= -2
+		replace `return' = "underweight_severe" if `z' <= -3
+		replace `return' = "normal" if abs(`z') < 2
+		replace `return' = "overweight" if `z' >= 2
+		replace `return' = "implausible" if abs(`z') > 5
+		replace `return' = "" if `z' == .
+	}
+	
+	restore, not
+end
+
+capture prog drop WFASex_Badsyntax
+program WFASex_Badsyntax
+	di as err "sexcode() option invalid: see {help ig_nbs}"
+	exit 198
 end
