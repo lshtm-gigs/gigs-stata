@@ -12,7 +12,7 @@ weight or length) to z-scores and percentiles, and the inverse. Also included ar
 growth according to DHS guidelines.
 
 ## Installation
-You can install `stata-gain` from GitHub using the [`github`](https://www) module for Stata:
+You can install `stata-gain` from GitHub using the [`github`](https://github.com/haghish/github) module for Stata:
 ```stata
 github install simpar1471/stata-gain
 ```
