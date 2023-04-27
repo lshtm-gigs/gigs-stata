@@ -22,12 +22,6 @@ program define _gclassify_sga
 		error 198
 	}
 	
-	di "`type'"
-	capture assert inlist("`type'", "str")
-	if _rc {
-	    di as error "classify_sga() can only return a variable of type str."
-		exit 198
-	}
 	capture assert inlist("`acronym'", "wfga", "lfga", "hcfga")
 	if _rc {
 		di as text "`acronym'" as error " is an invalid acronym. The only " /*
@@ -67,16 +61,18 @@ program define _gclassify_sga
  		local female "`3'"
  	} 
 	else SGA_Badsyntax	
-	
+
  	tempvar p_temp
 	egen `p_temp' = ig_nbs(`input', "`acronym'", "v2p"), ///
 		gest_age(`gest_age') sex(`sex') sexcode(m="`male'", f="`female'")
 	qui {
-	  generate `type' `return' = "AGA"
-	  replace `return' = "SGA" if `p_temp' <= 0.1
-	  replace `return' = "LGA" if `p_temp' >= 0.9
-	  replace `return' = "SGA(<3)" if `p_temp' < 0.03
+	  generate `type' `return' = 0
+	  replace `return' = -1 if `p_temp' <= 0.1
+	  replace `return' = 1 if `p_temp' >= 0.9
+	  replace `return' = -2 if `p_temp' < 0.03
 	} 
+	capture label define sga_labels -2 "severely SGA" -1 "SGA" 0 "AGA" 1 "LGA"
+	label values `return' sga_labels
 	restore, not
 end
 
