@@ -12,22 +12,10 @@ program define _gclassify_sga
 	gettoken paren 0 : 0, parse("(), ")
 
 	gettoken input 0 : 0, parse("(), ")
-	gettoken acronym  0 : 0, parse("(), ")
-	if `"`acronym'"' == "," {
-		gettoken acronym  0 : 0, parse("(), ")
-	}
 		
 	gettoken paren 0 : 0, parse("(), ")
 	if `"`paren'"' != ")" {
 		error 198
-	}
-	
-	capture assert inlist("`acronym'", "wfga", "lfga", "hcfga")
-	if _rc {
-		di as text "`acronym'" as error " is an invalid acronym. The only " /*
-		*/ as error "valid choices are " as text "wfga, lfga, " as error "or" /*
-		*/ as text "hcfga" as error "."
-		exit 198
 	}
 	
 	if `"`by'"' != "" {
@@ -63,7 +51,7 @@ program define _gclassify_sga
 	else SGA_Badsyntax	
 
  	tempvar p_temp
-	egen `p_temp' = ig_nbs(`input', "`acronym'", "v2p"), ///
+	egen `p_temp' = ig_nbs(`input', "wfga", "v2p"), ///
 		gest_age(`gest_age') sex(`sex') sexcode(m="`male'", f="`female'")
 	qui {
 	  generate `type' `return' = 0

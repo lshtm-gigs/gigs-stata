@@ -38,7 +38,7 @@ program define _gclassify_stunting
  		local male "`3'"
   		local female "`6'"
 	} 
-	else if "`1'" == substr("female",1,length("`1'")) {
+	else if "`1'" == substr("female", 1, length("`1'")) {
 	    if "`2'" ~= "=" | "`5'" ~= "=" | /*
  		*/ "`4'" ~= substr("male", 1, length("`4'") | /*
  		*/ "`7'" ~= "" {
@@ -62,7 +62,7 @@ program define _gclassify_stunting
  		local length "`3'"
   		local height "`6'"
 	} 
-	else if "`1'" == substr("height", 1,length("`1'")) {
+	else if "`1'" == substr("height", 1, length("`1'")) {
 	    if "`2'" ~= "=" | "`5'" ~= "=" | /*
  		*/ "`4'" ~= substr("length", 1, length("`4'") | /*
  		*/ "`7'" ~= "" {
@@ -72,7 +72,7 @@ program define _gclassify_stunting
  		local height "`3'"
  	} 
 	else StuntingLenht_Badsyntax	
-	
+	di "hello2"
 	tempvar lenht_cm
 	qui {
 		generate `lenht_cm' = `input'
@@ -81,19 +81,20 @@ program define _gclassify_stunting
 		replace `lenht_cm' = `lenht_cm' + 0.7 ///
 			if `age_days' < 731 & `lenht_method' == "`height'"
 	}
-	
+
 	tempvar pma_weeks z_PNG z_WHO z
 	qui {
-		generate `pma_weeks' = round((`age_days' + 7 * `ga_at_birth') / 7)
+		generate `pma_weeks' = round((`age_days' + `ga_at_birth') / 7)
 		egen `z_PNG' = ig_png(`lenht_cm', "lfa", "v2z"), ///
 			pma_weeks(`pma_weeks') sex(`sex') sexcode(m="`male'", f="`female'")
 		egen `z_WHO' = who_gs(`lenht_cm', "lhfa", "v2z"), xvar(`age_days') ///
 			sex(`sex') sexcode(m="`male'", f="`female'")
-		
-		gen double `z' = `z_PNG' if `ga_at_birth' >= 26 & `ga_at_birth' < 37 ///
-			& `pma_weeks' >= 27 & `pma_weeks' < 64 
+
+		gen double `z' = `z_PNG' if ///
+		    `ga_at_birth' >= 182 & `ga_at_birth' < 259 & ///
+			`pma_weeks' >= 27 & `pma_weeks' < 64 
 		replace `z' = `z_WHO' if ///
-			`ga_at_birth' < 26 | `ga_at_birth' >= 37 | `pma_weeks' < 27 | ///
+			`ga_at_birth' < 182 | `ga_at_birth' >= 259 | `pma_weeks' < 27 | ///
 			`pma_weeks' >= 64
 		
 		generate `type' `return' = .

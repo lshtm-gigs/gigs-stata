@@ -51,16 +51,17 @@ program define _gclassify_wfa
 	
 	tempvar pma_weeks acronym z_WHO z_PNG z standard 
 	qui {
-		gen `pma_weeks' = round((`age_days' + 7 * `ga_at_birth') / 7)
+		gen `pma_weeks' = round((`age_days' + `ga_at_birth') / 7)
 		egen `z_PNG' = ig_png(`weight_kg', "wfa", "v2z"), ///
 			pma_weeks(`pma_weeks') sex(`sex') sexcode(m="`male'", f="`female'")
 		egen `z_WHO' = who_gs(`weight_kg', "wfa", "v2z"), xvar(`age_days') ///
 			sex(`sex') sexcode(m="`male'", f="`female'")
 	
-		gen double `z' = `z_PNG' if `ga_at_birth' >= 26 & `ga_at_birth' < 37 ///
-  			& `pma_weeks' >= 27 & `pma_weeks' < 64 
+		gen double `z' = `z_PNG' if ///
+		    `ga_at_birth' >= 182 & `ga_at_birth' < 259 & ///
+			`pma_weeks' >= 27 & `pma_weeks' < 64 
 		replace `z' = `z_WHO' if ///
-			`ga_at_birth' < 26 | `ga_at_birth' >= 37 | `pma_weeks' < 27 | ///
+			`ga_at_birth' < 182 | `ga_at_birth' >= 259 | `pma_weeks' < 27 | ///
 			`pma_weeks' >= 64
 
 		generate `type' `return' = .

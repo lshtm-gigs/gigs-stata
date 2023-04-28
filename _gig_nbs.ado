@@ -1,5 +1,5 @@
 capture program drop _gig_nbs
-capture program drop Badsyntax
+capture program drop Badsyntax_nbs
 *! version 0.1.0 (SJxx-x: dmxxxx)
 program define _gig_nbs
  	version 16
@@ -8,9 +8,7 @@ program define _gig_nbs
 	gettoken type 0 : 0
 	gettoken return 0 : 0
 	gettoken eqs  0 : 0
-
 	gettoken paren 0 : 0, parse("(), ")
-
 	gettoken input 0 : 0, parse("(), ")
 	gettoken acronym  0 : 0, parse("(), ")
 	if `"`acronym'"' == "," {
@@ -20,12 +18,10 @@ program define _gig_nbs
  	if `"`conversion'"' == "," {
 		gettoken conversion  0 : 0, parse("(), ")
 	}
-	
 	gettoken paren 0 : 0, parse("(), ")
 	if `"`paren'"' != ")" {
 		error 198
 	}
-
 	capture assert inlist("`acronym'", "wfga", "lfga", "wlrfga", "hcfga", /*
 	*/                    "ffmfga", "bfpfga", "fmfga")
 	if _rc {
@@ -59,7 +55,7 @@ program define _gig_nbs
 		if "`2'" ~= "=" | "`5'" ~= "=" | /*
 		*/ "`4'" ~= substr("female", 1, length("`4'")) | /*
 		*/ "`7'" ~= "" {
- 			Badsyntax
+ 			Badsyntax_who
  		}
  		local male "`3'"
   		local female "`6'"
@@ -68,12 +64,12 @@ program define _gig_nbs
 	    if "`2'" ~= "=" | "`5'" ~= "=" | /*
  		*/ "`4'" ~= substr("male", 1, length("`4'") | /*
  		*/ "`7'" ~= "" {
- 			Badsyntax
+ 			Badsyntax_who
  		}
  		local male "`6'"
  		local female "`3'"
  	} 
-	else Badsyntax	
+	else Badsyntax_who	
 
 	tempvar check_sex
     qui generate `check_sex' = `sex' == "`male'" | `sex' == "`female'"
@@ -312,7 +308,7 @@ program define _gig_nbs
  	restore, not 
 end
 
-program Badsyntax
+program Badsyntax_nbs
 	di as err "sexcode() option invalid: see {help ig_nbs}"
 	exit 198
 end
