@@ -56,10 +56,10 @@
 expression, {varlist}, or {it:{help numlist}}, and the {it:options} are
 also {it:fcn} dependent.
 
-{p 4 4 2}We have developed multiple functions for {cmd:egen}, as part of the 
-Guidance for International Growth Standards (GIGS) project. Each of these 
-functions converts between anthropometric measures and z-scores/centiles, but in
-different growth standards.
+{p 4 4 2}We have developed multiple functions for {cmd:egen} as part of the
+ Guidance for International Growth Standards (GIGS) project. Each of these
+ functions converts between anthropometric measures and z-scores/centiles, for
+ a range of different growth standards.
 
 {marker functions}{...}
 {title:Functions for egen}
@@ -128,15 +128,19 @@ must be specified by the {hi:sexcode()} option.
  in either  order, and the comma is optional. Quotes around the codes are not
  allowed, even if your sex variable is a string. 
 
-{dlgtab:Standard-specific}
+{dlgtab:INTERGROWTH-21st Newborn Size Standards}
 
-{phang}{opt gest:_age(varname numeric)} specifies gestational age in days for newborns. Any value outside
-the range of valid gestational ages as specified by the acronym argument (see
-Table 1) will return a missing value.
+{phang}{opt gest:_age(varname numeric)} specifies gestational age in days for
+ newborns. Any value outside the range of valid gestational ages as specified by
+ the acronym argument (see Table 1) will return a missing value.
 
-{phang}{opt pma:_weeks(varname numeric)} specifies post-menstrual age in whole weeks for infants. Any
-value outside the range of valid post-menstrual ages as specified in Table 2 will
-return a missing value.
+{dlgtab:INTERGROWTH-21st Post-natal Growth of Preterm Infants Standards}
+
+{phang}{opt pma:_weeks(varname numeric)} specifies post-menstrual age in whole
+ weeks for infants. Any value outside the range of valid post-menstrual ages as
+ specified in Table 2 will return a missing value.
+
+{dlgtab:WHO Child Growth Standards}
 
 {phang}{opt x:var(varname numeric)} specifies the variable used with supplied
  sex values to standardise the measure of interest. This is usually age (in days)
@@ -144,7 +148,7 @@ return a missing value.
  Table 3 for appropriate {cmd:{it:x}} variables for each possible acronym value. Any
  {cmd:{it:x}} variable values outside the ranges described below.
 
-
+ 
 {marker standards}{...}
 {title:Available Standards}
 
@@ -202,7 +206,7 @@ return a missing value.
 {pstd}Getting centiles from values ({cmd: "v2p"}) in the INTERGROWTH-21st
  Newborn Size Standard for weight-for-gestational age ({cmd:"wfga"}), where 
  {cmd:sex} contains the codes {cmd:1} and {cmd:2}:{p_end}
-{phang2}{cmd:. egen z_wfga = ig_nbs(weight,"wfga","v2p"), gest_age(ga_weeks) sex(sex) sexcode(male=1, female=2)}
+{phang2}{cmd:. egen z_wfga = ig_nbs(weight,"wfga","v2p"), gest_age(ga_weeks * 7) sex(sex) sexcode(male=1, female=2)}
 
 {pstd}Getting z-scores from values ({cmd: "v2p"}) in the INTERGROWTH-21st
  Newborn Size Standard for weight-for-gestational age ({cmd:"wfga"}), where 
@@ -242,6 +246,8 @@ return a missing value.
 
 
 {title:Also see}
+
+{p 4 14 2}Classifcation functions: {help classify_sga:documentation}
 
 {p 4 14 2}Article:  {it:Stata Journal}, volume XX, number X: {browse "https://www.overleaf.com/project/641db63564edd62fb54c963b":st0001}
 
