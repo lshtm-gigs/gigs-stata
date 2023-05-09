@@ -97,7 +97,7 @@ program define _gwho_gs
 
 	tempvar n
 	gen `n' = _n
-	qui merge 1:1 whoLMS_xvar whoLMS_sex using "`filepath'", nogenerate keep(1 3)
+	qui merge m:1 whoLMS_xvar whoLMS_sex using "`filepath'", nogenerate keep(1 3)
 	sort `n'
 	drop whoLMS_sex whoLMS_xvar `n'
 	qui {
@@ -118,13 +118,21 @@ program define _gwho_gs
 			tempvar _sd3neg _sd2neg _sd2pos _sd3pos
 			gen double `_sd2pos' = `M' * (1 + `L' * `S' * 2) ^ (1/`L')
 			gen double `_sd3pos' = `M' * (1 + `L' * `S' * 3) ^ (1/`L')
-			replace `_z' = 3 + (`input' - `_sd3pos')/(`_sd3pos' - `_sd2pos') /*
-			*/	if `_z' > 3
-	
+			if `_z' < -3 & ("`acronym'" != "hcfa" & "`acronym'" != "lhfa") {
+				di "z is >3"
+				replace `_z' = /*
+				*/ 3 + (`input' - `_sd3pos')/(`_sd3pos' - `_sd2pos') /*
+				*/ if `_z' > 3
+			}
+			
 			gen double `_sd3neg' = `M' * (1 + `L' * `S' * -3) ^ (1 / `L')
 			gen double `_sd2neg' = `M' * (1 + `L' * `S' * -2) ^ (1 / `L')
-			replace `_z' = -3 + (`input' - `_sd3neg')/(`_sd2neg' - `_sd3neg') /*
-			*/	if `_z' < -3
+			if ("`acronym'" != "hcfa" & "`acronym'" != "lhfa") {
+				di "z is <-3"
+		  		replace `_z' = /*
+				*/ -3 + (`input' - `_sd3neg')/(`_sd2neg' - `_sd3neg') /*
+				*/ if `_z' > 3
+			}
 			replace `return' = `_z'		
 		}
 		if "`conversion'" == "v2p" {
@@ -144,14 +152,19 @@ program define _gwho_gs
 			tempvar _sd3neg _sd2neg _sd2pos _sd3pos
 			gen `_sd2pos' = `M' * (1 + `L' * `S' * 2) ^ (1 / `L')
 			gen `_sd3pos' = `M' * (1 + `L' * `S' * 3) ^ (1 / `L')
-			replace `_q' = (`z' - 3) * (`_sd3pos' - `_sd2pos') + `_sd3pos' /*
-			*/	if `z' > 3
-			
+			if ("`acronym'" != "hcfa" & "`acronym'" != "lhfa") {
+				di "z is <-3"
+			replace `_q' = /*
+			*/ (`z' - 3) * (`_sd3pos' - `_sd2pos') + `_sd3pos' /*
+			*/ if `z' > 3
+			}
 			gen `_sd3neg' = `M' * (1 + `L' * `S' * -3) ^ (1 / `L')
 			gen `_sd2neg' = `M' * (1 + `L' * `S' * -2) ^ (1 / `L')
+			if ("`acronym'" != "hcfa" & "`acronym'" != "lhfa") {
+				di "z is <-3"
 			replace `_q' = (`z' + 3) * (`_sd2neg' - `_sd3neg') + `_sd3neg' /*
 			*/	if `z' < -3
-			
+			}
 			replace `return' = `_q'
 		}
 	}
