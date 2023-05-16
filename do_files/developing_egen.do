@@ -33,7 +33,7 @@ frame create who_data
 frame change who_data
 use "datasets_dummy/who_gs_tester.dta", clear
 do "_gwho_gs.ado"
-local acro = "lhfa"
+local acro = "wfh"
 qui drop if acronym != "`acro'"
 qui drop acronym
 foreach conv in "v2p" "v2z" "p2v" "z2v" {
