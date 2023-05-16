@@ -9,22 +9,38 @@ frame create nbs_data
 frame change nbs_data
 use "datasets_dummy/ig_nbs_vpns_tester.dta", clear
 do "_gig_nbs.ado"
-local acro = "wfga"
+local acro = "wlrfga"
 qui drop if acronym != "`acro'"
 foreach conv in "v2p" "v2z" "p2v" "z2v" {
-	egen test_`conv' = ig_nbs(measurement, "`acro'", "`conv'"), gest_age(gest_age) sex(sex) sexcode(m=M, f=F)
+	tempvar y
+	capture drop `y'
+	qui gen `y' = ///
+				cond("`conv'" == "v2p", measurement, ///
+				cond("`conv'" == "v2z", measurement, ///
+				cond("`conv'" == "p2v", p, ///
+				cond("`conv'" == "z2v", z, .z ///
+				))))
+	egen test_`conv' = ig_nbs(`y', "`acro'", "`conv'"), gest_age(gest_age) sex(sex) sexcode(m=M, f=F)
 }
-
+stop
 // Using INTERGROWTH-21st PNG dummy data
 capture frame drop png_data
 frame create png_data
 frame change png_data
 use "datasets_dummy/ig_png_tester.dta", clear
 do "_gig_png.ado"
-local acro = "lfa"
+local acro = "hcfa"
 qui drop if acronym != "`acro'"
 foreach conv in "v2p" "v2z" "p2v" "z2v" {
-	egen test_`conv' = ig_png(measurement, "`acro'", "`conv'"), pma_weeks(pma_weeks) sex(sex) sexcode(m=M, f=F)
+	tempvar y
+	capture drop `y'
+	qui gen `y' = ///
+				cond("`conv'" == "v2p", measurement, ///
+				cond("`conv'" == "v2z", measurement, ///
+				cond("`conv'" == "p2v", p, ///
+				cond("`conv'" == "z2v", z, .z ///
+				))))
+	egen test_`conv' = ig_png(`y', "`acro'", "`conv'"), pma_weeks(pma_weeks) sex(sex) sexcode(m=M, f=F)
 }
 
 // Using WHO GS dummy data
@@ -33,11 +49,19 @@ frame create who_data
 frame change who_data
 use "datasets_dummy/who_gs_tester.dta", clear
 do "_gwho_gs.ado"
-local acro = "wfh"
+local acro = "bfa"
 qui drop if acronym != "`acro'"
 qui drop acronym
 foreach conv in "v2p" "v2z" "p2v" "z2v" {
-	egen test_`conv' = who_gs(measurement, "`acro'", "`conv'"), xvar(x_var) sex(sex) sexcode(m=M, f=F)
+	tempvar y
+	capture drop `y'
+	qui gen `y' = ///
+				cond("`conv'" == "v2p", measurement, ///
+				cond("`conv'" == "v2z", measurement, ///
+				cond("`conv'" == "p2v", p, ///
+				cond("`conv'" == "z2v", z, .z ///
+				))))
+	egen test_`conv' = who_gs(`y', "`acro'", "`conv'"), xvar(x_var) sex(sex) sexcode(m=M, f=F)
 }
 
 // Using SGA dummy data

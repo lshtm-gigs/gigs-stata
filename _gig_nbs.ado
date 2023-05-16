@@ -107,7 +107,6 @@ program define _gig_nbs
 		
 		tempvar n
 		gen `n' = _n
-		// TODO: Make merging on column names flexible
 		qui merge m:1 nbsMSNT_gest_age nbsMSNT_sex using "`filepath'", ///
 			nogenerate keep(1 3)
 		sort `n'
@@ -208,25 +207,27 @@ program define _gig_nbs
 			replace `sex_as_numeric' = 1 if `sex' == "`male'"
 			replace `sex_as_numeric' = 0 if `sex' == "`female'"
 			gen `ga' = `gest_age' / 7
+			
 			gen `mu' = .
 			replace `mu' = ///
 				3.400617 + (-0.0103163 * `ga' ^ 2) + ///
-				(0.0003407 * `ga' * 7 ^ 3) + (0.1382809 * `sex_as_numeric') ///
-				if `ga' < 33
+				(0.0003407 * `ga' ^ 3) + (0.1382809 * `sex_as_numeric') ///
+				if `gest_age' < 231
 			replace `mu' = ///
 				-17.84615 + (-3778.768 * (`ga' ^ -1)) + ///
 				(1291.477 * ((`ga' ^ -1) * log(`ga'))) /// 
-				if `ga' >= 33 & `sex' == "`male'"
+				if `gest_age' >= 231 & `sex' == "`male'"
 			replace `mu' = ///
 				-5.542927 + (0.0018926 * (`ga' ^ 3)) + ///
 				(-0.0004614 * ((`ga' ^ 3)* log(`ga'))) ///
-				if `gest_age' >= 33 * 7 & `sex' == "`female'"
+				if `gest_age' >= 231 & `sex' == "`female'"    
+			
 			gen `sigma' = .
-			replace `sigma' = sqrt(0.3570057) if `ga' < 33
+			replace `sigma' = sqrt(0.3570057) if `gest_age' < 231
 			replace `sigma' = 1.01047 + (-0.0080948 * `ga') ///
-				if `ga' >= 33 & `sex' == "`male'"
+				if `gest_age' >= 231 & `sex' == "`male'"
 			replace `sigma' = 0.6806229 ///
-				if `ga' >= 33 & `sex' == "`female'"		
+				if `gest_age' >= 231 & `sex' == "`female'"		
 		}
 		tempvar q p z
 		if "`conversion'" == "v2z" | "`conversion'" == "v2p" {
@@ -299,6 +300,7 @@ program define _gig_nbs
 				}
 				gen `q' = ///
 				  `y_intercept' + `ga_coeff' * `gest_age' / 7 + `z' * `std_dev'
+				replace `q' = . if `q' < 0
 				replace `return' = `q'
 			}
 		}
