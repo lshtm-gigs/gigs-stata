@@ -108,7 +108,7 @@ program define _gig_nbs
 		tempvar n
 		gen `n' = _n
 		// TODO: Make merging on column names flexible
-		qui merge 1:1 nbsMSNT_gest_age nbsMSNT_sex using "`filepath'", ///
+		qui merge m:1 nbsMSNT_gest_age nbsMSNT_sex using "`filepath'", ///
 			nogenerate keep(1 3)
 		sort `n'
 		drop  nbsMSNT_gest_age nbsMSNT_sex `n'

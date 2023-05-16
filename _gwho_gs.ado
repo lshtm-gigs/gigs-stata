@@ -15,7 +15,7 @@ program define _gwho_gs
 		gettoken acronym  0 : 0, parse("(), ")
 	}
 	gettoken conversion  0 : 0, parse("(), ")
- 	if `"`conversion'"' == "," {
+	if `"`conversion'"' == "," {
 		gettoken conversion  0 : 0, parse("(), ")
 	}
 	gettoken paren 0 : 0, parse("(), ")
@@ -52,24 +52,24 @@ program define _gwho_gs
 	local 1 : subinstr local 1 "," " ", all
 	tokenize `"`1'"', parse("= ")
 	
- 	if "`1'" == substr("male", 1, length("`1'")) {
+	if "`1'" == substr("male", 1, length("`1'")) {
 		if "`2'" ~= "=" | "`5'" ~= "=" | /*
 		*/ "`4'" ~= substr("female", 1, length("`4'")) | /*
 		*/ "`7'" ~= "" {
- 			Badsyntax_who
- 		}
- 		local male "`3'"
-  		local female "`6'"
+			Badsyntax_who
+		}
+		local male "`3'"
+		local female "`6'"
 	} 
 	else if "`1'" == substr("female",1,length("`1'")) {
 	    if "`2'" ~= "=" | "`5'" ~= "=" | /*
- 		*/ "`4'" ~= substr("male", 1, length("`4'") | /*
- 		*/ "`7'" ~= "" {
- 			Badsyntax_who
- 		}
- 		local male "`6'"
- 		local female "`3'"
- 	} 
+		*/ "`4'" ~= substr("male", 1, length("`4'") | /*
+		*/ "`7'" ~= "" {
+			Badsyntax_who
+		}
+		local male "`6'"
+		local female "`3'"
+	} 
 	else Badsyntax_who	
 
 	tempvar check_sex
@@ -102,7 +102,7 @@ program define _gwho_gs
 
 	tempvar n
 	gen `n' = _n
-	qui merge 1:1 whoLMS_xvar whoLMS_sex using "`filepath'", nogenerate keep(1 3)
+	qui merge m:1 whoLMS_xvar whoLMS_sex using "`filepath'", nogenerate keep(1 3)
 	sort `n'
 	drop whoLMS_sex whoLMS_xvar `n'
 	qui {
@@ -123,13 +123,19 @@ program define _gwho_gs
 			tempvar _sd3neg _sd2neg _sd2pos _sd3pos
 			gen double `_sd2pos' = `M' * (1 + `L' * `S' * 2) ^ (1/`L')
 			gen double `_sd3pos' = `M' * (1 + `L' * `S' * 3) ^ (1/`L')
-			replace `_z' = 3 + (`input' - `_sd3pos')/(`_sd3pos' - `_sd2pos') /*
-			*/	if `_z' > 3
-	
+			if `_z' < -3 & ("`acronym'" != "hcfa" & "`acronym'" != "lhfa") {
+				replace `_z' = /*
+				*/ 3 + (`input' - `_sd3pos')/(`_sd3pos' - `_sd2pos') /*
+				*/ if `_z' > 3
+			}
+			
 			gen double `_sd3neg' = `M' * (1 + `L' * `S' * -3) ^ (1 / `L')
 			gen double `_sd2neg' = `M' * (1 + `L' * `S' * -2) ^ (1 / `L')
-			replace `_z' = -3 + (`input' - `_sd3neg')/(`_sd2neg' - `_sd3neg') /*
-			*/	if `_z' < -3
+			if ("`acronym'" != "hcfa" & "`acronym'" != "lhfa") {
+				replace `_z' = /*
+				*/ -3 + (`input' - `_sd3neg')/(`_sd2neg' - `_sd3neg') /*
+				*/ if `_z' > 3
+			}
 			replace `return' = `_z'		
 		}
 		if "`conversion'" == "v2p" {
@@ -140,7 +146,7 @@ program define _gwho_gs
 		tempvar z _q q_out
 		qui gen `z' = `input'
 		if "`conversion'" == "p2v" {
-			qui replace `z' = invnormal(`input')
+			qui replace `z' = invnormal(`z')
 		}
 		qui {
 			gen `_q'  = ((`z' * `S' * `L' + 1) ^ (1 / `L')) * `M'
@@ -149,14 +155,19 @@ program define _gwho_gs
 			tempvar _sd3neg _sd2neg _sd2pos _sd3pos
 			gen `_sd2pos' = `M' * (1 + `L' * `S' * 2) ^ (1 / `L')
 			gen `_sd3pos' = `M' * (1 + `L' * `S' * 3) ^ (1 / `L')
-			replace `_q' = (`z' - 3) * (`_sd3pos' - `_sd2pos') + `_sd3pos' /*
-			*/  if `z' > 3
-			
+			if ("`acronym'" != "hcfa" & "`acronym'" != "lhfa") {
+				replace `_q' = /*
+				*/ (`z' - 3) * (`_sd3pos' - `_sd2pos') + `_sd3pos' /*
+				*/ if `z' > 3
+			}
+
 			gen `_sd3neg' = `M' * (1 + `L' * `S' * -3) ^ (1 / `L')
 			gen `_sd2neg' = `M' * (1 + `L' * `S' * -2) ^ (1 / `L')
-			replace `_q' = (`z' + 3) * (`_sd2neg' - `_sd3neg') + `_sd3neg' /*
-			*/  if `z' < -3
-			
+			if ("`acronym'" != "hcfa" & "`acronym'" != "lhfa") {
+				replace `_q' = /*
+				*/ (`z' + 3) * (`_sd2neg' - `_sd3neg') + `_sd3neg' /*
+				*/ if `z' < -3
+			}
 			replace `return' = `_q'
 		}
 	}
