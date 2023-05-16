@@ -115,7 +115,7 @@ program define _gig_png
 		} 
 	}
 
-	qui replace `return' = . if !(`pma_weeks' >= 27 & `pma_weeks' < 64)
+	qui replace `return' = . if !(`pma_weeks' >= 27 & `pma_weeks' <= 64)
 	qui replace `return' = . if !(`sex' == "`male'" | `sex' == "`female'")
 	
 	restore, not 

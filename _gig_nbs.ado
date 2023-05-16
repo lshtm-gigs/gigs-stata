@@ -126,7 +126,6 @@ program define _gig_nbs
 			generate `sex_as_numeric' = 1 if `sex' == "`male'"
 			replace `sex_as_numeric' = 0 if `sex' == "`female'"
 			generate `gest_age_weeks' = .
-			replace `gest_age_weeks' = `gest_age' if `gest_age' < 168
 			replace `gest_age_weeks' = `gest_age' / 7  if `gest_age' >= 168
 				
 			generate `vpns_median' = .
@@ -185,7 +184,7 @@ program define _gig_nbs
 					invt(`tau', `p' * (1 + `nu' ^ 2) / 2) ///
 					if `p' < (1 / (1 + `nu' ^ 2))
 				replace `q_qST3' = `mu' + (`sigma' * `nu') * ///
-					invt(`tau', (p * (1 + `nu'^2) - 1) / (2 * `nu'^2) + 0.5) ///
+					invt(`tau', (`p' * (1 + `nu'^2) - 1) / (2 * `nu'^2) + 0.5) ///
 					if `p' >= (1 / (1 + `nu'^2))
 			}
 			
@@ -194,7 +193,7 @@ program define _gig_nbs
 				gen `z' = invnormal(`p')
 				gen `q_vpns' = `vpns_median' + invnormal(`p') * `vpns_stddev'
 				replace `q_vpns' = exp(`vpns_median' + ///
-					(invnormal(`p') * `vpns_stddev')) if acronym == "wfga"
+					(invnormal(`p') * `vpns_stddev')) if "`acronym'" == "wfga"
 			} 		
 			tempvar q_out
 			qui gen `q_out' = `q_qST3'
@@ -221,7 +220,7 @@ program define _gig_nbs
 			replace `mu' = ///
 				-5.542927 + (0.0018926 * (`ga' ^ 3)) + ///
 				(-0.0004614 * ((`ga' ^ 3)* log(`ga'))) ///
-				if `gest_age' > 33 * 7 & `sex' == "`female'"
+				if `gest_age' >= 33 * 7 & `sex' == "`female'"
 			gen `sigma' = .
 			replace `sigma' = sqrt(0.3570057) if `ga' < 33
 			replace `sigma' = 1.01047 + (-0.0080948 * `ga') ///

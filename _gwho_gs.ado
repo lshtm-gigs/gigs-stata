@@ -89,8 +89,13 @@ program define _gwho_gs
 		}
 	}
 	qui {
-		gen double whoLMS_xvar = `xvar'
-		
+		if ("`acronym'" != "wfl" & "`acronym'" != "wfh") {
+			gen double whoLMS_xvar = `xvar'
+		}
+		if ("`acronym'" == "wfl" | "`acronym'" == "wfh") {
+			gen float whoLMS_xvar = `xvar'
+			replace whoLMS_xvar = round(whoLMS_xvar * 10, 1)
+		}
 		gen byte whoLMS_sex = 1 if `sex' == "`male'"
 		replace whoLMS_sex = 0 if `sex' == "`female'"
 	}
@@ -145,12 +150,12 @@ program define _gwho_gs
 			gen `_sd2pos' = `M' * (1 + `L' * `S' * 2) ^ (1 / `L')
 			gen `_sd3pos' = `M' * (1 + `L' * `S' * 3) ^ (1 / `L')
 			replace `_q' = (`z' - 3) * (`_sd3pos' - `_sd2pos') + `_sd3pos' /*
-			*/	if `z' > 3
+			*/  if `z' > 3
 			
 			gen `_sd3neg' = `M' * (1 + `L' * `S' * -3) ^ (1 / `L')
 			gen `_sd2neg' = `M' * (1 + `L' * `S' * -2) ^ (1 / `L')
 			replace `_q' = (`z' + 3) * (`_sd2neg' - `_sd3neg') + `_sd3neg' /*
-			*/	if `z' < -3
+			*/  if `z' < -3
 			
 			replace `return' = `_q'
 		}

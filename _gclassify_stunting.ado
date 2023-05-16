@@ -72,7 +72,6 @@ program define _gclassify_stunting
  		local height "`3'"
  	} 
 	else StuntingLenht_Badsyntax	
-	di "hello2"
 	tempvar lenht_cm
 	qui {
 		generate `lenht_cm' = `input'
