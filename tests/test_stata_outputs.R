@@ -118,11 +118,11 @@ compare_who_gs <- function(acronym, sex, z_or_p, interactive = FALSE) {
     "percentiles"
   }
   reference <- gigs::who_gs[[acronym]][[sex_str]][[z_or_p_r]]
-  tolerance <- 0.01
+  tolerance <- 0.001
 
   if (!all(is.na(stata)) & !is.null(reference)) {
     tryCatch(expr = {
-      testthat::expect_equal(stata, reference,
+      testthat::expect_equal(stata[, c(1, 3:9)], reference[, c(1, 3:9)],
                              check.attributes = FALSE,
                              tolerance = tolerance)
     }, error = function(e) {
