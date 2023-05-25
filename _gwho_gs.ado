@@ -103,16 +103,17 @@ program define _gwho_gs
 	tempvar n
 	gen `n' = _n
 	qui merge m:1 whoLMS_xvar whoLMS_sex using "`filepath'", nogenerate keep(1 3)
-	sort `n'
-	drop whoLMS_sex whoLMS_xvar `n'
+	sort `xvar'
+	drop whoLMS_sex   
 	qui {
 		tempvar L M S
-		gen double `L' = whoLMS_L
-		gen double `M' = whoLMS_M
-		gen double `S' = whoLMS_S
-		drop whoLMS_L whoLMS_M whoLMS_S
+		ipolate whoLMS_L whoLMS_xvar, gen(`L') epolate
+		ipolate whoLMS_M whoLMS_xvar, gen(`M') epolate
+		ipolate whoLMS_S whoLMS_xvar, gen(`S') epolate
+ 		drop whoLMS_xvar whoLMS_L whoLMS_M whoLMS_S
+		sort `n'
+		drop `n'
 	}
-
 	qui generate `type' `return' = .
 	if "`conversion'" == "v2p" | "`conversion'" == "v2z" {
 		tempvar _z z_out

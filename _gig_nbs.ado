@@ -76,20 +76,23 @@ program define _gig_nbs
 		
 	tempvar check_ga 
 	qui generate `check_ga' = `gest_age' >= 24 * 7 & `gest_age' < 43 * 7	
+	drop `check_ga' `check_sex'
 	
 	qui generate `type' `return' = .
 	if inlist("`acronym'", "wfga", "lfga", "hcfga") {
-		// Find reference LMS coeffecients
+		// Find reference GAMLSS coeffecients
 		local basename = "ig_nbsGAMLSS_" + "`acronym'" + ".dta"
 		qui findfile "`basename'"
 		local filepath = "`r(fn)'"
+		tempvar n
+		gen `n' = _n
 		
 		// Initialise new variables for merging
 		foreach var in gest_age sex mu sigma nu tau {
-			capture confirm new var ig_nbs_GAMLSS_`var'
+			capture confirm new var nbsMSNT_`var'
 			if _rc {
-				di as error "whoLMS_`var' is used by ig_nbs - rename your " /*
-				*/ as error " variable"
+				di as error "{bf:nbsMSNT_`var'} is used by ig_nbs() - rename" /* 
+				*/ as error " your variable."
 				exit 110
 			}
 		}
@@ -100,24 +103,54 @@ program define _gig_nbs
 			replace nbsMSNT_sex = 0 if `sex' == "`female'"
 		}
 		
-		// Find reference GAMLSS coeffecients
-		local basename = "ig_nbsGAMLSS_" + "`acronym'" + ".dta"
-		qui findfile "`basename'"
-		local filepath = "`r(fn)'"
+		// Add empty rows (if needed) for interpolation
+		tempvar interp
+		qui gen interp = 1 if ///
+			0 != mod(`gest_age', 1) & `gest_age' < 231
+		local rows_added 0
+		forval i=1/`=_N' {
+			di "x is `i'"
+			di "GA is "gest_age[`i']
+			if 0 != mod(gest_age[`i'], 1) {
+				di "row above = "`rows_added' + `i'
+				qui insobs 1, before(`i' + `rows_added')
+				local rows_added `rows_added' + 1 
+				di "row below = "`rows_added' + 1 + `i'
+				qui insobs 1, after(`i' + `rows_added')
+			}
+		}
 		
-		tempvar n
-		gen `n' = _n
-		qui merge m:1 nbsMSNT_gest_age nbsMSNT_sex using "`filepath'", ///
+		// Replace if NEXT ROW contains missing MSNT
+		qui replace nbsMSNT_gest_age = floor(nbsMSNT_gest_age[_n+1]) /*
+			*/ if 0 != mod(nbsMSNT_gest_age[_n+1],1) /*
+			*/ & nbsMSNT_sex == .
+		qui replace nbsMSNT_sex = nbsMSNT_sex[_n+1] /*
+			*/ if 0 != mod(nbsMSNT_gest_age[_n+1],1) /*
+			*/ & nbsMSNT_sex == . 
+		
+		// Replace if PREVIOUS ROW contains missing MSNT
+		qui replace nbsMSNT_gest_age = ceil(nbsMSNT_gest_age[_n-1]) /*
+			*/ if 0 != mod(nbsMSNT_gest_age[_n-1],1) /*
+			*/ & nbsMSNT_gest_age == .
+		qui replace nbsMSNT_sex = nbsMSNT_sex[_n-1] /*
+			*/ if 0 != mod(nbsMSNT_gest_age[_n-1],1) /*
+			*/ & nbsMSNT_sex == . 
+				
+		qui	merge m:1 nbsMSNT_gest_age nbsMSNT_sex using "`filepath'", ///
 			nogenerate keep(1 3)
-		sort `n'
-		drop  nbsMSNT_gest_age nbsMSNT_sex `n'
+		sort nbsMSNT_gest_age
+		
 		qui {
 			tempvar mu sigma nu tau
-			gen double `mu' = nbsMSNT_mu
-			gen double `sigma' = nbsMSNT_sigma
-			gen double `nu' = nbsMSNT_nu
-			gen double `tau' = nbsMSNT_tau
-			drop nbsMSNT_mu nbsMSNT_sigma nbsMSNT_nu nbsMSNT_tau
+			ipolate nbsMSNT_mu nbsMSNT_gest_age, gen(`mu') epolate
+		    ipolate nbsMSNT_sigma nbsMSNT_gest_age, gen(`sigma') epolate
+		    ipolate nbsMSNT_nu nbsMSNT_gest_age, gen(`nu') epolate
+			ipolate nbsMSNT_tau nbsMSNT_gest_age, gen(`tau') epolate
+			drop nbsMSNT_gest_age nbsMSNT_sex nbsMSNT_mu nbsMSNT_sigma ///
+				nbsMSNT_nu nbsMSNT_tau
+			drop if `input' == . & `n' == .
+			sort `n'
+			drop `n'
 		}
 		
 		tempvar sex_as_numeric median gest_age_weeks vpns_median vpns_stddev
@@ -261,24 +294,24 @@ program define _gig_nbs
 				cond(`sex' == "`male'" & "`acronym'" == "ffmfga", -2487.6, ///
 				cond(`sex' == "`female'" & "`acronym'" == "fmfga", -840.2, ///
 				cond(`sex' == "`female'" & "`acronym'" == "bfpfga", -9.02, ///
-				cond(`sex' == "`female'" & "`acronym'" == "ffmfga", -1279, .z ///
-				))))))
+				cond(`sex' == "`female'" & "`acronym'" == "ffmfga", -1279, ///
+				.z))))))
 			gen `ga_coeff' = ///
 				cond(`sex' == "`male'" & "`acronym'" == "fmfga", 37.2, ///
 				cond(`sex' == "`male'" & "`acronym'" == "bfpfga", 0.69, ///
 				cond(`sex' == "`male'" & "`acronym'" == "ffmfga", 139.9, ///
 				cond(`sex' == "`female'" & "`acronym'" == "fmfga", 30.7, ///
 				cond(`sex' == "`female'" & "`acronym'" == "bfpfga", 0.51, ///
-				cond(`sex' == "`female'" & "`acronym'" == "ffmfga", 105.3, .z ///
-				))))))
+				cond(`sex' == "`female'" & "`acronym'" == "ffmfga", 105.3, ///
+				.z))))))
 			gen `std_dev' = ///
 				cond(`sex' == "`male'" & "`acronym'" == "fmfga", 152.1593, ///
 				cond(`sex' == "`male'" & "`acronym'" == "bfpfga", 3.6674, ///
 				cond(`sex' == "`male'" & "`acronym'" == "ffmfga", 276.2276, ///
 				cond(`sex' == "`female'" & "`acronym'" == "fmfga", 156.8411, ///
 				cond(`sex' == "`female'" & "`acronym'" == "bfpfga", 3.9405, ///
-				cond(`sex' == "`female'" & "`acronym'" == "ffmfga", 260.621, .z ///
-				))))))
+				cond(`sex' == "`female'" & "`acronym'" == "ffmfga", 260.621, ///
+				.z))))))
 		}
 		tempvar q p z
 		if "`conversion'" == "v2z" | "`conversion'" == "v2p" {
@@ -305,7 +338,8 @@ program define _gig_nbs
 			}
 		}
 	}
-	    
+	qui replace `return' = . if gest_age < 231
+    qui replace `return' = . if gest_age > 300
  	restore, not 
 end
 
