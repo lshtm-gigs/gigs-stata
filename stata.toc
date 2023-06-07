@@ -2,8 +2,8 @@ v 0.0.01
 d Materials by Simon Parker
 d London School of Hygiene and Tropical Medicine
 d simon.parker@lshtm.ac.uk
-d https://www.github.com/simpar1471
+d https://www.github.com/lshtm-gigs/gigs-stata
 
-d 'stata-gain': A unified interface to WHO Growth Standards data as well as growth information from the
+d 'gigs': International Growth Standards for Child Growth Assessment
 
-p stata-gain
+p gigs

@@ -222,13 +222,13 @@ must be specified by the {hi:sexcode()} option.
 {title:Authors}
 
 {pstd}Simon R. Parker{p_end}
-{pstd}Maternal and Newborn Health Group{p_end}
+{pstd}Maternal, Adolescent, Reproductive, and Child Health (MARCH) Center{p_end}
 {pstd}London School of Hygiene and Tropical Medicine{p_end}
 {pstd}London, U.K.{p_end}
 {pstd}simon.parker@lshtm.ac.uk{p_end}
 
 {pstd}Eric O. Ohuma{p_end}
-{pstd}Maternal and Newborn Health Group{p_end}
+{pstd}Maternal, Adolescent, Reproductive, and Child Health (MARCH) Center{p_end}
 {pstd}London School of Hygiene and Tropical Medicine{p_end}
 {pstd}London, U.K.{p_end}
 {pstd}eric.ohuma@lshtm.ac.uk{p_end}
