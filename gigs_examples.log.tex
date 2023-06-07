@@ -1,0 +1,150 @@
+. use life6mo
+{\smallskip}
+. list in f/10, noobs abbreviate(10) sep(10)
+{\smallskip}
+  {\TLC}\HLI{59}{\TRC}
+  {\VBAR}   infantid   gestage   pma   sex   visitweek   meaninfwgt {\VBAR}
+  {\LFTT}\HLI{59}{\RGTT}
+  {\VBAR} 101-1002-1       132   133     2           0         2300 {\VBAR}
+  {\VBAR} 101-1002-1       132   139     2           1         2270 {\VBAR}
+  {\VBAR} 101-1002-1       132   146     2           2         2465 {\VBAR}
+  {\VBAR} 101-1002-1       132   162     2           4         2700 {\VBAR}
+  {\VBAR} 101-1002-1       132   174     2           6         3160 {\VBAR}
+  {\VBAR} 101-1002-1       132   203     2          10         4004 {\VBAR}
+  {\VBAR} 101-1002-1       132   230     2          14     4893.333 {\VBAR}
+  {\VBAR} 101-1002-1       132   258     2          18         5690 {\VBAR}
+  {\VBAR} 101-1002-1       132   317     2          26         6950 {\VBAR}
+  {\VBAR} 101-1003-1       237   238     1           0         1900 {\VBAR}
+  {\BLC}\HLI{59}{\BRC}
+{\smallskip}
+. 
+. local 40weeks 7 * 40
+{\smallskip}
+. local 37weeks 7 * 37 
+{\smallskip}
+. 
+. tempvar agedays
+{\smallskip}
+. gen agedays = pma - gestage
+{\smallskip}
+. egen waz_who = who_gs(meaninfwgt/1000, "wfa", "v2z") if gestage > `37weeks', ///
+>         xvar(agedays) sex(sex) sexcode(m=1, f=2)
+(4,657 missing values generated)
+{\smallskip}
+. drop agedays
+{\smallskip}
+. list in f/100 if gestage > 259, noobs sep(10)
+{\smallskip}
+  {\TLC}\HLI{68}{\TRC}
+  {\VBAR}   infantid   gestage   pma   sex   visitw{\tytilde}k   meanin{\tytilde}t     waz_who {\VBAR}
+  {\LFTT}\HLI{68}{\RGTT}
+  {\VBAR} 101-1004-1       273   273     1          0       2300   -2.407175 {\VBAR}
+  {\VBAR} 101-1004-1       273   280     1          1       2185   -3.028356 {\VBAR}
+  {\VBAR} 101-1004-1       273   288     1          2       2325   -3.268595 {\VBAR}
+  {\VBAR} 101-1004-1       273   301     1          4       2575   -3.682458 {\VBAR}
+  {\VBAR} 101-1004-1       273   316     1          6       3410   -2.796237 {\VBAR}
+  {\VBAR} 101-1004-1       273   344     1         10   4262.333   -2.549588 {\VBAR}
+  {\VBAR} 101-1004-1       273   376     1         14       5050   -2.310244 {\VBAR}
+  {\VBAR} 101-1004-1       273   399     1         18   5431.667   -2.303073 {\VBAR}
+  {\VBAR} 101-1004-1       273   460     1         26       5835   -2.815774 {\VBAR}
+  {\BLC}\HLI{68}{\BRC}
+{\smallskip}
+. 
+. egen waz_nbs = ig_nbs(meaninfwgt/1000, "wfga", "v2z") ///
+>         if visitweek == 0, ///
+>         gest_age(gestage) sex(sex) sexcode(m=1, f=2)
+(7,308 missing values generated)
+{\smallskip}
+. 
+. gen pma_weeks = round(pma/7, 1)
+{\smallskip}
+. egen waz_png = ig_png(meaninfwgt/1000, "wfa", "v2z") ///
+>         if gestage < `37weeks' \& visitweek > 0 \& visitweek <= 18, ///
+>         pma_weeks(pma_weeks) sex(sex) sexcode(m=1, f=2)
+(5,391 missing values generated)
+{\smallskip}
+. drop pma_weeks
+{\smallskip}
+. 
+. gen age_corrected = (pma - gestage) + (gestage - `40weeks')
+{\smallskip}
+. egen waz_whocorr = who_gs(meaninfwgt/1000, "wfa", "v2z") ///
+>         if gestage < `37weeks' \& visitweek == 26, ///
+>         xvar(age_corrected) sex(sex) sexcode(m=1, f=2)
+(7,996 missing values generated)
+{\smallskip}
+. drop age_corrected
+{\smallskip}
+. 
+. gen waz = waz_who if gestage > `37weeks'
+(4,657 missing values generated)
+{\smallskip}
+. replace waz = waz_nbs if visitweek == 0
+(1,112 real changes made, 4 to missing)
+{\smallskip}
+. replace waz = waz_png if gestage < `37weeks' \& visitweek > 0 \& visitweek <= 18
+(3,025 real changes made)
+{\smallskip}
+. replace waz = waz_whocorr if gestage < `37weeks' \& visitweek == 26
+(420 real changes made)
+{\smallskip}
+. 
+. list gestage pma visitweek waz_* waz in f/10, noobs sep(10)
+{\smallskip}
+  {\TLC}\HLI{82}{\TRC}
+  {\VBAR} gestage   pma   visitw{\tytilde}k   waz_who     waz_nbs    waz_png   waz_wh{\tytilde}r         waz {\VBAR}
+  {\LFTT}\HLI{82}{\RGTT}
+  {\VBAR}     132   133          0         .           .          .          .           . {\VBAR}
+  {\VBAR}     132   139          1         .           .          .          .           . {\VBAR}
+  {\VBAR}     132   146          2         .           .          .          .           . {\VBAR}
+  {\VBAR}     132   162          4         .           .          .          .           . {\VBAR}
+  {\VBAR}     132   174          6         .           .          .          .           . {\VBAR}
+  {\VBAR}     132   203         10         .           .   7.859495          .    7.859495 {\VBAR}
+  {\VBAR}     132   230         14         .           .   6.699389          .    6.699389 {\VBAR}
+  {\VBAR}     132   258         18         .           .   5.612474          .    5.612474 {\VBAR}
+  {\VBAR}     132   317         26         .           .          .   3.511517    3.511517 {\VBAR}
+  {\VBAR}     237   238          0         .   -.7119927          .          .   -.7119927 {\VBAR}
+  {\BLC}\HLI{82}{\BRC}
+{\smallskip}
+. drop waz_*
+{\smallskip}
+. 
+. gen preterm = gestage < `37weeks'
+{\smallskip}
+. collapse waz, by(visitweek preterm)
+{\smallskip}
+. line waz visitweek if preterm == 0 || line waz visitweek if preterm == 1 ||, ///
+>         title("WAZ in term/preterm infants in the LIFE study") ///
+>         xtitle("Visit week") ///
+>         ytitle("WAZ") ///
+>         xlabel(0 1 2 4 6 10 14 18 26) ///
+>         legend(label(1 "Term") label(2 "Preterm")) ///
+>         scheme(sj)
+{\smallskip}
+. graph export "gigs_fig1.pdf"
+file{\bftt{ gigs_fig1.pdf}} saved as PDF format
+{\smallskip}
+. 
+. use life6mo, clear
+{\smallskip}
+. drop if visitweek != 0
+(7,303 observations deleted)
+{\smallskip}
+. egen sga = classify_sga(meaninfwgt/1000), ///
+>         gest_age(gestage) sex(sex) sexcode(m=1, f=2)
+(5 missing values generated)
+{\smallskip}
+. gen preterm = "Preterm" if gestage < `37weeks'
+(597 missing values generated)
+{\smallskip}
+. replace preterm = "Term" if gestage >= `37weeks'
+(597 real changes made)
+{\smallskip}
+. graph bar (count), over(sga) by(preterm, ///
+>     title("Size-for-GA category counts by term status")) ///
+>         ytitle("Frequency") ///
+>         scheme(sj)
+{\smallskip}
+. graph export "gigs_fig2.pdf"
+file{\bftt{ gigs_fig2.pdf}} saved as PDF format
+{\smallskip}
