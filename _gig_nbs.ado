@@ -71,12 +71,9 @@ program define _gig_nbs
  	} 
 	else Badsyntax_who	
 
-	tempvar check_sex
-    qui generate `check_sex' = `sex' == "`male'" | `sex' == "`female'"
-		
-	tempvar check_ga 
-	qui generate `check_ga' = `gest_age' >= 24 * 7 & `gest_age' < 43 * 7	
-	drop `check_ga' `check_sex'
+	tempvar check_sex check_ga
+    qui gen int `check_sex' = `sex' == "`male'" | `sex' == "`female'"
+	qui gen int `check_ga' = `gest_age' >= 168 & `gest_age' <= 300
 	
 	qui generate `type' `return' = .
 	if inlist("`acronym'", "wfga", "lfga", "hcfga") {
@@ -105,22 +102,26 @@ program define _gig_nbs
 		
 		// Add empty rows (if needed) for interpolation
 		tempvar interp
-		qui gen interp = 1 if ///
-			0 != mod(`gest_age', 1) & `gest_age' < 231
-		local rows_added 0
-		forval i=1/`=_N' {
-			di "x is `i'"
-			di "GA is "gest_age[`i']
-			if 0 != mod(gest_age[`i'], 1) {
-				di "row above = "`rows_added' + `i'
-				qui insobs 1, before(`i' + `rows_added')
-				local rows_added `rows_added' + 1 
-				di "row below = "`rows_added' + 1 + `i'
-				qui insobs 1, after(`i' + `rows_added')
+		qui gen int `interp' = 0
+		qui replace `interp' = 1 if ///
+			0 != mod(`gest_age', 1) & `gest_age' >= 231  & `gest_age' <= 300
+		qui levelsof `interp', clean local(interp_local)
+		while inlist(`interp_local', 1) == 1 {
+			forval i=1/`=_N' {
+				if `interp'[`i'] == 1 {
+					qui replace `interp' = 0 if _n == `i'
+					qui insobs 1, before(`i')
+					qui insobs 1, after(`i' + 1)
+					continue, break
+				}
 			}
+			macro drop interp_local
+			qui levelsof `interp', clean local(interp_local)
 		}
+		qui replace `interp' = 1 if ///
+			0 != mod(`gest_age', 1) & `gest_age' >= 231  & `gest_age' <= 300
 		
-		// Replace if NEXT ROW contains missing MSNT
+		// Replace GA + sex if NEXT ROW contains missing MSNT
 		qui replace nbsMSNT_gest_age = floor(nbsMSNT_gest_age[_n+1]) /*
 			*/ if 0 != mod(nbsMSNT_gest_age[_n+1],1) /*
 			*/ & nbsMSNT_sex == .
@@ -128,26 +129,40 @@ program define _gig_nbs
 			*/ if 0 != mod(nbsMSNT_gest_age[_n+1],1) /*
 			*/ & nbsMSNT_sex == . 
 		
-		// Replace if PREVIOUS ROW contains missing MSNT
+		// Replace GA + sex if PREVIOUS ROW contains missing MSNT
 		qui replace nbsMSNT_gest_age = ceil(nbsMSNT_gest_age[_n-1]) /*
 			*/ if 0 != mod(nbsMSNT_gest_age[_n-1],1) /*
-			*/ & nbsMSNT_gest_age == .
+			*/ & nbsMSNT_sex == .
 		qui replace nbsMSNT_sex = nbsMSNT_sex[_n-1] /*
 			*/ if 0 != mod(nbsMSNT_gest_age[_n-1],1) /*
 			*/ & nbsMSNT_sex == . 
-				
+		
+		tempvar n_long
+		qui gen `n_long' = _n
 		qui	merge m:1 nbsMSNT_gest_age nbsMSNT_sex using "`filepath'", ///
 			nogenerate keep(1 3)
-		sort nbsMSNT_gest_age
-		
+		sort `n_long'
+		drop `n_long'
+
 		qui {
-			tempvar mu sigma nu tau
-			ipolate nbsMSNT_mu nbsMSNT_gest_age, gen(`mu') epolate
-		    ipolate nbsMSNT_sigma nbsMSNT_gest_age, gen(`sigma') epolate
-		    ipolate nbsMSNT_nu nbsMSNT_gest_age, gen(`nu') epolate
-			ipolate nbsMSNT_tau nbsMSNT_gest_age, gen(`tau') epolate
-			drop nbsMSNT_gest_age nbsMSNT_sex nbsMSNT_mu nbsMSNT_sigma ///
-				nbsMSNT_nu nbsMSNT_tau
+			tempvar iMu iSigma iNu iTau mu sigma nu tau
+			ipolate nbsMSNT_mu nbsMSNT_gest_age, gen(`iMu')
+		    ipolate nbsMSNT_sigma nbsMSNT_gest_age, gen(`iSigma')
+		    ipolate nbsMSNT_nu nbsMSNT_gest_age, gen(`iNu')
+			ipolate nbsMSNT_tau nbsMSNT_gest_age, gen(`iTau')
+			
+			gen `mu'= `iMu' if `interp' == 1
+			replace `mu' = nbsMSNT_mu if `interp' == 0
+			gen `sigma'= `iSigma' if `interp' == 1
+			replace `sigma' = nbsMSNT_sigma if `interp' == 0
+			gen `nu'= `iNu' if `interp' == 1
+			replace `nu' = nbsMSNT_nu if `interp' == 0
+			gen `tau'= `iTau' if `interp' == 1
+			replace `tau' = nbsMSNT_tau if `interp' == 0
+				
+			drop nbsMSNT_gest_age nbsMSNT_sex /// 
+				nbsMSNT_mu nbsMSNT_sigma nbsMSNT_nu nbsMSNT_tau ///
+				`iMu' `iSigma' `iNu' `iTau' 
 			drop if `input' == . & `n' == .
 			sort `n'
 			drop `n'
@@ -174,7 +189,7 @@ program define _gig_nbs
 			replace `vpns_stddev' = sqrt(6.7575430) if "`acronym'" == "lfga"
 			replace `vpns_stddev' = sqrt(2.4334810) if "`acronym'" == "hcfga"
 		}
-			
+
 		if "`conversion'" == "v2p" | "`conversion'" == "v2z" {
 			tempvar q cdf p_pST3 p_out
 			qui {
@@ -287,7 +302,7 @@ program define _gig_nbs
 	else if inlist("`acronym'", "ffmfga", "bfpfga", "fmfga") {
 		tempvar y_intercept ga_coeff std_dev
 		qui {
-			replace `check_ga' = . if `gest_age' < 38 * 7 | `gest_age' > 42 * 7
+			replace `check_ga' = 0 if `gest_age' < 38 * 7 | `gest_age' > 42 * 7
 			gen `y_intercept' = ///
 				cond(`sex' == "`male'" & "`acronym'" == "fmfga", -1134.2, ///
 				cond(`sex' == "`male'" & "`acronym'" == "bfpfga", -17.68, ///
@@ -338,8 +353,7 @@ program define _gig_nbs
 			}
 		}
 	}
-	qui replace `return' = . if gest_age < 231
-    qui replace `return' = . if gest_age > 300
+  	qui replace `return' = . if `check_sex' == 0 | `check_ga' == 0
  	restore, not 
 end
 

@@ -93,7 +93,8 @@ program define _gig_png
 		replace `stddev' = 3.0582292 + (3910.05 * (`pma_weeks' ^ -2)) - ///
 			180.5625 * `pma_weeks' ^ -1 ///
 			if "`acronym'" == "hcfa"
-			
+		
+		li 
 		tempvar q p z
 		if "`conversion'" == "v2z" | "`conversion'" == "v2p" {
 			gen double `q' = `input'
