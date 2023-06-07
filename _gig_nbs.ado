@@ -71,10 +71,12 @@ program define _gig_nbs
  	} 
 	else Badsyntax_who	
 
-	tempvar check_sex check_ga
-    qui gen int `check_sex' = `sex' == "`male'" | `sex' == "`female'"
-	qui gen int `check_ga' = `gest_age' >= 168 & `gest_age' <= 300
-	
+    marksample touse
+
+	if !regexm("`:type `sex''", "str") {
+		qui tostring(`sex'), replace
+	}
+
 	qui generate `type' `return' = .
 	if inlist("`acronym'", "wfga", "lfga", "hcfga") {
 		// Find reference GAMLSS coeffecients
@@ -353,7 +355,13 @@ program define _gig_nbs
 			}
 		}
 	}
-  	qui replace `return' = . if `check_sex' == 0 | `check_ga' == 0
+	tempvar check_ga check_sex
+	qui {
+        gen `check_ga' = `gest_age' >= 168 & `gest_age' <= 300
+        gen `check_sex' = `sex' == "`male'" | `sex' == "`female'"
+        replace `return' = . ///
+  	        if  `check_ga' == 0 | `check_sex' == 0 | `touse' == 0
+    }
  	restore, not 
 end
 

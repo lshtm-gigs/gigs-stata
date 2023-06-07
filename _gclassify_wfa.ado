@@ -48,7 +48,9 @@ program define _gclassify_wfa
  		local female "`3'"
  	} 
 	else WFASex_Badsyntax	
-	
+
+	marksample touse
+
 	tempvar pma_weeks acronym z_WHO z_PNG z standard 
 	qui {
 		gen `pma_weeks' = round((`age_days' + `ga_at_birth') / 7)
@@ -70,7 +72,7 @@ program define _gclassify_wfa
 		replace `return' = 0 if abs(`z') < 2
 		replace `return' = 1 if `z' >= 2
 		replace `return' = -10 if abs(`z') > 5
-		replace `return' = . if `z' == .
+		replace `return' = . if `z' == . | `touse` == 0
 	}
 	capture label define wfa_labels -10 "implausible" ///
 		-2 "severely underweight" -1 "underweight" 0 "normal" 1 "overweight"

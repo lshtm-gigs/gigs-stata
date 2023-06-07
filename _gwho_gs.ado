@@ -72,6 +72,12 @@ program define _gwho_gs
 	} 
 	else Badsyntax_who	
 
+	if !regexm("`:type `sex''", "str") {
+		qui tostring(`sex'), replace
+	}
+
+	marksample touse
+
 	// Find reference LMS coeffecients
 	local basename = "whoLMS_" + "`acronym'" + ".dta"
 	qui findfile "`basename'"
@@ -234,19 +240,18 @@ program define _gwho_gs
 				*/ (`z' + 3) * (`_sd2neg' - `_sd3neg') + `_sd3neg' /*
 				*/ if `z' < -3
 			}
-			
 			replace `return' = `_q'
 		}
 	}
-	
 	qui {
-		tempvar check_sex check_xvar
-		gen int `check_sex' = `sex' == "`male'" | `sex' == "`female'"
+		tempvar check_xvar check_sex
 		gen int `check_xvar' = `xvar' >= `xlimlow'  & `xvar' <= `xlimhigh'
-		replace `return' = . if `check_xvar' == 0 | `check_sex' == 0
+		gen int `check_sex' = `sex' == "`male'" | `sex' == "`female'"
+		replace `return' = . ///
+		    if `check_xvar' == 0 | `check_sex' == 0 | `touse' == 0
 	}
-	
-	restore, not 
+
+	restore, not
 end
 
 program Badsyntax_who

@@ -50,14 +50,17 @@ program define _gclassify_sga
  	} 
 	else SGA_Badsyntax	
 
+    marksample touse
+
  	tempvar p_temp
 	egen `p_temp' = ig_nbs(`input', "wfga", "v2p"), ///
 		gest_age(`gest_age') sex(`sex') sexcode(m="`male'", f="`female'")
 	qui {
-	  generate `type' `return' = 0
-	  replace `return' = -1 if `p_temp' <= 0.1
-	  replace `return' = 1 if `p_temp' >= 0.9
-	  replace `return' = -2 if `p_temp' < 0.03
+	    generate `type' `return' = 0
+	    replace `return' = -1 if `p_temp' <= 0.1
+	    replace `return' = 1 if `p_temp' >= 0.9
+	    replace `return' = -2 if `p_temp' < 0.03
+	    replace `return' = . if `p_temp' == . | `touse` == 0
 	} 
 	capture label define sga_labels -2 "severely SGA" -1 "SGA" 0 "AGA" 1 "LGA"
 	label values `return' sga_labels
