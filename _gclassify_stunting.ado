@@ -105,7 +105,7 @@ program define _gclassify_stunting
 		replace `return' = -10 if `z' < -6
 		replace `return' = 0 if `z' > -2
 		replace `return' = -10 if `z' > 6
-		replace `return' = . if `z' == . | `touse` == 0
+		replace `return' = . if `z' == . | `touse' == 0
 	}
 	capture label define stunting_labels -10 "implausible" ///
 	   -2 "severe stunting"  -1 "stunting" 0 "normal"
