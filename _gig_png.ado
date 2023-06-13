@@ -1,16 +1,14 @@
 capture program drop _gig_png
-capture program drop Badsyntax
+capture program drop Badsyntax_png
 *! version 0.1.0 (SJxx-x: dmxxxx)
 program define _gig_png
  	version 16
 	preserve
 
 	gettoken type 0 : 0
-	gettoken return    0 : 0
+	gettoken return 0 : 0
 	gettoken eqs  0 : 0
-
 	gettoken paren 0 : 0, parse("(), ")
-
 	gettoken input 0 : 0, parse("(), ")
 	gettoken acronym  0 : 0, parse("(), ")
 	if `"`acronym'"' == "," {
@@ -20,7 +18,6 @@ program define _gig_png
  	if `"`conversion'"' == "," {
 		gettoken conversion  0 : 0, parse("(), ")
 	}
-	
 	gettoken paren 0 : 0, parse("(), ")
 	if `"`paren'"' != ")" {
 		error 198
@@ -57,7 +54,7 @@ program define _gig_png
 		if "`2'" ~= "=" | "`5'" ~= "=" | /*
 		*/ "`4'" ~= substr("female", 1, length("`4'")) | /*
 		*/ "`7'" ~= "" {
- 			Badsyntax
+ 			Badsyntax_png
  		}
  		local male "`3'"
   		local female "`6'"
@@ -66,14 +63,20 @@ program define _gig_png
 	    if "`2'" ~= "=" | "`5'" ~= "=" | /*
  		*/ "`4'" ~= substr("male", 1, length("`4'") | /*
  		*/ "`7'" ~= "" {
- 			Badsyntax
+ 			Badsyntax_png
  		}
  		local male "`6'"
  		local female "`3'"
  	} 
-	else Badsyntax	
-
-		qui generate `type' `return' = .
+	else Badsyntax_who	
+	
+	if !regexm("`:type `sex''", "str") {
+		qui tostring(`sex'), replace
+	}
+	
+	marksample touse
+	
+	qui generate `type' `return' = .
 	tempvar sex_as_numeric median stddev 
 	qui {
 		gen `sex_as_numeric' = 1 if `sex' == "`male'"
@@ -96,7 +99,7 @@ program define _gig_png
 		replace `stddev' = 3.0582292 + (3910.05 * (`pma_weeks' ^ -2)) - ///
 			180.5625 * `pma_weeks' ^ -1 ///
 			if "`acronym'" == "hcfa"
-			
+		
 		tempvar q p z
 		if "`conversion'" == "v2z" | "`conversion'" == "v2p" {
 			gen double `q' = `input'
@@ -117,14 +120,19 @@ program define _gig_png
 			replace `return' = `q'
 		} 
 	}
-
-	qui replace `return' = . if !(`pma_weeks' >= 27 & `pma_weeks' < 64)
-	qui replace `return' = . if !(`sex' == "`male'" | `sex' == "`female'")
+	
+	tempvar check_pma check_sex
+	qui {
+		gen `check_pma' = `pma_weeks' >= 27 & `pma_weeks' <= 64
+		gen `check_sex' = `sex' == "`male'" | `sex' == "`female'"
+	}
+	qui replace `return' = . ///
+		if `check_pma' == 0 | `check_sex' == 0 | `touse' == 0
 	
 	restore, not 
 end
 
-program Badsyntax
+program Badsyntax_png
 	di as err "sexcode() option invalid: see {help ig_png}"
 	exit 198
 end

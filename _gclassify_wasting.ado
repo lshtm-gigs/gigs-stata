@@ -17,12 +17,6 @@ program define _gclassify_wasting
 		error 198
 	}
 	
-	capture assert inlist("`type'", "str")
-	if _rc {
-	    di as error "classify_wasting() can only return a variable of type str."
-		exit 198
-	}
-	
 	if `"`by'"' != "" {
 		_egennoby classify_wasting() `"`by'"'
 		/* NOTREACHED */
@@ -78,7 +72,9 @@ program define _gclassify_wasting
  		local height "`3'"
  	} 
 	else WastingLenht_Badsyntax
-		
+
+	marksample touse
+
 	tempvar z z_height z_length
 	qui {
 		egen `z_height' = who_gs(`weight_kg', "wfh", "v2z"), ///
@@ -90,14 +86,17 @@ program define _gclassify_wasting
 		replace `z' = `z_length' if `lenht_method' == "`length'"
 		replace `z' = `z_height' if `lenht_method' == "`height'"
 		
-		gen `type' `return' = ""
-		replace `return' = "wasting" if `z' <= -2
-		replace `return' = "wasting_severe" if `z' <= -3
-		replace `return' = "normal" if abs(`z') < 2
-		replace `return' = "overweight" if `z' >= 2
-		replace `return' = "implausible" if abs(`z') > 5
-		replace `return' = "" if `z' == .
-	}
+		gen `type' `return' = .
+		replace `return' = -1 if `z' <= -2
+		replace `return' = -2 if `z' <= -3
+		replace `return' = 0 if abs(`z') < 2
+		replace `return' = 1 if `z' >= 2
+		replace `return' = -10 if abs(`z') > 5
+		replace `return' = . if `z' == . | `touse' == 0
+	}	
+	capture label define wasting_labels -10 "implausible" ///
+	    -2 "severe wasting"  -1 "wasting" 0 "normal" 1 "overweight"
+	label values `return' wasting_labels
 	restore, not
 end
 
