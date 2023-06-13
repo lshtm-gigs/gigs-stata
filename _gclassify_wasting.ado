@@ -92,7 +92,7 @@ program define _gclassify_wasting
 		replace `return' = 0 if abs(`z') < 2
 		replace `return' = 1 if `z' >= 2
 		replace `return' = -10 if abs(`z') > 5
-		replace `return' = . if `z' == . | `touse` == 0
+		replace `return' = . if `z' == . | `touse' == 0
 	}	
 	capture label define wasting_labels -10 "implausible" ///
 	    -2 "severe wasting"  -1 "wasting" 0 "normal" 1 "overweight"
