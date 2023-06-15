@@ -97,7 +97,7 @@ program define make_ig_nbs_tbl
 	}
 end
 
-foreach acronym in "wfga" "lfga" "hcfga" "wlrfga" {
+foreach acronym in "wfga" "lfga" "hcfga" "wlrfga" "bfpfga" "ffmfga" "fmfga" {
 	foreach sex in "male" "female" {
 		foreach conversion in "z2v" "p2v" {
 			local _frame = "ig_nbs_`acronym'_`conversion'_`sex'"
@@ -105,48 +105,52 @@ foreach acronym in "wfga" "lfga" "hcfga" "wlrfga" {
 			cap frame create `_frame'
 			cap frame change `_frame'
 			capture clear
-			qui set obs 133
-			capture drop gest_age
-			range gest_age 168 300
+			if inlist("`acronym'", "bfpfga", "ffmfga", "fmfga") {
+				if "`conversion'" == "z2v" {
+					continue
+				}
+				qui set obs 5
+				range gest_age 266 294
+			}
+			else {
+				qui set obs 133
+				range gest_age 168 300
+			}
 			recast int gest_age	
 			local _sex = "`sex'"
 			qui make_ig_nbs_tbl gest_age "`sex'" "`acronym'" "`conversion'"
-			if ("`conversion'" == "v2z") {
-				local _tabletype = "zscores"
+			
+			if "`conversion'" == "z2v" {
+				local colnames SD3neg SD2neg SD1neg SD0 SD1 SD2 SD3
 			}
-			if ("`conversion'" == "v2z") {
-				local _tabletype = "centiles"
+			if "`conversion'" == "p2v" {
+				local colnames P03 P05 P10 P50 P90 P95 P97
+				if inlist("`acronym'", "bfpfga", "ffmfga", "fmfga") {
+					local colnames P03 P10 P50 P90 P97
+				}
 			}
 			local path = "tests/outputs/ig_nbs/`acronym'_`conversion'_`_sex'.dta"
-			di ""
-			saveold "`path'", replace version(12)
+			cap merge 1:1 gest_age `colnames' using "`path'"
+			if _rc {
+				noi save "`path'", replace
+				continue
+			}
+			qui {
+				levelsof _merge, clean local(merge_local)
+			}
+			if "`merge_local'" != "3" {
+				di as text "Disk file not same as memory; saving."
+				keep if _merge != 2
+				drop _merge
+				noi save "`path'", replace
+				continue
+			}
+			else {
+				noi di "Disk file same as memory; not saving."
+			}
 		}
 	}
 }
 
-foreach acronym in "bfpfga" "ffmfga" "fmfga" {
-	foreach sex in "male" "female" {
-		foreach conversion in "p2v" {
-			local _frame = "ig_nbs_`acronym'_`conversion'_`sex'"
-			cap frame drop `_frame'
-			cap frame create `_frame'
-			cap frame change `_frame'
-			capture clear
-			qui set obs 5
-			capture drop gest_age
-			range gest_age 266 294
-			recast int gest_age	
-			local _sex = "`sex'"
-			qui make_ig_nbs_tbl gest_age "`sex'" "`acronym'" "`conversion'"
-			if ("`conversion'" == "v2z") {
-				local _tabletype = "zscores"
-			}
-			if ("`conversion'" == "v2z") {
-				local _tabletype = "centiles"
-			}
-			local path = "tests/outputs/ig_nbs/`acronym'_`conversion'_`_sex'.dta"
-			di ""
-			saveold "`path'", replace version(12)
-		}
-	}
-}
+qui frame change default
+qui clear

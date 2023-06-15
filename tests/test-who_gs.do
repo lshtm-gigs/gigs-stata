@@ -145,15 +145,32 @@ foreach acronym in "wfa"  "bfa" "lhfa" "hcfa" "wfh" "wfl" "acfa" "ssfa" "tsfa" {
 				recast int age_days
 				qui make_who_gs_tbl age_days "`sex'" "`acronym'" "`conversion'"
 			}
-			if ("`conversion'" == "v2z") {
-				local _tabletype = "zscores"
-			}
-			if ("`conversion'" == "v2z") {
-				local _tabletype = "centiles"
-			}
+			
 			local path = "tests/outputs/who_gs/`acronym'_`conversion'_`_sex'.dta"
-			di ""
-			saveold "`path'", replace version(12)
+			if "`conversion'" == "z2v" {
+				local colnames SD3neg SD2neg SD1neg SD0 SD1 SD2 SD3
+			}
+			if "`conversion'" == "p2v" {
+				local colnames P03 P05 P10 P50 P90 P95 P97
+			}
+			cap merge 1:1 `colnames' using "`path'"
+			if _rc {
+				noi save "`path'", replace
+				continue
+			}
+			qui {
+				levelsof _merge, clean local(merge_local)
+			}
+			if "`merge_local'" != "3" {
+				di as text "Disk file not same as memory; saving."
+				keep if _merge != 2
+				drop _merge
+				noi save "`path'", replace
+				continue
+			}
+			else {
+				noi di "Disk file same as memory; not saving."
+			}
 		}
 	}
 }
