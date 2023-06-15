@@ -1,5 +1,5 @@
-v 0.0.01
-d Materials by Simon Parker
+v 0.1.0
+d Materials by S. R. Parker
 d London School of Hygiene and Tropical Medicine
 d simon.parker@lshtm.ac.uk
 d https://www.github.com/lshtm-gigs/gigs-stata
