@@ -4,8 +4,13 @@
 // cap ssc install rsource, replace
 
 // Test conversion functions
+local outputs "tests/outputs"
+cap mkdir "`outputs'"
+
 //   1. Generate .dta files with standards using "z2v/p2v" conversions
-foreach standard in "who_gs" { // "ig_nbs" "ig_png" "who_gs" {
+foreach standard in "ig_nbs" "ig_png" "who_gs" {
+	cap mkdir "`outputs'/`standard'"
+	di ""
 	run "tests/test-`standard'.do"
 }
 

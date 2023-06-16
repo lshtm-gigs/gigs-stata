@@ -132,7 +132,7 @@ foreach acronym in "wfga" "lfga" "hcfga" "wlrfga" "bfpfga" "ffmfga" "fmfga" {
 			local path = "tests/outputs/ig_nbs/`acronym'_`conversion'_`_sex'.dta"
 			cap merge 1:1 gest_age `colnames' using "`path'"
 			if _rc {
-				noi save "`path'", replace
+				save "`path'", replace
 				continue
 			}
 			qui {
@@ -146,7 +146,7 @@ foreach acronym in "wfga" "lfga" "hcfga" "wlrfga" "bfpfga" "ffmfga" "fmfga" {
 				continue
 			}
 			else {
-				noi di "Disk file same as memory; not saving."
+				di as text "Disk file same as memory; not saving."
 			}
 		}
 	}

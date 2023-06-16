@@ -108,7 +108,7 @@ foreach acronym in "wfa" "lfa" "hcfa" {
 			}
 			cap merge 1:1 pma_weeks `colnames' using "`path'"
 			if _rc {
-				noi save "`path'", replace
+				save "`path'", replace
 				continue
 			}
 			qui {
@@ -122,7 +122,7 @@ foreach acronym in "wfa" "lfa" "hcfa" {
 				continue
 			}
 			else {
-				noi di "Disk file same as memory; not saving."
+				di as text "Disk file same as memory; not saving."
 			}
 		}
 	}

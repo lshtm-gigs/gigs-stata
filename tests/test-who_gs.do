@@ -148,14 +148,16 @@ foreach acronym in "wfa"  "bfa" "lhfa" "hcfa" "wfh" "wfl" "acfa" "ssfa" "tsfa" {
 			
 			local path = "tests/outputs/who_gs/`acronym'_`conversion'_`_sex'.dta"
 			if "`conversion'" == "z2v" {
-				local colnames SD3neg SD2neg SD1neg SD0 SD1 SD2 SD3
+				ds SD*, not
+				local colnames `r(varlist)' SD3neg SD2neg SD1neg SD0 SD1 SD2 SD3
 			}
 			if "`conversion'" == "p2v" {
-				local colnames P03 P05 P10 P50 P90 P95 P97
+				ds P*, not
+				local colnames `r(varlist)' P03 P05 P10 P50 P90 P95 P97
 			}
 			cap merge 1:1 `colnames' using "`path'"
 			if _rc {
-				noi save "`path'", replace
+				save "`path'", replace
 				continue
 			}
 			qui {
@@ -169,7 +171,7 @@ foreach acronym in "wfa"  "bfa" "lhfa" "hcfa" "wfh" "wfl" "acfa" "ssfa" "tsfa" {
 				continue
 			}
 			else {
-				noi di "Disk file same as memory; not saving."
+				di as text "Disk file same as memory; not saving."
 			}
 		}
 	}

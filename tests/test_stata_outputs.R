@@ -172,4 +172,3 @@ if (all(overall)) {
 }
 
 if (!interactive()) Sys.sleep(time = 20)
-# invisible(readline(prompt = "Press any key to continue"))
