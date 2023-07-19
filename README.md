@@ -1,8 +1,6 @@
 # gigs: Newborn and infant growth assessment in Stata
 <!-- badges: start -->
-[![Project Status: WIP – Initial development is in progress, but there
-has not yet been a stable, usable release suitable for the
-public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 <!-- badges: end -->
 
 ## About
@@ -43,7 +41,7 @@ Or you can install it directly from the SSC using `net search`:
   | `fmfga`  | Fat mass-for-gestational age               | mm    | 266 to 294 days    |
 
   </details>
-- `ig_png` - INTERGROWTH-21<sup>st</sup> standards for post-natal growth in preterm
+- `ig_png` - INTERGROWTH-21<sup>st</sup> standards for postnatal growth in preterm
   infants
   <details>
   <summary>
@@ -92,9 +90,9 @@ Standards.
 
 ![](./readme/readme_ignbs.png)
 
-### INTERGROWTH-21<sup>st</sup> post-natal growth standards
+### INTERGROWTH-21<sup>st</sup> postnatal growth standards
 This function can be used to convert between measurements and 
-z-scores/percentiles in each of the INTERGROWTH-21<sup>st</sup> Post-natal 
+z-scores/percentiles in each of the INTERGROWTH-21<sup>st</sup> Postnatal 
 Growth of Preterm Infants Standards.
 
 ![](./readme/readme_igpng.png)
@@ -192,7 +190,7 @@ contains weight measurements for term and preterm infants from birth
 We can use the conversion functions listed above to generate weight-for-age 
 z-scores (WAZs) in the different study populations (i.e. term vs preterm) and 
 measurement  timings (i.e. z-scores for newborns with 
-INTERGROWTH-21<sup>st</sup> Newborn Size Standards, WHO/INTERGROWTH Post-natal 
+INTERGROWTH-21<sup>st</sup> Newborn Size Standards, WHO/INTERGROWTH Postnatal 
 standards after birth).
 
 ```stata

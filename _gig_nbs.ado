@@ -78,6 +78,7 @@ program define _gig_nbs
 	}
 
 	qui generate `type' `return' = .
+	tempvar check_ga check_sex
 	if inlist("`acronym'", "wfga", "lfga", "hcfga") {
 		// Find reference GAMLSS coeffecients
 		local basename = "ig_nbsGAMLSS_" + "`acronym'" + ".dta"
@@ -304,7 +305,7 @@ program define _gig_nbs
 	else if inlist("`acronym'", "ffmfga", "bfpfga", "fmfga") {
 		tempvar y_intercept ga_coeff std_dev
 		qui {
-			replace `check_ga' = 0 if `gest_age' < 38 * 7 | `gest_age' > 42 * 7
+			generate `check_ga' = 0 if `gest_age' < 266 | `gest_age' > 294
 			gen `y_intercept' = ///
 				cond(`sex' == "`male'" & "`acronym'" == "fmfga", -1134.2, ///
 				cond(`sex' == "`male'" & "`acronym'" == "bfpfga", -17.68, ///
@@ -320,7 +321,7 @@ program define _gig_nbs
 				cond(`sex' == "`female'" & "`acronym'" == "fmfga", 30.7, ///
 				cond(`sex' == "`female'" & "`acronym'" == "bfpfga", 0.51, ///
 				cond(`sex' == "`female'" & "`acronym'" == "ffmfga", 105.3, ///
-				.z))))))
+				.z))))))			
 			gen `std_dev' = ///
 				cond(`sex' == "`male'" & "`acronym'" == "fmfga", 152.1593, ///
 				cond(`sex' == "`male'" & "`acronym'" == "bfpfga", 3.6674, ///
@@ -355,9 +356,8 @@ program define _gig_nbs
 			}
 		}
 	}
-	tempvar check_ga check_sex
 	qui {
-        gen `check_ga' = `gest_age' >= 168 & `gest_age' <= 300
+        cap gen `check_ga' = `gest_age' >= 168 & `gest_age' <= 300
         gen `check_sex' = `sex' == "`male'" | `sex' == "`female'"
         replace `return' = . ///
   	        if  `check_ga' == 0 | `check_sex' == 0 | `touse' == 0
