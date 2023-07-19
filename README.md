@@ -4,7 +4,7 @@
 <!-- badges: end -->
 
 ## About
-Produced as part of the Guidance for International Growth Standards project, 
+Produced as part of the Guidance for International Growth Standards (GIGS) project, 
 `gigs` provides a single, simple interface for working with the WHO Child Growth
 Standards and outputs from the INTERGROWTH-21<sup>st</sup> project. You will find functions
 for converting between anthropometric measures (e.g. weight or length) to 
@@ -12,7 +12,7 @@ z-scores and percentiles, and the inverse. Also included are functions for
 classifying newborn and infant growth according to DHS guidelines.
 
 ## Installation
-You can install `stata-gain` from GitHub using the 
+You can install `gigs-stata` from GitHub using the 
 [`github`](https://haghish.github.io/github/) module for Stata:
 ```stata
 . github install lshtm-gigs/gigs-stata
