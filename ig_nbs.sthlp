@@ -23,19 +23,19 @@
 {title:Syntax}
 
 {p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
-{cmd:ig_nbs}{cmd:(}{{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
+{cmd:ig_nbs}{cmd:(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
 {ifin}{cmd:,} 
 {cmdab:gest:_age}{cmd:(}{varname}{cmd:)} {cmdab:sex}{cmd:(}{varname}{cmd:)}
 {cmdab:sexc:ode}{cmd:(}{cmdab:m:ale=}{it:code}{cmd:,} {cmdab:f:emale=}{it:code}{cmd:)}
 
 {p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
-{cmd:ig_png}{cmd:(}{{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
+{cmd:ig_png}{cmd:(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
 {ifin}{cmd:,} 
 {cmdab:pma:_weeks}{cmd:(}{varname}{cmd:)} {cmdab:sex}{cmd:(}{varname}{cmd:)}
 {cmdab:sexc:ode}{cmd:(}{cmdab:m:ale=}{it:code}{cmd:,} {cmdab:f:emale=}{it:code}{cmd:)}
 
 {p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
-{cmd:who_gs}{cmd:(}{{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
+{cmd:who_gs}{cmd:(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
 {ifin}{cmd:,} 
 {cmdab:x:var}{cmd:(}{varname}{cmd:)} 
 {cmdab:sex}{cmd:(}{varname}{cmd:)}
@@ -89,7 +89,7 @@ also {it:fcn} dependent.
  to a z-score, centile or anthropometric measure (for example, {cmd:weight_kg},
  {cmd:headcirc_cm}).
 
-{pmore}{it:acronym} defines the INTERGROWTH-21st Post-natal Growth standard by 
+{pmore}{it:acronym} defines the INTERGROWTH-21st Postnatal Growth standard by
  which to convert the values in {varname}, and should be one of the acronyms
  listed in the {help ig_nbs##standards:Available Standards} section below.
 
@@ -134,7 +134,7 @@ must be specified by the {hi:sexcode()} option.
  newborns. Any value outside the range of valid gestational ages as specified by
  the acronym argument (see Table 1) will return a missing value.
 
-{dlgtab:INTERGROWTH-21st Post-natal Growth of Preterm Infants Standards}
+{dlgtab:INTERGROWTH-21st Postnatal Growth of Preterm Infants Standards}
 
 {phang}{opt pma:_weeks(varname numeric)} specifies post-menstrual age in whole
  weeks for infants. Any value outside the range of valid post-menstrual ages as
@@ -166,7 +166,7 @@ must be specified by the {hi:sexcode()} option.
 {col 6}{cmd:fmfga}{col 17}fat-free mass-for-GA{col 45}kg{col 57}266-294 days
 {col 5}{hline 77} 
 
-{col 5}{ul:INTERGROWTH-21st Post-natal Growth Standards for Preterm Infants}
+{col 5}{ul:INTERGROWTH-21st Postnatal Growth Standards for Preterm Infants}
 
 {col 5}{it:acronym}{col 18}Description{col 42}Measurement{col 57}{cmd:pma_weeks()} range
 {col 5}{col 45}unit

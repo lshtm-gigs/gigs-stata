@@ -73,7 +73,7 @@
 
 {p 4 4 2}{hi:classify_sga(}{varname}{cmd:)} is used to classify size for 
  gestational age in newborns according to INTERGROWTH-21st 
- weight-for-gestational age standards. It producess a variable with the 
+ weight-for-gestational age standards. It produces a variable with the
  following values and labels:
  
 {col 9}Value{col 17}Label{col 56}Centile range
@@ -89,8 +89,8 @@
  example, {cmd:weight_kg}, {cmd:mean_wgt}).
 
 {p 4 4 2}{hi:classify_stunting(}{varname}{cmd:)} is used to classify stunting in infants up to five
- years old using the INTERGROWTH-21st standards for post-natal growth or WHO
- Child Growth Standards as appropriate. It producess a variable with the 
+ years old using the INTERGROWTH-21st standards for postnatal growth or WHO
+ Child Growth Standards as appropriate. It produces a variable with the
  following values and labels:
 
 {col 20}Value{col 27}Label{col 45}{it:Z}-score range
@@ -107,7 +107,7 @@
  
 {p 4 4 2}{hi:classify_wasting(}{varname}{cmd:)} is used to classify wasting in
  infants up to five years old using the WHO Child Growth Standards for
- weight-for-length and weight-for-height as appropriate. It producess a variable
+ weight-for-length and weight-for-height as appropriate. It produces a variable
  with the following values and labels:
 
 {col 20}Value{col 27}Label{col 45}{it:Z}-score range
@@ -125,7 +125,7 @@
 
 {p 4 4 2}{hi:classify_wfa(}{varname}{cmd:)} is used to classify weight-for-age
  in infants up to five years old using the INTERGROWTH-21st standards for
- post-natal growth or WHO Child Growth Standards as appropriate. It producess a
+ postnatal growth or WHO Child Growth Standards as appropriate. It produces a
  variable with the following values and labels:
 
 {col 20}Value{col 27}Label{col 50}{it:Z}-score range
