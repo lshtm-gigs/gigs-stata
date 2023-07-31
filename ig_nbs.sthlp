@@ -107,8 +107,8 @@ also {it:fcn} dependent.
  {cmd:BMI}).
 
 {pmore}{it:acronym} defines the WHO Child Growth Standard by which to convert
- the values in {varname}, and should be one of the acronyms listed in the {help
- ig_nbs##standards:Available Standards} section below.
+ the values in {varname}, and should be one of the acronyms listed in the
+ {help ig_nbs##standards:Available Standards} section below.
 
 {pmore}{it:conversion} defines the type of conversion to be performed on
  {varname}, and must be one of {cmd:"v2z"} (value-to-z-score), {cmd:"v2p"} 
@@ -132,26 +132,32 @@ must be specified by the {hi:sexcode()} option.
 
 {phang}{opt gest:_age(varname numeric)} specifies gestational age in days for
  newborns. Any value outside the range of valid gestational ages as specified by
- the acronym argument (see Table 1) will return a missing value.
+ the acronym argument (see {help ig_nbs##tab1:Table 1}) will return a missing
+ value.
 
 {dlgtab:INTERGROWTH-21st Postnatal Growth of Preterm Infants Standards}
 
-{phang}{opt pma:_weeks(varname numeric)} specifies post-menstrual age in whole
- weeks for infants. Any value outside the range of valid post-menstrual ages as
- specified in Table 2 will return a missing value.
+{phang}{opt x:var(varname numeric)} specifies the variable used with supplied
+ sex values to standardise the measure of interest. This is usually
+ post-menstrual age (in exact weeks) but may also be length or height (in cm) if
+ using the {cmd:{bf:wfl}} standard. See {help ig_nbs##tab2:Table 2} for
+ appropriate {cmd:{it:x}} variables for each possible acronym value. Any
+ {cmd:{it:x}} variable values outside the ranges described below will return a
+ missing value.
 
 {dlgtab:WHO Child Growth Standards}
 
 {phang}{opt x:var(varname numeric)} specifies the variable used with supplied
  sex values to standardise the measure of interest. This is usually age (in days)
- but may also be length or height (in cm) if using the wfl or wfh standard. See
- Table 3 for appropriate {cmd:{it:x}} variables for each possible acronym value. Any
- {cmd:{it:x}} variable values outside the ranges described below.
+ but may also be length or height (in cm) if using either the {cmd:wfl} or
+ {cmd:wfh} standards. See {help ig_nbs##tab3:Table 3} for appropriate
+ {cmd:{it:x}} variables for each possible acronym value. Any {cmd:{it:x}}
+ variable values outside the ranges described below will return a missing value.
 
- 
 {marker standards}{...}
 {title:Available Standards}
 
+{marker tab1}{...}
 {col 5}{ul:INTERGROWTH-21st Newborn Size Standards}
 
 {col 5}{it:acronym}{col 20}Description{col 40}Measurement{col 57}{cmd:gest_age()} range
@@ -166,9 +172,10 @@ must be specified by the {hi:sexcode()} option.
 {col 6}{cmd:fmfga}{col 17}fat-free mass-for-GA{col 45}kg{col 57}266-294 days
 {col 5}{hline 77} 
 
+{marker tab2}{...}
 {col 5}{ul:INTERGROWTH-21st Postnatal Growth Standards for Preterm Infants}
 
-{col 5}{it:acronym}{col 18}Description{col 42}Measurement{col 57}{cmd:pma_weeks()} range
+{col 5}{it:acronym}{col 18}Description{col 42}Measurement{col 57}{cmd:xvar()} range
 {col 5}{col 45}unit
 {col 5}{hline 77}
 {col 6}{cmd:wfa}{col 17}weight-for-age{col 45}kg{col 57}27 to <64 exact weeks
@@ -176,6 +183,7 @@ must be specified by the {hi:sexcode()} option.
 {col 6}{cmd:hcfa}{col 13}head circumference-for-age{col 45}cm{col 57}27 to <64 exact weeks
 {col 5}{hline 77}
 
+{marker tab3}{...}
 {col 5}{ul:WHO Child Growth Standards}
 
 {col 5}{it:acronym}{col 20}Description{col 42}Measurement{col 57}{cmd:xvar()} range
@@ -196,9 +204,9 @@ must be specified by the {hi:sexcode()} option.
 {title:Remarks}
 
 {pstd}These functions will return missing values where values are outside the
- ranges given above, but otherwise will not automatically detect data errors. 
- Ensure you check your data before using these functions or you may receive
- incorrect results.
+ ranges given above, but otherwise will not automatically detect data
+ errors. Ensure you check your data before using these functions or you may
+ receive incorrect results.
 
 {marker examples}{...}
 {title:Examples}
@@ -247,7 +255,7 @@ must be specified by the {hi:sexcode()} option.
 
 {title:Also see}
 
-{p 4 14 2}Classifcation functions: {help classify_sga:documentation}
+{p 4 14 2}Classification functions: {help classify_sga:documentation}
 
 {p 4 14 2}Article:  {it:Stata Journal}, volume XX, number X: {browse "https://www.overleaf.com/project/641db63564edd62fb54c963b":st0001}
 

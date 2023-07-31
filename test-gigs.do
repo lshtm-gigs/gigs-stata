@@ -24,12 +24,12 @@ if "`c(os)'"=="MacOSX" | "`c(os)'"=="UNIX" {
 }
 else if "`c(os)'"=="Windows" { 
 	// Windows
-	local rversion "4.3.0"
+	local rversion "4.3.1"
 	rsource using "`test_rscript'", ///
 		noloutput ///
 		rpath("C:\Program Files\R\R-`rversion'\bin\x64\Rterm.exe") ///
 		roptions("--vanilla")
 }
 
-// Test classification functions
+//	3. Test classification functions
 run "tests/test-classification.do"

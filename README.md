@@ -6,19 +6,20 @@
 ## About
 Produced as part of the Guidance for International Growth Standards project, 
 `gigs` provides a single, simple interface for working with the WHO Child Growth
-Standards and outputs from the INTERGROWTH-21<sup>st</sup> project. You will find functions
-for converting between anthropometric measures (e.g. weight or length) to 
-z-scores and percentiles, and the inverse. Also included are functions for 
-classifying newborn and infant growth according to DHS guidelines.
+Standards and outputs from the INTERGROWTH-21<sup>st</sup> project. You will 
+find functions for converting between anthropometric measures (e.g. weight or 
+length) to z-scores and percentiles, and the inverse. Also included are 
+functions for classifying newborn and infant growth according to 
+literature-based cut-offs.
 
 ## Installation
-You can install `stata-gain` from GitHub using the 
+You can install `gigs-stata` from GitHub using the 
 [`github`](https://haghish.github.io/github/) module for Stata:
 ```stata
 . github install lshtm-gigs/gigs-stata
 ```
 
-Or you can install it directly from the SSC using `net search`:
+Or you can install it directly from SSC using `net install`:
 ```stata
 . net install gigs
 ```
@@ -48,11 +49,12 @@ Or you can install it directly from the SSC using `net search`:
   Component standards
   </summary>
   
-  | Acronym | Description                | Unit | `pma_weeks()` range   |
+  | Acronym | Description                | Unit | `xvar()` range        |
   |---------|----------------------------|------|-----------------------|
   | `wfa`   | weight-for-age             | kg   | 27 to <64 exact weeks |
   | `lfa`   | length-for-age             | cm   | 27 to <64 exact weeks |
   | `hcfa`  | head circumference-for-age | cm   | 27 to <64 exact weeks |
+  | `wfl`   | weight-for-length          | kg   | 35 to 65 cm           |
 
   </details>
 - `who_gs` - WHO Child Growth Standards for term infants
@@ -90,7 +92,7 @@ Standards.
 
 ![](./readme/readme_ignbs.png)
 
-### INTERGROWTH-21<sup>st</sup> postnatal growth standards
+### INTERGROWTH-21<sup>st</sup> Postnatal Growth standards
 This function can be used to convert between measurements and 
 z-scores/percentiles in each of the INTERGROWTH-21<sup>st</sup> Postnatal 
 Growth of Preterm Infants Standards.

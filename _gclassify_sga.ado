@@ -57,8 +57,8 @@ program define _gclassify_sga
 		gest_age(`gest_age') sex(`sex') sexcode(m="`male'", f="`female'")
 	qui {
 	    generate `type' `return' = 0
-	    replace `return' = -1 if `p_temp' <= 0.1
-	    replace `return' = 1 if `p_temp' >= 0.9
+	    replace `return' = -1 if `p_temp' < 0.1
+	    replace `return' = 1 if `p_temp' > 0.9
 	    replace `return' = -2 if `p_temp' < 0.03
 	    replace `return' = . if `p_temp' == . | `touse' == 0
 	} 

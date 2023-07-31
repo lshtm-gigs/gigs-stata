@@ -158,7 +158,7 @@ must be specified by the {hi:sexcode()} option.
 
 {phang}{opt gest:_age(varname numeric)} specifies gestational age in days for
  newborns. Any value outside the range of valid gestational ages as specified in
- the {help ig_nbs:ig_nbs() documentation} will return a missing value.
+ the {help ig_nbs##tab1:ig_nbs() documentation} will return a missing value.
 
 {dlgtab:Wasting classification}
 
@@ -196,7 +196,7 @@ must be specified by the {hi:sexcode()} option.
 {title:Remarks}
 
 {pstd}These functions will return missing values where values are outside the
- ranges specified for the {help ig_nbs##standards:gigs conversion functions},
+ ranges specified for the {help ig_nbs##tab1:gigs conversion functions},
  but otherwise will not automatically detect data errors. Ensure you check your 
  data before using these functions or you may receive incorrect results.
  
