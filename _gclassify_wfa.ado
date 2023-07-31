@@ -55,7 +55,7 @@ program define _gclassify_wfa
 	qui {
 		gen `pma_weeks' = round((`age_days' + `ga_at_birth') / 7)
 		egen `z_PNG' = ig_png(`weight_kg', "wfa", "v2z"), ///
-			pma_weeks(`pma_weeks') sex(`sex') sexcode(m="`male'", f="`female'")
+			xvar(`pma_weeks') sex(`sex') sexcode(m="`male'", f="`female'")
 		egen `z_WHO' = who_gs(`weight_kg', "wfa", "v2z"), xvar(`age_days') ///
 			sex(`sex') sexcode(m="`male'", f="`female'")
 	

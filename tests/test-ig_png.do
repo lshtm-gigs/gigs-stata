@@ -3,7 +3,7 @@ do "_gig_png.ado"
 
 capture program drop make_ig_png_tbl
 program define make_ig_png_tbl
- 	args _pma_weeks sex acronym conversion
+ 	args _x_var sex acronym conversion
 	tempvar _sex round
 	generate `_sex' = "`sex'" 
 	if ("`conversion'" == "z2v") {
@@ -34,8 +34,8 @@ program define make_ig_png_tbl
 			qui gen `_SD' = `SD'
 			egen double measure = ///
 				ig_png(`_SD', "`acronym'", "`conversion'"), ///
-				pma_weeks(`_pma_weeks') sex(`_sex') sexcode(m=male, f=female)
-			if ("`acronym'" == "wfa" | "`acronym'" == "wlrfga") {
+				xvar(`_x_var') sex(`_sex') sexcode(m=male, f=female)
+			if ("`acronym'" == "wfa" | "`acronym'" == "wfl") {
 				replace measure = round(measure, 0.01)
 			} 
 			else {
@@ -72,8 +72,8 @@ program define make_ig_png_tbl
 			gen double `_cent' = `cent'
 			egen double measure = ///
 				ig_png(`_cent', "`acronym'", "`conversion'"), ///
-				pma_weeks(`_pma_weeks') sex(`_sex') sexcode(m=male, f=female)
-			if ("`acronym'" == "wfa") {
+				xvar(`_x_var') sex(`_sex') sexcode(m=male, f=female)
+			if ("`acronym'" == "wfa" | "`acronym'" == "wfl") {
 				replace measure = round(measure, 0.01)
 			} 
 			else {
@@ -84,7 +84,7 @@ program define make_ig_png_tbl
 	}
 end
 
-foreach acronym in "wfa" "lfa" "hcfa" {
+foreach acronym in "wfa" "lfa" "hcfa" "wfl" {
 	foreach sex in "male" "female" {
 		foreach conversion in "z2v" "p2v" {
 			local _frame = "ig_png_`acronym'_`conversion'_`sex'"
@@ -92,12 +92,25 @@ foreach acronym in "wfa" "lfa" "hcfa" {
 			cap frame create `_frame'
 			cap frame change `_frame'
 			capture clear
-			qui set obs 38
-			capture drop pma_weeks
-			range pma_weeks 27 64
-			recast int pma_weeks
-			local _sex = "`sex'"
-			qui make_ig_png_tbl pma_weeks "`sex'" "`acronym'" "`conversion'"
+			if "`acronym'" != "wfl" {
+				qui set obs 38
+				capture drop pma_weeks
+				range pma_weeks 27 64
+				recast int pma_weeks
+				local _sex = "`sex'"
+				local xname = "pma_weeks"
+				qui make_ig_png_tbl pma_weeks "`sex'" "`acronym'" "`conversion'"
+			}
+			else {
+				cap clear
+				qui set obs 301
+				range length_cm 35 65
+				recast double length_cm
+				qui replace length_cm = round(length_cm, 0.1)
+				local _sex = "`sex'"
+				local xname = "length_cm"
+				qui make_ig_png_tbl length_cm "`sex'" "`acronym'" "`conversion'"
+			}
 			
 			local path = "tests/outputs/ig_png/`acronym'_`conversion'_`_sex'.dta"
 			if "`conversion'" == "z2v" {
@@ -106,7 +119,7 @@ foreach acronym in "wfa" "lfa" "hcfa" {
 			if "`conversion'" == "p2v" {
 				local colnames P03 P05 P10 P50 P90 P95 P97
 			}
-			cap merge 1:1 pma_weeks `colnames' using "`path'"
+			cap merge 1:1 `xname' `colnames' using "`path'"
 			if _rc {
 				save "`path'", replace
 				continue
