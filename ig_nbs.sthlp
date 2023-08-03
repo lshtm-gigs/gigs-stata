@@ -31,7 +31,7 @@
 {p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
 {cmd:ig_png}{cmd:(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
 {ifin}{cmd:,} 
-{cmdab:pma:_weeks}{cmd:(}{varname}{cmd:)} {cmdab:sex}{cmd:(}{varname}{cmd:)}
+{cmdab:x:var}{cmd:(}{varname}{cmd:)} {cmdab:sex}{cmd:(}{varname}{cmd:)}
 {cmdab:sexc:ode}{cmd:(}{cmdab:m:ale=}{it:code}{cmd:,} {cmdab:f:emale=}{it:code}{cmd:)}
 
 {p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
