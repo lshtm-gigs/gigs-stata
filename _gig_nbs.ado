@@ -70,13 +70,14 @@ program define _gig_nbs
  		local female "`3'"
  	} 
 	else Badsyntax_who	
-
+	
     marksample touse
-
+	
+	/// TODO: make this and other functions not replace the sex var with a string
 	if !regexm("`:type `sex''", "str") {
 		qui tostring(`sex'), replace
 	}
-
+	
 	qui generate `type' `return' = .
 	tempvar check_ga check_sex
 	if inlist("`acronym'", "wfga", "lfga", "hcfga") {
