@@ -108,6 +108,6 @@ end
 
 capture prog drop WastingLenht_Badsyntax
 program WastingLenht_Badsyntax
-	di as err "lenhtcode() option invalid: see {help ig_nbs}"
+	di as err "lenhtcode() option invalid: see {help classify_wasting}"
 	exit 198
 end

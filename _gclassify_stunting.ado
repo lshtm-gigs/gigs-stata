@@ -121,6 +121,6 @@ end
 
 capture prog drop StuntingLenht_Badsyntax
 program StuntingLenht_Badsyntax
-	di as err "lenhtcode() option invalid: see {help ig_nbs}"
+	di as err "lenhtcode() option invalid: see {help classify_stunting}"
 	exit 198
 end

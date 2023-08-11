@@ -82,6 +82,6 @@ end
 
 capture prog drop WFASex_Badsyntax
 program WFASex_Badsyntax
-	di as err "sexcode() option invalid: see {help ig_nbs}"
+	di as err "sexcode() option invalid: see {help classify_wfa}"
 	exit 198
 end
