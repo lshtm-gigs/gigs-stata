@@ -68,6 +68,6 @@ program define _gclassify_sga
 end
 
 program SGA_Badsyntax
-	di as err "sexcode() option invalid: see {help ig_nbs}"
+	di as err "sexcode() option invalid: see {help classify_sga}"
 	exit 198
 end

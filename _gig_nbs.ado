@@ -1,4 +1,5 @@
 capture program drop _gig_nbs
+capture program drop Badsexvar_nbs
 capture program drop Badsyntax_nbs
 *! version 0.1.0 (SJxx-x: dmxxxx)
 program define _gig_nbs
@@ -55,7 +56,7 @@ program define _gig_nbs
 		if "`2'" ~= "=" | "`5'" ~= "=" | /*
 		*/ "`4'" ~= substr("female", 1, length("`4'")) | /*
 		*/ "`7'" ~= "" {
- 			Badsyntax_who
+ 			Badsyntax_nbs
  		}
  		local male "`3'"
   		local female "`6'"
@@ -64,17 +65,25 @@ program define _gig_nbs
 	    if "`2'" ~= "=" | "`5'" ~= "=" | /*
  		*/ "`4'" ~= substr("male", 1, length("`4'") | /*
  		*/ "`7'" ~= "" {
- 			Badsyntax_who
+ 			Badsyntax_nbs
  		}
  		local male "`6'"
  		local female "`3'"
  	} 
-	else Badsyntax_who	
+	else Badsyntax_nbs
 
     marksample touse
 
-	if !regexm("`:type `sex''", "str") {
-		qui tostring(`sex'), replace
+	local sex_type = "`:type `sex''"
+	if !regexm("`sex_type'", "byte|str|int") {
+		Badsexvar_nbs
+	}
+	else {
+		local sex_was_str = .
+		if regexm("`sex_type'", "byte|int") {
+			local sex_was_str = 0
+			tostring(`sex'), replace
+		}
 	}
 
 	qui generate `type' `return' = .
@@ -357,12 +366,19 @@ program define _gig_nbs
 		}
 	}
 	qui {
-        cap gen `check_ga' = `gest_age' >= 168 & `gest_age' <= 300
+		cap gen `check_ga' = `gest_age' >= 168 & `gest_age' <= 300
         gen `check_sex' = `sex' == "`male'" | `sex' == "`female'"
-        replace `return' = . ///
+		if "`sex_was_str'" == "0" destring(`sex'), replace
+		replace `return' = . ///
   	        if  `check_ga' == 0 | `check_sex' == 0 | `touse' == 0
     }
  	restore, not 
+end
+
+program Badsexvar_nbs
+	di as err "sex() option should be a byte, int or str variable: see " /*
+	       */ "{help ig_nbs}"
+	exit 109
 end
 
 program Badsyntax_nbs

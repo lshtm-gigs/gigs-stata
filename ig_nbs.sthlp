@@ -31,7 +31,7 @@
 {p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
 {cmd:ig_png}{cmd:(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
 {ifin}{cmd:,} 
-{cmdab:pma:_weeks}{cmd:(}{varname}{cmd:)} {cmdab:sex}{cmd:(}{varname}{cmd:)}
+{cmdab:x:var}{cmd:(}{varname}{cmd:)} {cmdab:sex}{cmd:(}{varname}{cmd:)}
 {cmdab:sexc:ode}{cmd:(}{cmdab:m:ale=}{it:code}{cmd:,} {cmdab:f:emale=}{it:code}{cmd:)}
 
 {p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
@@ -58,19 +58,19 @@ also {it:fcn} dependent.
 
 {p 4 4 2}We have developed multiple functions for {cmd:egen} as part of the
  Guidance for International Growth Standards (GIGS) project. Each of these
- functions converts between anthropometric measures and z-scores/centiles, for
- a range of different growth standards.
+ functions converts between anthropometric measures and z-scores/percentiles, 
+ for a range of different growth standards.
 
 {marker functions}{...}
 {title:Functions for egen}
 
 {p 4 4 2}{hi:ig_nbs(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
- converts between newborn anthropometric data and centiles/z-scores in
+ converts between newborn anthropometric data and z-scores/percentiles in
  the INTERGROWTH-21st Newborn Size Standards. It has three arguments:
 
 {pmore}{varname} is the variable name in your dataset which you want to convert
- to a z-score, centile or anthropometric measure (for example, {cmd:weight_kg},
- {cmd:fat_mass_kg}).
+ to a z-score, percentile or anthropometric measure (for example, 
+ {cmd:weight_kg}, {cmd:fat_mass_kg}).
 
 {pmore}{it:acronym} defines the INTERGROWTH-21st Newborn Size standard by which
  to convert the values in {varname}, and should be one of the acronyms listed in
@@ -78,16 +78,16 @@ also {it:fcn} dependent.
 
 {pmore}{it:conversion} defines the type of conversion to be performed on
  {varname}, and must be one of {cmd:"v2z"} (value-to-z-score), {cmd:"v2p"} 
- (value-to-centile), {cmd:"p2v"} (centile-to-value), or {cmd:"z2v"}
+ (value-to-percentile), {cmd:"p2v"} (percentile-to-value), or {cmd:"z2v"}
  (z-score-to-value).
 
 {p 4 4 2}{hi:ig_png(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
- converts between newborn anthropometric data and centiles/z-scores in
+ converts between newborn anthropometric data and z-scores/percentiles in
  the INTERGROWTH-21st Newborn Size Standards. It has three arguments:
 
 {pmore}{varname} is the variable name in your dataset which you want to convert
- to a z-score, centile or anthropometric measure (for example, {cmd:weight_kg},
- {cmd:headcirc_cm}).
+ to a z-score, percentile or anthropometric measure (for example, 
+ {cmd:weight_kg}, {cmd:headcirc_cm}).
 
 {pmore}{it:acronym} defines the INTERGROWTH-21st Postnatal Growth standard by
  which to convert the values in {varname}, and should be one of the acronyms
@@ -95,16 +95,16 @@ also {it:fcn} dependent.
 
 {pmore}{it:conversion} defines the type of conversion to be performed on
  {varname}, and must be one of {cmd:"v2z"} (value-to-z-score), {cmd:"v2p"} 
- (value-to-centile), {cmd:"p2v"} (centile-to-value), or {cmd:"z2v"}
+ (value-to-percentile), {cmd:"p2v"} (percentile-to-value), or {cmd:"z2v"}
  (z-score-to-value).
 
 {p 4 4 2}{hi:who_gs(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
- converts between newborn anthropometric data and centiles/z-scores in
+ converts between newborn anthropometric data and z-scores/percentiles in
  the WHO Child Growth Standards. It has three arguments:
 
 {pmore}{varname} is the variable name in your dataset which you want to convert
- to a z-score, centile or anthropometric measure (for example, {cmd:armcirc_cm},
- {cmd:BMI}).
+ to a z-score, percentile or anthropometric measure (for example, 
+ {cmd:armcirc_cm}, {cmd:BMI}).
 
 {pmore}{it:acronym} defines the WHO Child Growth Standard by which to convert
  the values in {varname}, and should be one of the acronyms listed in the
@@ -112,16 +112,16 @@ also {it:fcn} dependent.
 
 {pmore}{it:conversion} defines the type of conversion to be performed on
  {varname}, and must be one of {cmd:"v2z"} (value-to-z-score), {cmd:"v2p"} 
- (value-to-centile), {cmd:"p2v"} (centile-to-value), or {cmd:"z2v"}
+ (value-to-percentile), {cmd:"p2v"} (percentile-to-value), or {cmd:"z2v"}
  (z-score-to-value).
 
 {marker options}{...}
 {title:Options}
 {dlgtab:Non-specific}
 
-{phang}{opt sex(varname)} specifies the sex variable.  It
-can be string or numeric. The codes for {cmd:male} and {cmd:female}
-must be specified by the {hi:sexcode()} option.
+{phang}{opt sex(varname)} specifies the sex variable.  It can be int, byte, or 
+ string. The codes for {cmd:male} and {cmd:female} must be specified by the 
+ {hi:sexcode()} option.
 
 {phang}{cmd:sexcode(male=}{it:code}{cmd:, female=}{it:code}{cmd:)}
  specifies the codes for {cmd:male} and {cmd:female}. The codes can be specified
@@ -211,7 +211,7 @@ must be specified by the {hi:sexcode()} option.
 {marker examples}{...}
 {title:Examples}
 
-{pstd}Getting centiles from values ({cmd: "v2p"}) in the INTERGROWTH-21st
+{pstd}Getting percentiles from values ({cmd: "v2p"}) in the INTERGROWTH-21st
  Newborn Size Standard for weight-for-gestational age ({cmd:"wfga"}), where 
  {cmd:sex} contains the codes {cmd:1} and {cmd:2}:{p_end}
 {phang2}{cmd:. egen z_wfga = ig_nbs(weight,"wfga","v2p"), gest_age(ga_weeks * 7) sex(sex) sexcode(male=1, female=2)}
@@ -257,10 +257,10 @@ must be specified by the {hi:sexcode()} option.
 
 {p 4 14 2}Classification functions: {help classify_sga:documentation}
 
-{p 4 14 2}Article:  {it:Stata Journal}, volume XX, number X: {browse "https://www.overleaf.com/project/641db63564edd62fb54c963b":st0001}
+{p 4 14 2}Article: {it:Stata Journal}, volume XX, number X: {browse "https://www.overleaf.com/project/641db63564edd62fb54c963b":st0001}
 
-{p 5 14 2}Manual:  {manlink R egen}{p_end}
+{p 5 14 2}Manual: {manlink R egen}{p_end}
 
-{p 7 14 2}Help:  {manhelp egen R}, {manhelp functions D}, {manhelp generate D}{p_end}
+{p 7 14 2}Help: {manhelp egen R}, {manhelp functions D}, {manhelp generate D}{p_end}
 
 

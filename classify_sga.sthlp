@@ -145,9 +145,9 @@
 {title:Options}
 {dlgtab:Non-specific}
 
-{phang}{opt sex(varname)} specifies the sex variable.  It
-can be string or numeric. The codes for {cmd:male} and {cmd:female}
-must be specified by the {hi:sexcode()} option.
+{phang}{opt sex(varname)} specifies the sex variable.  It can be int, byte, or 
+ string. The codes for {cmd:male} and {cmd:female} must be specified by the 
+ {hi:sexcode()} option.
 
 {phang}{cmdab:sexc:ode}{cmd:(}{cmdab:m:ale=}{it:code}{cmd:,} {cmdab:f:emale=}{it:code}{cmd:)}
  specifies the codes for {cmd:male} and {cmd:female}. The codes can be specified
@@ -237,10 +237,10 @@ must be specified by the {hi:sexcode()} option.
 
 {p 4 14 2}Conversion functions: {help ig_nbs:documentation}
 
-{p 4 14 2}Article:  {it:Stata Journal}, volume XX, number X: {browse "https://www.overleaf.com/project/641db63564edd62fb54c963b":st0001}
+{p 4 14 2}Article: {it:Stata Journal}, volume XX, number X: {browse "https://www.overleaf.com/project/641db63564edd62fb54c963b":st0001}
 
-{p 5 14 2}Manual:  {manlink R egen}{p_end}
+{p 5 14 2}Manual: {manlink R egen}{p_end}
 
-{p 7 14 2}Help:  {manhelp egen R}, {manhelp functions D}, {manhelp generate D}{p_end}
+{p 7 14 2}Help: {manhelp egen R}, {manhelp functions D}, {manhelp generate D}{p_end}
 
 
