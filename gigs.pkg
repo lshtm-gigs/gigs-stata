@@ -1,9 +1,9 @@
-v 0.1.0
+v 0.2.1
 d 'GIGS': Newborn and infant growth assessment using international growth standards
 d 
-d Produced as part of the Guidance for International Growth Standards (GIGS) project, gigs provides a single, simple interface for working with the WHO Child Growth Standards and outputs from the INTERGROWTH-21st project. You will find functions for converting between anthropometric measures (e.g. weight or length) to z-scores and percentiles, and the inverse. Also included are functions for classifying newborn and infant growth according to DHS guidelines.
+d gigs provides a single, simple interface for working with the WHO Child Growth Standards and outputs from the INTERGROWTH-21st project. You will find functions for converting between anthropometric measures (e.g. weight or length) to z-scores and percentiles, and the inverse. Also included are functions for classifying newborn and infant growth according to DHS guidelines.
 d 
-d Distribution-Date:   20230615
+d Distribution-Date:   20230811
 d License: GNU General Public License v3.0
 d 
 F _gclassify_sga.ado
