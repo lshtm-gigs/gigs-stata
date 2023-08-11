@@ -1,4 +1,5 @@
 capture program drop _gig_png
+capture program drop Badsexvar_png
 capture program drop Badsyntax_png
 *! version 0.1.0 (SJxx-x: dmxxxx)
 program define _gig_png
@@ -70,8 +71,16 @@ program define _gig_png
  	} 
 	else Badsyntax_who	
 	
-	if !regexm("`:type `sex''", "str") {
-		qui tostring(`sex'), replace
+	local sex_type = "`:type `sex''"
+	if !regexm("`sex_type'", "byte|str|int") {
+		Badsexvar_png
+	} 
+	else {
+		local sex_was_str = .
+		if regexm("`sex_type'", "byte|int") {
+			local sex_was_str = 0
+			tostring(`sex'), replace
+		}
 	}
 	
 	marksample touse
@@ -142,11 +151,17 @@ program define _gig_png
 		replace `check_pma' = `xvar' >= 35 & `xvar' <= 65 ///
 			if "`acronym'" == "wfl"
 		gen `check_sex' = `sex' == "`male'" | `sex' == "`female'"
+		if "`sex_was_str'" == "0" destring(`sex'), replace
+		replace `return' = . ///
+			if `check_pma' == 0 | `check_sex' == 0 | `touse' == 0
 	}
-	qui replace `return' = . ///
-		if `check_pma' == 0 | `check_sex' == 0 | `touse' == 0
-	
 	restore, not 
+end
+
+program Badsexvar_png
+	di as err "sex() option should be a byte, int or str variable: see " /*
+	       */ "{help ig_png}"
+	exit 109
 end
 
 program Badsyntax_png

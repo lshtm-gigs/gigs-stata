@@ -1,4 +1,5 @@
 capture program drop _gwho_gs
+capture program drop Badsexvar_who
 capture program drop Badsyntax_who
 *! version 0.1.0 (SJxx-x: dmxxxx)
 program define _gwho_gs
@@ -72,8 +73,16 @@ program define _gwho_gs
 	} 
 	else Badsyntax_who	
 
-	if !regexm("`:type `sex''", "str") {
-		qui tostring(`sex'), replace
+	local sex_type = "`:type `sex''"
+	if !regexm("`sex_type'", "byte|str|int") {
+		Badsexvar_who
+	} 
+	else {
+		local sex_was_str = .
+		if regexm("`sex_type'", "byte|int") {
+			local sex_was_str = 0
+			tostring(`sex'), replace
+		}
 	}
 
 	marksample touse
@@ -252,6 +261,12 @@ program define _gwho_gs
 	}
 
 	restore, not
+end
+
+program Badsexvar_who
+	di as err "sex() option should be a byte, int or str variable: see " /*
+	       */ "{help who_gs}"
+	exit 109
 end
 
 program Badsyntax_who
