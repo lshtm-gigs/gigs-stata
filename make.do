@@ -3,7 +3,7 @@
 // DO NOT FORGET to update the version of the package, if changed!
 // for more information visit http://github.com/haghish/github
 
-make gigs, replace toc pkg  version(0.2.0)                                   ///
+make gigs, replace toc pkg  version(0.2.1)                                   ///
      license("GNU General Public License v3.0")                              ///
      author("S. R. Parker")                                                  ///
      affiliation("London School of Hygiene and Tropical Medicine")           ///
