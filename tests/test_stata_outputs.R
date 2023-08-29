@@ -26,15 +26,15 @@ compare_ig_nbs <- function(acronym, sex, z_or_p) {
   reference <- gigs::ig_nbs[[acronym]][[sex_str]][[z_or_p_r]]
   if (sex == "M") {
     tolerance <- switch(acronym,
-           fmfga = 7.0,
-           ffmfga = 26,
-           bfpfga = 0.5,
-           0.003)
+                        fmfga = 2,
+                        ffmfga = 6,
+                        bfpfga = 0.11,
+                        0.003)
   } else if (sex == "F") {
     tolerance <- switch(acronym,
-                        fmfga = 5.0,
+                        fmfga = 0,
                         ffmfga = 1,
-                        bfpfga = 0.5,
+                        bfpfga = 0.11,
                         0.003)
   }
 
