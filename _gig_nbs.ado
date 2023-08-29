@@ -82,7 +82,7 @@ program define _gig_nbs
 		local sex_was_str = .
 		if regexm("`sex_type'", "byte|int") {
 			local sex_was_str = 0
-			tostring(`sex'), replace
+			qui tostring(`sex'), replace
 		}
 	}
 
@@ -312,40 +312,45 @@ program define _gig_nbs
 		}
 	}
 	else if inlist("`acronym'", "ffmfga", "bfpfga", "fmfga") {
-		tempvar y_intercept ga_coeff std_dev
+		tempvar mu sigma
+		qui generate `check_ga' = 0 if `gest_age' < 266 | `gest_age' > 294
+		
+		// Find reference GAMLSS coeffecients
+		local basename = "ig_nbsNORMBODYCOMP.dta"
+		qui findfile "`basename'"
+		local filepath = "`r(fn)'"
+		tempvar n
+		gen `n' = _n
+		
+		// Initialise new variables for merging
+		foreach var in sexacronym intercept x x2 x3 sigma {
+			capture confirm new var nbsBC_`var'
+			if _rc {
+				di as error "{bf:nbsMSNT_`var'} is used by ig_nbs() - rename" /* 
+				*/ as error " your variable."
+				exit 110
+			}
+		}
+		
 		qui {
-			generate `check_ga' = 0 if `gest_age' < 266 | `gest_age' > 294
-			gen `y_intercept' = ///
-				cond(`sex' == "`male'" & "`acronym'" == "fmfga", -1134.2, ///
-				cond(`sex' == "`male'" & "`acronym'" == "bfpfga", -17.68, ///
-				cond(`sex' == "`male'" & "`acronym'" == "ffmfga", -2487.6, ///
-				cond(`sex' == "`female'" & "`acronym'" == "fmfga", -840.2, ///
-				cond(`sex' == "`female'" & "`acronym'" == "bfpfga", -9.02, ///
-				cond(`sex' == "`female'" & "`acronym'" == "ffmfga", -1279, ///
-				.z))))))
-			gen `ga_coeff' = ///
-				cond(`sex' == "`male'" & "`acronym'" == "fmfga", 37.2, ///
-				cond(`sex' == "`male'" & "`acronym'" == "bfpfga", 0.69, ///
-				cond(`sex' == "`male'" & "`acronym'" == "ffmfga", 139.9, ///
-				cond(`sex' == "`female'" & "`acronym'" == "fmfga", 30.7, ///
-				cond(`sex' == "`female'" & "`acronym'" == "bfpfga", 0.51, ///
-				cond(`sex' == "`female'" & "`acronym'" == "ffmfga", 105.3, ///
-				.z))))))			
-			gen `std_dev' = ///
-				cond(`sex' == "`male'" & "`acronym'" == "fmfga", 152.1593, ///
-				cond(`sex' == "`male'" & "`acronym'" == "bfpfga", 3.6674, ///
-				cond(`sex' == "`male'" & "`acronym'" == "ffmfga", 276.2276, ///
-				cond(`sex' == "`female'" & "`acronym'" == "fmfga", 156.8411, ///
-				cond(`sex' == "`female'" & "`acronym'" == "bfpfga", 3.9405, ///
-				cond(`sex' == "`female'" & "`acronym'" == "ffmfga", 260.621, ///
-				.z))))))
+		    gen nbsBC_sexacronym = "`acronym'_M" if `sex' == "`male'"
+            replace nbsBC_sexacronym = "`acronym'_F" if `sex' == "`female'"
+			merge m:1 nbsBC_sexacronym using "`filepath'", ///
+				nogenerate keep(1 3)
+			sort `n'
+			gen `mu' = ///
+				nbsBC_intercept + ///
+				nbsBC_x * `gest_age' + ///
+				nbsBC_x2 * (`gest_age' ^ 2) + ///
+				nbsBC_x3 * (`gest_age' ^ 3)
+			gen `sigma' = nbsBC_sigma
+			drop nbsBC_* `n'
 		}
 		tempvar q p z
 		if "`conversion'" == "v2z" | "`conversion'" == "v2p" {
 			qui {
 				gen double `q' = `input'
-				gen double `z' = ///
-					(`q' - `y_intercept' - `ga_coeff'*`gest_age'/7) / `std_dev'
+				gen double `z' = (`q' - `mu') / `sigma'
 				replace `return' = `z'
 			}
 			if "`conversion'" == "v2p" {
@@ -358,8 +363,7 @@ program define _gig_nbs
 				if "`conversion'" == "p2v" {
 					qui replace `z' = invnormal(`input')  
 				}
-				gen `q' = ///
-				  `y_intercept' + `ga_coeff' * `gest_age' / 7 + `z' * `std_dev'
+				gen `q' = `mu' + (`z' * `sigma')
 				replace `q' = . if `q' < 0
 				replace `return' = `q'
 			}

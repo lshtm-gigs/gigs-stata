@@ -1,6 +1,6 @@
 // Moves and zips files into a shareable zipped version of the package. This
 // is necessary whilst we wait to make the code fully open-source.
-local version = "0.2.1"
+local version = "0.2.2"
 local zipfolder = "stata-gigs_`version'"
 cap rmdir `zipfolder'
 mkdir `zipfolder'
