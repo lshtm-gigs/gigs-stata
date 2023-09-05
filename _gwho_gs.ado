@@ -1,7 +1,7 @@
 capture program drop _gwho_gs
 capture program drop Badsexvar_who
 capture program drop Badsyntax_who
-*! version 0.1.0 (SJxx-x: dmxxxx)
+*! version 0.2.3 (SJxx-x: dmxxxx)
 program define _gwho_gs
 	version 16
 	preserve

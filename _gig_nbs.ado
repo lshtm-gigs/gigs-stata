@@ -1,7 +1,7 @@
 capture program drop _gig_nbs
 capture program drop Badsexvar_nbs
 capture program drop Badsyntax_nbs
-*! version 0.1.0 (SJxx-x: dmxxxx)
+*! version 0.2.3 (SJxx-x: dmxxxx)
 program define _gig_nbs
  	version 16
 	preserve

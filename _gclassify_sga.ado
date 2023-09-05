@@ -1,6 +1,6 @@
 capture program drop _gclassify_sga
 capture program drop SGA_Badsyntax
-*! version 0.1.0 (SJxx-x: dmxxxx)
+*! version 0.2.3 (SJxx-x: dmxxxx)
 program define _gclassify_sga
 	version 16
 	preserve
