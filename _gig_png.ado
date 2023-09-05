@@ -1,7 +1,7 @@
 capture program drop _gig_png
 capture program drop Badsexvar_png
 capture program drop Badsyntax_png
-*! version 0.1.0 (SJxx-x: dmxxxx)
+*! version 0.2.3 (SJxx-x: dmxxxx)
 program define _gig_png
  	version 16
 	preserve
@@ -86,46 +86,46 @@ program define _gig_png
 	marksample touse
 	
 	qui generate `type' `return' = .
-	tempvar sex_as_numeric median stddev 
+	tempvar sex_as_numeric mu sigma 
 	qui {
 		gen `sex_as_numeric' = 1 if `sex' == "`male'"
 		replace `sex_as_numeric' = 0 if `sex' == "`female'"
-		gen `median' = 2.591277 - 0.01155 * (`xvar' ^ 0.5) - ///
+		gen double `mu' = 2.591277 - 0.01155 * (`xvar' ^ 0.5) - ///
 			2201.705 * (`xvar' ^ -2) + 0.0911639 * `sex_as_numeric' ///
 			if "`acronym'" == "wfa"
-		replace `median' = 4.136244 - 547.0018 * (`xvar' ^ -2) + ///
+		replace `mu' = 4.136244 - 547.0018 * (`xvar' ^ -2) + ///
 			0.0026066 * `xvar' + 0.0314961 * `sex_as_numeric' ///
 			if "`acronym'" == "lfa"
-		replace `median' = 55.53617 - 852.0059 * (`xvar' ^ -1) + ///
+		replace `mu' = 55.53617 - 852.0059 * (`xvar' ^ -1) + ///
 			0.7957903 * `sex_as_numeric' ///
 			if "`acronym'" == "hcfa"
-		replace `median' = 13.98383 + 203.5677 * (`xvar' / 10) ^ -2 - ///
+		replace `mu' = 13.98383 + 203.5677 * (`xvar' / 10) ^ -2 - ///
 		    291.114 * ((`xvar' / 10)^ -2 * log(`xvar' / 10)) ///
 			if "`acronym'" == "wfl" & `sex' == "`male'"
-		replace `median' = 50.32492 + 140.8019 * (`xvar' / 10) ^ -1 - ///
+		replace `mu' = 50.32492 + 140.8019 * (`xvar' / 10) ^ -1 - ///
 		    167.906 * (`xvar' / 10) ^ -0.5 ///
 			if "`acronym'" == "wfl" & `sex' == "`female'"
 
-		gen `stddev' = 0.1470258 + 505.92394 / `xvar' ^ 2 - ///
+		gen `sigma' = 0.1470258 + 505.92394 / `xvar' ^ 2 - ///
 			140.0576 / (`xvar' ^ 2) * log(`xvar') ///
 			if "`acronym'" == "wfa" 
-		replace `stddev' = 0.050489 + (310.44761 * (`xvar' ^ -2)) - ///
+		replace `sigma' = 0.050489 + (310.44761 * (`xvar' ^ -2)) - ///
 			(90.0742 * (`xvar' ^ -2)) * log(`xvar') ///
 			if "`acronym'" == "lfa"
-		replace `stddev' = 3.0582292 + (3910.05 * (`xvar' ^ -2)) - ///
+		replace `sigma' = 3.0582292 + (3910.05 * (`xvar' ^ -2)) - ///
 			180.5625 * `xvar' ^ -1 ///
 			if "`acronym'" == "hcfa"
-		replace `stddev' = exp(-1.830098 + 0.0049708 * (`xvar' / 10) ^ 3) ///
+		replace `sigma' = exp(-1.830098 + 0.0049708 * (`xvar' / 10) ^ 3) ///
 			if "`acronym'" == "wfl" & `sex' == "`male'"
-		replace `stddev' = 0.2195888 - 0.0046046 * (`xvar' / 10) ^ 3 + ///
+		replace `sigma' = 0.2195888 - 0.0046046 * (`xvar' / 10) ^ 3 + ///
 			0.0033017 * (`xvar' / 10) ^ 3 * log(`xvar' / 10) ///
 			if "`acronym'" == "wfl" & `sex' == "`female'"
 			
 		tempvar q p z
 		if "`conversion'" == "v2z" | "`conversion'" == "v2p" {
 			gen double `q' = `input'
-			gen double `z' = (log(`q') - `median') / `stddev' 
-			replace `z' = (`q' - `median') / `stddev' ///
+			gen double `z' = (log(`q') - `mu') / `sigma' 
+			replace `z' = (`q' - `mu') / `sigma' ///
 				if inlist("`acronym'", "hcfa", "wfl")
 			replace `return' = `z'
 			if "`conversion'" == "v2p" {
@@ -137,8 +137,8 @@ program define _gig_png
 			if "`conversion'" == "p2v" {
 				replace `z' = invnormal(`input')  
 			}
-			gen `q' = exp(`median' + `z' * `stddev')
-			replace `q' = `median' + `z' * `stddev' ///
+			gen double `q' = exp(`mu' + `z' * `sigma')
+			replace `q' = `mu' + `z' * `sigma' ///
 				if inlist("`acronym'", "hcfa", "wfl")
 			replace `return' = `q'
 		} 

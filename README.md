@@ -13,15 +13,10 @@ functions for classifying newborn and infant growth according to
 literature-based cut-offs.
 
 ## Installation
-You can install `gigs-stata` from GitHub using the 
-[`github`](https://haghish.github.io/github/) module for Stata:
+You can install the latest stable release of `gigs` from GitHub using the 
+[`github` module](https://haghish.github.io/github/) for Stata:
 ```stata
 . github install lshtm-gigs/gigs-stata
-```
-
-Or you can install it directly from SSC using `net install`:
-```stata
-. net install gigs
 ```
 
 ## Available standards
@@ -42,8 +37,8 @@ Or you can install it directly from SSC using `net install`:
   | `fmfga`  | Fat mass-for-gestational age               | kg    | 266 to 294 days    |
 
   </details>
-- `ig_png` - INTERGROWTH-21<sup>st</sup> standards for postnatal growth in preterm
-  infants
+- `ig_png` - INTERGROWTH-21<sup>st</sup> standards for postnatal growth in
+  preterm infants
   <details>
   <summary>
   Component standards
@@ -79,11 +74,11 @@ Or you can install it directly from SSC using `net install`:
 
 ## Conversion functions
 Each conversion function has similar syntax. The main function call determines
-the set of standards in use, the `acronym` parameter determines which component 
-standard is being used, and the `conv` parameter determines the type of 
+the set of standards in use, the `acronym` parameter specifies which component 
+standard is being used, and the `conversion` parameter specifies the type of 
 conversion you wish to perform. The `sex()` and `sexcode()` options are used to 
 give the function sex data - as the growth standards are sex-specific, the
-standards cannot be applied without this.
+standards cannot be applied correctly without this information.
 
 ### INTERGROWTH-21<sup>st</sup> Newborn Size standards, including very preterm
 This function can be used to convert between measurements and 

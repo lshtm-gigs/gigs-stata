@@ -1,5 +1,5 @@
 capture program drop _gclassify_wasting
-*! version 0.1.0 (SJxx-x: dmxxxx)
+*! version 0.2.3 (SJxx-x: dmxxxx)
 program define _gclassify_wasting
 	version 16
 	preserve
@@ -77,21 +77,21 @@ program define _gclassify_wasting
 
 	tempvar z z_height z_length
 	qui {
-		egen `z_height' = who_gs(`weight_kg', "wfh", "v2z"), ///
+		egen double `z_height' = who_gs(`weight_kg', "wfh", "v2z"), ///
 			xvar(`lenht_cm') sex(`sex') sexcode(m="`male'", f="`female'") 
-		egen `z_length' = who_gs(`weight_kg', "wfl", "v2z"), ///
+		egen double `z_length' = who_gs(`weight_kg', "wfl", "v2z"), ///
 			xvar(`lenht_cm') sex(`sex') sexcode(m="`male'", f="`female'")
 	
-		gen `z' = .
+		gen double `z' = .
 		replace `z' = `z_length' if `lenht_method' == "`length'"
 		replace `z' = `z_height' if `lenht_method' == "`height'"
 		
 		gen `type' `return' = .
-		replace `return' = -1 if `z' <= -2
-		replace `return' = -2 if `z' <= -3
-		replace `return' = 0 if abs(`z') < 2
-		replace `return' = 1 if `z' >= 2
-		replace `return' = -10 if abs(`z') > 5
+		replace `return' = -1 if float(`z') <= -2
+		replace `return' = -2 if float(`z') <= -3
+		replace `return' = 0 if abs(float(`z')) < 2
+		replace `return' = 1 if float(`z') >= 2
+		replace `return' = -10 if abs(float(`z')) > 5
 		replace `return' = . if `z' == . | `touse' == 0
 	}	
 	capture label define wasting_labels -10 "implausible" ///

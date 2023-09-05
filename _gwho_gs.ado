@@ -1,7 +1,7 @@
 capture program drop _gwho_gs
 capture program drop Badsexvar_who
 capture program drop Badsyntax_who
-*! version 0.1.0 (SJxx-x: dmxxxx)
+*! version 0.2.3 (SJxx-x: dmxxxx)
 program define _gwho_gs
 	version 16
 	preserve
@@ -64,7 +64,7 @@ program define _gwho_gs
 	} 
 	else if "`1'" == substr("female",1,length("`1'")) {
 	    if "`2'" ~= "=" | "`5'" ~= "=" | /*
-		*/ "`4'" ~= substr("male", 1, length("`4'") | /*
+		*/ "`4'" ~= substr("male", 1, length("`4'")) | /*
 		*/ "`7'" ~= "" {
 			Badsyntax_who
 		}
@@ -180,11 +180,11 @@ program define _gwho_gs
 		ipolate whoLMS_M whoLMS_xvar, gen(`iM')
 		ipolate whoLMS_S whoLMS_xvar, gen(`iS')
 		
-		gen `L'= `iL' if `interp' == 1
+		gen double `L'= `iL' if `interp' == 1
 		replace `L' = whoLMS_L if `interp' == 0
-		gen `M'= `iM' if `interp' == 1
+		gen double `M'= `iM' if `interp' == 1
 		replace `M' = whoLMS_M if `interp' == 0
-		gen `S'= `iS' if `interp' == 1
+		gen double `S'= `iS' if `interp' == 1
 		replace `S' = whoLMS_S if `interp' == 0
 
 		drop whoLMS_xvar whoLMS_sex whoLMS_L whoLMS_M whoLMS_S ///
@@ -230,20 +230,20 @@ program define _gwho_gs
 			qui replace `z' = invnormal(`z')
 		}
 		qui {
-			gen `_q'  = ((`z' * `S' * `L' + 1) ^ (1 / `L')) * `M'
+			gen double `_q'  = ((`z' * `S' * `L' + 1) ^ (1 / `L')) * `M'
 			replace `_q' = `M' * exp(`S' * `z') if `L' == 0
 			
 			tempvar _sd3neg _sd2neg _sd2pos _sd3pos
-			gen `_sd2pos' = `M' * (1 + `L' * `S' * 2) ^ (1 / `L')
-			gen `_sd3pos' = `M' * (1 + `L' * `S' * 3) ^ (1 / `L')
+			gen double `_sd2pos' = `M' * (1 + `L' * `S' * 2) ^ (1 / `L')
+			gen double `_sd3pos' = `M' * (1 + `L' * `S' * 3) ^ (1 / `L')
 			if `z' > 3 & ("`acronym'" != "hcfa" & "`acronym'" != "lhfa") {
 				replace `_q' = /*
 				*/ (`z' - 3) * (`_sd3pos' - `_sd2pos') + `_sd3pos' /*
 				*/ if `z' > 3
 			}
 
-			gen `_sd3neg' = `M' * (1 + `L' * `S' * -3) ^ (1 / `L')
-			gen `_sd2neg' = `M' * (1 + `L' * `S' * -2) ^ (1 / `L')
+			gen double `_sd3neg' = `M' * (1 + `L' * `S' * -3) ^ (1 / `L')
+			gen double `_sd2neg' = `M' * (1 + `L' * `S' * -2) ^ (1 / `L')
 			if `z' < -3 & ("`acronym'" != "hcfa" & "`acronym'" != "lhfa") {
 				replace `_q' = /*
 				*/ (`z' + 3) * (`_sd2neg' - `_sd3neg') + `_sd3neg' /*
@@ -256,6 +256,7 @@ program define _gwho_gs
 		tempvar check_xvar check_sex
 		gen int `check_xvar' = `xvar' >= `xlimlow'  & `xvar' <= `xlimhigh'
 		gen int `check_sex' = `sex' == "`male'" | `sex' == "`female'"
+		if "`sex_was_str'" == "0" destring(`sex'), replace
 		replace `return' = . ///
 		    if `check_xvar' == 0 | `check_sex' == 0 | `touse' == 0
 	}

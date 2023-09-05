@@ -1,5 +1,5 @@
 capture program drop _gclassify_wfa
-*! version 0.1.0 (SJxx-x: dmxxxx)
+*! version 0.2.3 (SJxx-x: dmxxxx)
 program define _gclassify_wfa
 	version 16
 	preserve
@@ -53,10 +53,10 @@ program define _gclassify_wfa
 
 	tempvar pma_weeks acronym z_WHO z_PNG z standard 
 	qui {
-		gen `pma_weeks' = round((`age_days' + `ga_at_birth') / 7)
-		egen `z_PNG' = ig_png(`weight_kg', "wfa", "v2z"), ///
+		gen double `pma_weeks' = round((`age_days' + `ga_at_birth') / 7)
+		egen double `z_PNG' = ig_png(`weight_kg', "wfa", "v2z"), ///
 			xvar(`pma_weeks') sex(`sex') sexcode(m="`male'", f="`female'")
-		egen `z_WHO' = who_gs(`weight_kg', "wfa", "v2z"), xvar(`age_days') ///
+		egen double `z_WHO' = who_gs(`weight_kg', "wfa", "v2z"), xvar(`age_days') ///
 			sex(`sex') sexcode(m="`male'", f="`female'")
 	
 		gen double `z' = `z_PNG' if ///
@@ -67,11 +67,11 @@ program define _gclassify_wfa
 			`pma_weeks' >= 64
 
 		generate `type' `return' = .
-		replace `return' = -1 if `z' <= -2
-		replace `return' = -2 if `z' <= -3
-		replace `return' = 0 if abs(`z') < 2
-		replace `return' = 1 if `z' >= 2
-		replace `return' = -10 if abs(`z') > 5
+		replace `return' = -1 if float(`z') <= -2
+		replace `return' = -2 if float(`z') <= -3
+		replace `return' = 0 if float(abs(`z')) < 2
+		replace `return' = 1 if float(`z') >= 2
+		replace `return' = -10 if float(abs(`z')) > 5
 		replace `return' = . if `z' == . | `touse' == 0
 	}
 	capture label define wfa_labels -10 "implausible" ///

@@ -119,7 +119,7 @@ also {it:fcn} dependent.
 {title:Options}
 {dlgtab:Non-specific}
 
-{phang}{opt sex(varname)} specifies the sex variable.  It can be int, byte, or 
+{phang}{opt sex(varname)} specifies the sex variable. It can be int, byte, or
  string. The codes for {cmd:male} and {cmd:female} must be specified by the 
  {hi:sexcode()} option.
 
@@ -160,8 +160,8 @@ also {it:fcn} dependent.
 {marker tab1}{...}
 {col 5}{ul:INTERGROWTH-21st Newborn Size Standards}
 
-{col 5}{it:acronym}{col 20}Description{col 40}Measurement{col 57}{cmd:gest_age()} range
-{col 5}{col 43}unit
+{col 5}{it:acronym}{col 20}Description{col 41}Measurement{col 57}{cmd:gest_age()} range
+{col 5}{col 44}unit
 {col 5}{hline 77}
 {col 6}{cmd:wfga}{col 20}weight-for-GA{col 45}kg{col 57}168-300 days
 {col 6}{cmd:lfga}{col 20}length-for-GA{col 45}cm{col 57}168-300 days
@@ -178,9 +178,10 @@ also {it:fcn} dependent.
 {col 5}{it:acronym}{col 18}Description{col 42}Measurement{col 57}{cmd:xvar()} range
 {col 5}{col 45}unit
 {col 5}{hline 77}
-{col 6}{cmd:wfa}{col 17}weight-for-age{col 45}kg{col 57}27 to <64 exact weeks
-{col 6}{cmd:lfa}{col 17}length-for-age{col 45}cm{col 57}27 to <64 exact weeks
-{col 6}{cmd:hcfa}{col 13}head circumference-for-age{col 45}cm{col 57}27 to <64 exact weeks
+{col 6}{cmd:wfa}{col 17}weight-for-age{col 46}kg{col 57}27 to <64 exact weeks
+{col 6}{cmd:lfa}{col 17}length-for-age{col 46}cm{col 57}27 to <64 exact weeks
+{col 6}{cmd:hcfa}{col 13}head circumference-for-age{col 46}cm{col 57}27 to <64 exact weeks
+{col 6}{cmd:wfl}{col 16}weight-for-length{col 46}kg{col 57}35-65 cm
 {col 5}{hline 77}
 
 {marker tab3}{...}
