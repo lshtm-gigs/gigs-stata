@@ -16,7 +16,7 @@ literature-based cut-offs.
 You can install the latest stable release of `gigs` from GitHub using the 
 [`github` module](https://haghish.github.io/github/) for Stata:
 ```stata
-. github install lshtm-gigs/gigs-stata, stable
+. github install lshtm-gigs/gigs-stata
 ```
 
 ## Available standards
