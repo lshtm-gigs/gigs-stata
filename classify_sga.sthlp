@@ -31,6 +31,7 @@
 {cmd:classify_stunting}{cmd:(}{varname}{cmd:)} 
 {ifin}{cmd:,} 
 {cmdab:ga:_at_birth}{cmd:(}{varname}{cmd:)} {cmdab:age_days}{cmd:(}{varname}{cmd:)}
+{cmd:lenht_method}{cmd:(}{varname}{cmd:)} {cmdab:lenhtc:ode}{cmd:(}{cmdab:l:ength=}{it:code}{cmd:,} {cmdab:h:eight=}{it:code}{cmd:)}
 {cmdab:sex}{cmd:(}{varname}{cmd:)} {cmdab:sexc:ode}{cmd:(}{cmdab:m:ale=}{it:code}{cmd:,} {cmdab:f:emale=}{it:code}{cmd:)}
 
 {p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
@@ -145,14 +146,14 @@
 {title:Options}
 {dlgtab:Non-specific}
 
-{phang}{opt sex(varname)} specifies the sex variable.  It can be int, byte, or 
+{phang}{opt sex(varname)} specifies the sex variable. It can be int, byte, or
  string. The codes for {cmd:male} and {cmd:female} must be specified by the 
  {hi:sexcode()} option.
 
 {phang}{cmdab:sexc:ode}{cmd:(}{cmdab:m:ale=}{it:code}{cmd:,} {cmdab:f:emale=}{it:code}{cmd:)}
  specifies the codes for {cmd:male} and {cmd:female}. The codes can be specified
  in either  order, and the comma is optional. Quotes around the codes are not
- allowed, even if your sex variable is a string. 
+ allowed, even if your sex variable is a string.
 
 {dlgtab:Size-for-GA classification}
 
@@ -168,7 +169,17 @@
 {phang}{opt age_days(varname numeric)} specifies age in days for each
  observation.
 
-{dlgtab:Stunting classification}
+{phang}{opt lenht_method(varname numeric)} specifies whether recumbent length or
+ standing height were used to measure infant size for each observation. The
+ codes for {cmd:length} and {cmd:height} must be provided by the
+ {cmd:lenht_code()} option.
+
+{phang}{cmdab:lenhtc:ode}{cmd:(}{cmdab:l:ength=}{it:code}{cmd:,} {cmdab:h:eight=}{it:code}{cmd:)}
+ specifies the codes for {cmd:length} and {cmd:height}. The codes can be specified
+ in either  order, and the comma is optional. Quotes around the codes are not
+ allowed, even if your {cmd:lenht_method()} variable is a string.
+
+{dlgtab:Wasting classification}
 
 {phang}{opt lenht:_cm(varname numeric)} specifies the length or height in cm for
  each observation. The method used to obtain these values should be recorded in
@@ -178,11 +189,11 @@
  standing height were used to measure infant size for each observation. The
  codes for {cmd:length} and {cmd:height} must be provided by the
  {cmd:lenht_code()} option.
- 
+
 {phang}{cmdab:lenhtc:ode}{cmd:(}{cmdab:l:ength=}{it:code}{cmd:,} {cmdab:h:eight=}{it:code}{cmd:)}
  specifies the codes for {cmd:length} and {cmd:height}. The codes can be specified
  in either  order, and the comma is optional. Quotes around the codes are not
- allowed, even if your {cmd:lenht_method()} variable is a string. 
+ allowed, even if your {cmd:lenht_method()} variable is a string.
 
 {dlgtab:Weight-for-age classification}
 

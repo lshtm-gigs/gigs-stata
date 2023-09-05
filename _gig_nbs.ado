@@ -187,7 +187,7 @@ program define _gig_nbs
 			generate `gest_age_weeks' = .
 			replace `gest_age_weeks' = `gest_age' / 7  if `gest_age' >= 168
 				
-			generate `vpns_median' = .
+			gen double `vpns_median' = .
 			replace `vpns_median' = ///
 				-7.00303 + (1.325911 * (`gest_age_weeks' ^ 0.5)) + ///
 				(0.0571937 * `sex_as_numeric') if "`acronym'" == "wfga"
@@ -196,7 +196,7 @@ program define _gig_nbs
 				0.4263885 * `sex_as_numeric' if "`acronym'" == "lfga"
 			replace `vpns_median' = 0.7866522 + 0.887638 * `gest_age_weeks' ///
 				+ 0.2513385 * `sex_as_numeric' if "`acronym'" == "hcfga"
-			generate `vpns_stddev' = .
+			gen double `vpns_stddev' = .
 			replace `vpns_stddev' = sqrt(0.0373218) if "`acronym'" == "wfga"
 			replace `vpns_stddev' = sqrt(6.7575430) if "`acronym'" == "lfga"
 			replace `vpns_stddev' = sqrt(2.4334810) if "`acronym'" == "hcfga"
@@ -205,22 +205,23 @@ program define _gig_nbs
 		if "`conversion'" == "v2p" | "`conversion'" == "v2z" {
 			tempvar q cdf p_pST3 p_out
 			qui {
-				gen `q' = `input'
-				gen `cdf' = 2 * t(`tau', `nu' * (`q' - `mu') / `sigma') ///
+				gen double `q' = `input'
+				gen double `cdf' = ///
+					2 * t(`tau', `nu' * (`q' - `mu') / `sigma') ///
 					if `q' < `mu'		
 				replace `cdf' = 1 + 2 * `nu' ^ 2 * ///
 					(t(`tau', (`q' - `mu') / (`sigma' * `nu')) - 0.5) ///
 					if `q' >= `mu' 
-				generate `p_pST3' = `cdf' / (1 + `nu' ^ 2)
+				generate double `p_pST3' = `cdf' / (1 + `nu' ^ 2)
 			
 				tempvar p_vpns 
-				generate `p_vpns' = ///
+				generate double `p_vpns' = ///
 					normal((`q' - `vpns_median') / `vpns_stddev')
 				replace `p_vpns' = ///
 					normal((log(`q') - `vpns_median') / `vpns_stddev') ///
-					if "`acronym'" == "wfga"
+						if "`acronym'" == "wfga"
 				
-				generate `p_out' = `p_pST3' if `p_pST3' != .
+				gen double `p_out' = `p_pST3' if `p_pST3' != .
 				replace `p_out' = `p_vpns' if `p_vpns' != . & `p_pST3' == .
 				replace `return' = `p_out'
 			}
@@ -231,15 +232,15 @@ program define _gig_nbs
 		else {
 			tempvar p
 			if "`conversion'" == "p2v" {
-				qui gen `p' = `input'
+				qui gen double `p' = `input'
 			}
 			else if "`conversion'" == "z2v" {
-				qui gen `p' = normal(`input')
+				qui gen double `p' = normal(`input')
 			}
 					
 			tempvar q_qST3
 			qui {
-				generate `q_qST3' = `mu' + (`sigma' / `nu') * ///
+				gen double `q_qST3' = `mu' + (`sigma' / `nu') * ///
 					invt(`tau', `p' * (1 + `nu' ^ 2) / 2) ///
 					if `p' < (1 / (1 + `nu' ^ 2))
 				replace `q_qST3' = `mu' + (`sigma' * `nu') * ///
@@ -249,13 +250,14 @@ program define _gig_nbs
 			
 			tempvar z q_vpns
 			qui {
-				gen `z' = invnormal(`p')
-				gen `q_vpns' = `vpns_median' + invnormal(`p') * `vpns_stddev'
+				gen double `z' = invnormal(`p')
+				gen double `q_vpns' = ///
+					`vpns_median' + invnormal(`p') * `vpns_stddev'
 				replace `q_vpns' = exp(`vpns_median' + ///
 					(invnormal(`p') * `vpns_stddev')) if "`acronym'" == "wfga"
 			} 		
 			tempvar q_out
-			qui gen `q_out' = `q_qST3'
+			qui gen double `q_out' = `q_qST3'
 			qui replace `q_out' = `q_vpns' if `q_vpns' != . & `q_qST3' == .
 			qui replace `return' = `q_out'
 		}
@@ -266,9 +268,9 @@ program define _gig_nbs
 			gen byte `sex_as_numeric' = .
 			replace `sex_as_numeric' = 1 if `sex' == "`male'"
 			replace `sex_as_numeric' = 0 if `sex' == "`female'"
-			gen `ga' = `gest_age' / 7
+			gen double `ga' = `gest_age' / 7
 			
-			gen `mu' = .
+			gen double `mu' = .
 			replace `mu' = ///
 				3.400617 + (-0.0103163 * `ga' ^ 2) + ///
 				(0.0003407 * `ga' ^ 3) + (0.1382809 * `sex_as_numeric') ///
@@ -282,7 +284,7 @@ program define _gig_nbs
 				(-0.0004614 * ((`ga' ^ 3)* log(`ga'))) ///
 				if `gest_age' >= 231 & `sex' == "`female'"    
 			
-			gen `sigma' = .
+			gen double `sigma' = .
 			replace `sigma' = sqrt(0.3570057) if `gest_age' < 231
 			replace `sigma' = 1.01047 + (-0.0080948 * `ga') ///
 				if `gest_age' >= 231 & `sex' == "`male'"
@@ -306,7 +308,7 @@ program define _gig_nbs
 				if "`conversion'" == "p2v" {
 					qui replace `z' = invnormal(`input')  
 				}
-				gen `q' = `z' * `sigma' + `mu'
+				gen double `q' = `z' * `sigma' + `mu'
 				replace `return' = `q'
 			}
 		}
@@ -338,12 +340,12 @@ program define _gig_nbs
 			merge m:1 nbsBC_sexacronym using "`filepath'", ///
 				nogenerate keep(1 3)
 			sort `n'
-			gen `mu' = ///
+			gen double `mu' = ///
 				nbsBC_intercept + ///
 				nbsBC_x * `gest_age' + ///
 				nbsBC_x2 * (`gest_age' ^ 2) + ///
 				nbsBC_x3 * (`gest_age' ^ 3)
-			gen `sigma' = nbsBC_sigma
+			gen double `sigma' = nbsBC_sigma
 			drop nbsBC_* `n'
 		}
 		tempvar q p z
@@ -363,7 +365,7 @@ program define _gig_nbs
 				if "`conversion'" == "p2v" {
 					qui replace `z' = invnormal(`input')  
 				}
-				gen `q' = `mu' + (`z' * `sigma')
+				gen double `q' = `mu' + (`z' * `sigma')
 				replace `q' = . if `q' < 0
 				replace `return' = `q'
 			}

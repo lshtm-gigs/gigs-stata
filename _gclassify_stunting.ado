@@ -23,7 +23,7 @@ program define _gclassify_stunting
 	}
 
 	syntax [if] [in], GA_at_birth(varname numeric) age_days(varname numeric) /*
-		*/ sex(varname) SEXCode(string) lenht_method(varname) LENHTCode(string)
+		*/ lenht_method(varname) LENHTCode(string) sex(varname) SEXCode(string) 
 
 	local 1 `sexcode'
 	local 1 : subinstr local 1 "," " ", all
@@ -77,7 +77,7 @@ program define _gclassify_stunting
 
 	tempvar lenht_cm
 	qui {
-		generate `lenht_cm' = `input'
+		generate double `lenht_cm' = `input'
 		replace `lenht_cm' = `lenht_cm' - 0.7 ///
 			if `age_days' >= 731 & `lenht_method' == "`length'"
 		replace `lenht_cm' = `lenht_cm' + 0.7 ///
@@ -86,11 +86,11 @@ program define _gclassify_stunting
 
 	tempvar pma_weeks z_PNG z_WHO z
 	qui {
-		generate `pma_weeks' = round((`age_days' + `ga_at_birth') / 7)
-		egen `z_PNG' = ig_png(`lenht_cm', "lfa", "v2z"), ///
+		gen double `pma_weeks' = round((`age_days' + `ga_at_birth') / 7)
+		egen double `z_PNG' = ig_png(`lenht_cm', "lfa", "v2z"), ///
 			xvar(`pma_weeks') sex(`sex') sexcode(m="`male'", f="`female'")
-		egen `z_WHO' = who_gs(`lenht_cm', "lhfa", "v2z"), xvar(`age_days') ///
-			sex(`sex') sexcode(m="`male'", f="`female'")
+		egen double `z_WHO' = who_gs(`lenht_cm', "lhfa", "v2z"), ///
+			xvar(`age_days') sex(`sex') sexcode(m="`male'", f="`female'")
 
 		gen double `z' = `z_PNG' if ///
 		    `ga_at_birth' >= 182 & `ga_at_birth' < 259 & ///
@@ -100,11 +100,11 @@ program define _gclassify_stunting
 			`pma_weeks' >= 64
 		
 		generate `type' `return' = .
-		replace `return' = -1 if `z' <= -2
-		replace `return' = -2 if `z' <= -3
-		replace `return' = -10 if `z' < -6
-		replace `return' = 0 if `z' > -2
-		replace `return' = -10 if `z' > 6
+		replace `return' = -1 if float(`z') <= -2
+		replace `return' = -2 if float(`z') <= -3
+		replace `return' = -10 if float(`z') < -6
+		replace `return' = 0 if float(`z') > -2
+		replace `return' = -10 if float(`z') > 6
 		replace `return' = . if `z' == . | `touse' == 0
 	}
 	capture label define stunting_labels -10 "implausible" ///
