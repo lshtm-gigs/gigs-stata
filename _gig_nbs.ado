@@ -373,7 +373,7 @@ program define _gig_nbs
 	}
 	qui {
 		cap gen `check_ga' = `gest_age' >= 168 & `gest_age' <= 300
-        gen `check_sex' = `sex' == "`male'" | `sex' == "`female'"
+        	gen `check_sex' = `sex' == "`male'" | `sex' == "`female'"
 		if "`sex_was_str'" == "0" destring(`sex'), replace
 		replace `return' = . ///
   	        if  `check_ga' == 0 | `check_sex' == 0 | `touse' == 0
