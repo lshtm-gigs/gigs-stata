@@ -13,10 +13,16 @@ functions for classifying newborn and infant growth according to
 literature-based cut-offs.
 
 ## Installation
-You can install the latest stable release of `gigs` from GitHub using the 
-[`github` module](https://haghish.github.io/github/) for Stata:
-```stata
-. github install lshtm-gigs/gigs-stata
+You can install the latest stable release of `gigs` from GitHub using the `net install`
+command from Stata. Simply go to the **stable release** of `gigs` that you want to 
+download from the [releases](https://github.com/lshtm-gigs/gigs-stata/releases/) page 
+on GitHub, and download the zipped archive. Unzip this downloaded archive. Within this
+unzipped folder will be another folder, inside which will be the `.ado`/`.dta` files 
+needed for `gigs` to work. Put the path to the folder containing the `.ado`/`.dta` 
+files in the `from()` option of `net install`, and Stata will install the necessary 
+files.
+```
+net install gigs, from(directory/of/unzipped/folder/with/ado/files)
 ```
 
 ## Available standards
@@ -181,8 +187,6 @@ contains weight measurements for term and preterm infants from birth
 |-----------------------------------------------------------|
 ```
 
-
-
 ### Conversion
 We can use the conversion functions listed above to generate weight-for-age 
 z-scores (WAZs) in the different study populations (i.e. term vs preterm) and 
@@ -250,8 +254,6 @@ We can then combine these WAZs into one overall `waz` variable:
 |--------------------------------------------------------------------------|
 ```
 
-
-
 This `waz` variable can then be used to determine whether infants are 
 underweight at different age points, or to track the growth trajectory of
 individual children.
@@ -271,6 +273,14 @@ remove any observations which were not made at birth. We then use the
 >     gest_age(gestage) sex(sex) sexcode(m=1, f=2)
 (5 missing values generated)
 ```
+
+## Known issues and bug reporting
+For coefficient-based standards (i.e. the `who_gs()` standards and some of the `ig_nbs()`
+standards), providing floats/doubles to the `xvar()` or `gest_age()` options may result 
+in massive slowdowns. This is going to be addressed in a coming update.
+
+We kindly request that users note any bugs, issues, or feature requests on the GitHub 
+[issues page](https://github.com/lshtm-gigs/gigs-stata/issues).
 
 Authors
 ------
