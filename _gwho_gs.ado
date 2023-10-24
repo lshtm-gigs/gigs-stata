@@ -81,7 +81,7 @@ program define _gwho_gs
 		local sex_was_str = .
 		if regexm("`sex_type'", "byte|int") {
 			local sex_was_str = 0
-			tostring(`sex'), replace
+			qui tostring(`sex'), replace
 		}
 	}
 
