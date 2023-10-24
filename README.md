@@ -13,7 +13,8 @@ functions for classifying newborn and infant growth according to
 literature-based cut-offs.
 
 ## Installation
-You can install the latest stable release of `gigs` from GitHub using the 
+The `gigs` package is available for Stata version 16 and over. You can install
+the latest stable release of `gigs` from GitHub using the 
 [`github` module](https://haghish.github.io/github/) for Stata:
 ```stata
 . github install lshtm-gigs/gigs-stata
@@ -181,8 +182,6 @@ contains weight measurements for term and preterm infants from birth
 |-----------------------------------------------------------|
 ```
 
-
-
 ### Conversion
 We can use the conversion functions listed above to generate weight-for-age 
 z-scores (WAZs) in the different study populations (i.e. term vs preterm) and 
@@ -249,8 +248,6 @@ We can then combine these WAZs into one overall `waz` variable:
 | 237       238   0      .         -.712     .         .             -.712 |
 |--------------------------------------------------------------------------|
 ```
-
-
 
 This `waz` variable can then be used to determine whether infants are 
 underweight at different age points, or to track the growth trajectory of
