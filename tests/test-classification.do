@@ -71,7 +71,7 @@ foreach classification in "SGA" "Stunting" "Wasting" "WFA" {
 	if "`classification'" == "Wasting" local name "_gclassify_wasting.ado"
 	if "`classification'" == "WFA" local name "_gclassify_wfa.ado"
 	if ``classification'' != 1 {
-		di as err "{bf: `classification' failed.} Refactor `name'"
+		noi di as err "{bf: `classification' failed.} Refactor `name'".
 	}
 	else {
 		noi di as text "{bf: `classification' passed.}"

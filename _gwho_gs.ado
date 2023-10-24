@@ -1,7 +1,7 @@
 capture program drop _gwho_gs
 capture program drop Badsexvar_who
 capture program drop Badsyntax_who
-*! version 0.2.3 (SJxx-x: dmxxxx)
+*! version 0.2.4 (SJxx-x: dmxxxx)
 program define _gwho_gs
 	version 16
 	preserve
@@ -105,7 +105,7 @@ program define _gwho_gs
 	}
 	
 	if ("`acronym'" != "wfl" & "`acronym'" != "wfh") {
-		gen double whoLMS_xvar = `xvar'
+		qui gen double whoLMS_xvar = `xvar'
 		if inlist("`acronym'", "wfa", "bfa", "lhfa", "hcfa") {
 			local xlimlow = 0
 			local xlimhigh = 1856
@@ -116,8 +116,8 @@ program define _gwho_gs
 		}
 	}
 	if ("`acronym'" == "wfl" | "`acronym'" == "wfh") {
-		qui gen float whoLMS_xvar = `xvar'
-		qui replace whoLMS_xvar = round(whoLMS_xvar * 10, 1)
+		qui gen double whoLMS_xvar = `xvar'
+		qui replace whoLMS_xvar = whoLMS_xvar * 10
 		if inlist("`acronym'", "wfl") {
 			local xlimlow = 45
 			local xlimhigh = 110
@@ -130,69 +130,35 @@ program define _gwho_gs
 	qui gen byte whoLMS_sex = 1 if `sex' == "`male'"
 	qui replace whoLMS_sex = 0 if `sex' == "`female'"
 	
-	// Add empty rows (if needed) for interpolation
+	// Interpolate if needed using Mata (see interpolate_coeffs.ado)
 	tempvar interp
 	qui gen int `interp' = 0
 	qui replace `interp' = 1 if ///
 		0 != mod(whoLMS_xvar, 1) & `xvar' >= `xlimlow'  & `xvar' <= `xlimhigh'
-	qui levelsof `interp', clean local(interp_local)
-	while inlist(`interp_local', 1) == 1 {
-		forval i=1/`=_N' {
-			if `interp'[`i'] == 1 {
-				qui replace `interp' = 0 if _n == `i'
-				qui insobs 1, before(`i')
-				qui insobs 1, after(`i' + 1)
-				continue, break
-			}
-		}
-		macro drop interp_local
-		qui levelsof `interp', clean local(interp_local)
-	}
-	qui replace `interp' = 1 if ///
-		0 != mod(whoLMS_xvar, 1) & `xvar' >= `xlimlow'  & `xvar' <= `xlimhigh'
-	
-	// Replace xvar + sex if NEXT ROW contains missing LMS
-	qui replace whoLMS_xvar = floor(whoLMS_xvar[_n+1]) /*
-		*/ if 0 != mod(whoLMS_xvar[_n+1],1) /*
-		*/ & whoLMS_sex == .
-	qui replace whoLMS_sex = whoLMS_sex[_n+1] /*
-		*/ if 0 != mod(whoLMS_xvar[_n+1],1) /*
-		*/ & whoLMS_sex == . 
-	
-	// Replace xvar + sex if PREVIOUS ROW contains missing LMS
-	qui replace whoLMS_xvar = ceil(whoLMS_xvar[_n-1]) /*
-		*/ if 0 != mod(whoLMS_xvar[_n-1],1) /*
-		*/ & whoLMS_sex == .
-	qui replace whoLMS_sex = whoLMS_sex[_n-1] /*
-		*/ if 0 != mod(whoLMS_xvar[_n-1],1) /*
-		*/ & whoLMS_sex == .
-	
-	tempvar n_long
-	qui gen `n_long' = _n
 	qui merge m:1 whoLMS_xvar whoLMS_sex using "`filepath'", ///
 		nogenerate keep(1 3)
-	sort `n_long'
-	drop `n_long' 
-	 
-	qui {
-		tempvar iL iM iS L M S
-		ipolate whoLMS_L whoLMS_xvar, gen(`iL')
-		ipolate whoLMS_M whoLMS_xvar, gen(`iM')
-		ipolate whoLMS_S whoLMS_xvar, gen(`iS')
 		
-		gen double `L'= `iL' if `interp' == 1
-		replace `L' = whoLMS_L if `interp' == 0
-		gen double `M'= `iM' if `interp' == 1
-		replace `M' = whoLMS_M if `interp' == 0
-		gen double `S'= `iS' if `interp' == 1
-		replace `S' = whoLMS_S if `interp' == 0
-
-		drop whoLMS_xvar whoLMS_sex whoLMS_L whoLMS_M whoLMS_S ///
-			`interp' `iL' `iM' `iS'
-		drop if `input' == . & `n' == .
-		sort `n'
-		drop `n'
+	qui levelsof `interp', clean local(interp_local)
+	if inlist(`interp_local', 1) {
+		noi mata retrieve_coefficients("`interp'", ///
+								   "whoLMS_xvar", ///
+							       "whoLMS_sex", ///
+							       "`n'", ///
+							       "`filepath'", ///
+							       "whoLMS_L whoLMS_M whoLMS_S",
+							       "iL iM iS")
 	}
+
+	tempvar L M S
+	gen double `L' = whoLMS_L
+	// Errors were creeping in from interpolated values being extremely close to
+	// zero without being set as zero. This line replaces extremely small values
+	// in `L' with zero to ensure a correction for skewness isn't performed when
+	// unnecessary.
+	replace `L' = 0 if abs(`L') < 1.414 * 10^-16
+	gen double `M' = whoLMS_M
+	gen double `S' = whoLMS_S 
+	drop whoLMS_xvar whoLMS_sex whoLMS_L whoLMS_M whoLMS_S `interp'
 	
 	qui generate `type' `return' = .
 	if "`conversion'" == "v2p" | "`conversion'" == "v2z" {
@@ -260,7 +226,6 @@ program define _gwho_gs
 		replace `return' = . ///
 		    if `check_xvar' == 0 | `check_sex' == 0 | `touse' == 0
 	}
-
 	restore, not
 end
 

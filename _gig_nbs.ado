@@ -1,7 +1,7 @@
 capture program drop _gig_nbs
 capture program drop Badsexvar_nbs
 capture program drop Badsyntax_nbs
-*! version 0.2.3 (SJxx-x: dmxxxx)
+*! version 0.2.4 (SJxx-x: dmxxxx)
 program define _gig_nbs
  	version 16
 	preserve
@@ -105,80 +105,41 @@ program define _gig_nbs
 				exit 110
 			}
 		}
+		qui gen double nbsMSNT_gest_age = `gest_age'
+		qui gen byte nbsMSNT_sex = 1 if `sex' == "`male'"
+		qui replace nbsMSNT_sex = 0 if `sex' == "`female'"
 		
-		qui {
-			gen double nbsMSNT_gest_age = `gest_age'
-			gen byte nbsMSNT_sex = 1 if `sex' == "`male'"
-			replace nbsMSNT_sex = 0 if `sex' == "`female'"
-		}
-		
-		// Add empty rows (if needed) for interpolation
+		// Merge + interpolate if needed using Mata (see interpolate_coeffs.ado)
+		local xlimlow = 231
+		local xlimhigh = 300
 		tempvar interp
 		qui gen int `interp' = 0
 		qui replace `interp' = 1 if ///
-			0 != mod(`gest_age', 1) & `gest_age' >= 231  & `gest_age' <= 300
-		qui levelsof `interp', clean local(interp_local)
-		while inlist(`interp_local', 1) == 1 {
-			forval i=1/`=_N' {
-				if `interp'[`i'] == 1 {
-					qui replace `interp' = 0 if _n == `i'
-					qui insobs 1, before(`i')
-					qui insobs 1, after(`i' + 1)
-					continue, break
-				}
-			}
-			macro drop interp_local
-			qui levelsof `interp', clean local(interp_local)
-		}
-		qui replace `interp' = 1 if ///
-			0 != mod(`gest_age', 1) & `gest_age' >= 231  & `gest_age' <= 300
-		
-		// Replace GA + sex if NEXT ROW contains missing MSNT
-		qui replace nbsMSNT_gest_age = floor(nbsMSNT_gest_age[_n+1]) /*
-			*/ if 0 != mod(nbsMSNT_gest_age[_n+1],1) /*
-			*/ & nbsMSNT_sex == .
-		qui replace nbsMSNT_sex = nbsMSNT_sex[_n+1] /*
-			*/ if 0 != mod(nbsMSNT_gest_age[_n+1],1) /*
-			*/ & nbsMSNT_sex == . 
-		
-		// Replace GA + sex if PREVIOUS ROW contains missing MSNT
-		qui replace nbsMSNT_gest_age = ceil(nbsMSNT_gest_age[_n-1]) /*
-			*/ if 0 != mod(nbsMSNT_gest_age[_n-1],1) /*
-			*/ & nbsMSNT_sex == .
-		qui replace nbsMSNT_sex = nbsMSNT_sex[_n-1] /*
-			*/ if 0 != mod(nbsMSNT_gest_age[_n-1],1) /*
-			*/ & nbsMSNT_sex == . 
-		
-		tempvar n_long
-		qui gen `n_long' = _n
+			0 != mod(nbsMSNT_gest_age, 1) & ///
+			`gest_age' >= `xlimlow'  & `gest_age' <= `xlimhigh'
 		qui	merge m:1 nbsMSNT_gest_age nbsMSNT_sex using "`filepath'", ///
 			nogenerate keep(1 3)
-		sort `n_long'
-		drop `n_long'
-
-		qui {
-			tempvar iMu iSigma iNu iTau mu sigma nu tau
-			ipolate nbsMSNT_mu nbsMSNT_gest_age, gen(`iMu')
-		    ipolate nbsMSNT_sigma nbsMSNT_gest_age, gen(`iSigma')
-		    ipolate nbsMSNT_nu nbsMSNT_gest_age, gen(`iNu')
-			ipolate nbsMSNT_tau nbsMSNT_gest_age, gen(`iTau')
 			
-			gen `mu'= `iMu' if `interp' == 1
-			replace `mu' = nbsMSNT_mu if `interp' == 0
-			gen `sigma'= `iSigma' if `interp' == 1
-			replace `sigma' = nbsMSNT_sigma if `interp' == 0
-			gen `nu'= `iNu' if `interp' == 1
-			replace `nu' = nbsMSNT_nu if `interp' == 0
-			gen `tau'= `iTau' if `interp' == 1
-			replace `tau' = nbsMSNT_tau if `interp' == 0
-				
-			drop nbsMSNT_gest_age nbsMSNT_sex /// 
-				nbsMSNT_mu nbsMSNT_sigma nbsMSNT_nu nbsMSNT_tau ///
-				`iMu' `iSigma' `iNu' `iTau' 
-			drop if `input' == . & `n' == .
-			sort `n'
-			drop `n'
+		qui levelsof `interp', clean local(interp_local)
+		if inlist(`interp_local', 1) {
+		mata retrieve_coefficients( ///
+		  "`interp'", ///
+		  "nbsMSNT_gest_age", ///
+		  "nbsMSNT_sex", ///
+		  "`n'", ///
+		  "`filepath'", ///
+		  "nbsMSNT_mu nbsMSNT_sigma nbsMSNT_nu nbsMSNT_tau",
+		  "iMu iSigma iNu iTau")
 		}
+		tempvar mu sigma nu tau
+		qui {
+			gen double `mu' = nbsMSNT_mu
+			gen double `sigma' = nbsMSNT_sigma
+			gen double `nu' = nbsMSNT_nu
+			gen double `tau' = nbsMSNT_tau
+		}
+		drop nbsMSNT_gest_age nbsMSNT_sex nbsMSNT_mu nbsMSNT_sigma ///
+			nbsMSNT_nu nbsMSNT_tau `interp'	
 		
 		tempvar sex_as_numeric median gest_age_weeks vpns_median vpns_stddev
 		qui {

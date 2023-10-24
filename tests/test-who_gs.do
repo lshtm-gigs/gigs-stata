@@ -104,7 +104,7 @@ program define make_who_gs_tbl
 	}
 end
 
-foreach acronym in "wfa"  "bfa" "lhfa" "hcfa" "wfh" "wfl" "acfa" "ssfa" "tsfa" { // 
+foreach acronym in "wfa" "bfa" "lhfa" "hcfa" "wfh" "wfl" "acfa" "ssfa" "tsfa" {
 	foreach sex in "male" "female" {
 		foreach conversion in "p2v" "z2v" {
 			local _frame = "who_gs_`acronym'_`conversion'_`sex'"
