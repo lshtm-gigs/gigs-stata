@@ -13,16 +13,24 @@ functions for classifying newborn and infant growth according to
 literature-based cut-offs.
 
 ## Installation
-You can install the latest stable release of `gigs` from GitHub using the `net install`
-command from Stata. Simply go to the **stable release** of `gigs` that you want to 
-download from the [releases](https://github.com/lshtm-gigs/gigs-stata/releases/) page 
-on GitHub, and download the zipped archive. Unzip this downloaded archive. Within this
-unzipped folder will be another folder, inside which will be the `.ado`/`.dta` files 
-needed for `gigs` to work. Put the path to the folder containing the `.ado`/`.dta` 
-files in the `from()` option of `net install`, and Stata will install the necessary 
+The `gigs` package is available for Stata version 16 and over. You can install
+the latest stable release of `gigs` from GitHub using the 
+[`github` module](https://haghish.github.io/github/) for Stata:
+```stata
+. github install lshtm-gigs/gigs-stata
+```
+
+Alternatively, you can download a stable release of your choice from GitHub using the
+`net install` command from Stata. Simply go to the **stable release** of `gigs` that 
+you want to download from the 
+[releases](https://github.com/lshtm-gigs/gigs-stata/releases/) page on GitHub, and 
+download the zipped archive. Unzip this downloaded archive. Within this unzipped 
+folder will be another folder, inside which will be the `.ado`/`.dta` files needed
+for `gigs` to work. Put the path to the folder containing the `.ado`/`.dta` files 
+in the `from()` option of `net install`, and Stata will install the necessary 
 files.
 ```
-net install gigs, from(directory/of/unzipped/folder/with/ado/files)
+. net install gigs, from("directory/of/unzipped/folder/with/ado/files")
 ```
 
 ## Available standards

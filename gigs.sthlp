@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.2.3 05 Sep 2023}{...}
+{* *! version 0.2.4 05 Sep 2023}{...}
 {vieweralsosee "" "--"}{...}
 {vieweralsosee "gigs: Conversion functions" "help ig_nbs"}{...}
 {vieweralsosee "gigs: Classification functions" "help classify_sga"}{...}
