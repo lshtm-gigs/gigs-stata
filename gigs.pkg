@@ -13,7 +13,7 @@ F _gclassify_wfa.ado
 F _gig_nbs.ado
 F _gig_png.ado
 F _gwho_gs.ado
-F _interpolate_coeffs.ado
+F interpolate_coeffs.ado
 F classify_sga.sthlp
 F classify_stunting.sthlp
 F classify_wasting.sthlp
