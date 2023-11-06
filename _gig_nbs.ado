@@ -1,7 +1,7 @@
 capture program drop _gig_nbs
 capture program drop Badsexvar_nbs
 capture program drop Badsyntax_nbs
-*! version 0.2.4 (SJxx-x: dmxxxx)
+*! version 0.3.0 (SJxx-x: dmxxxx)
 program define _gig_nbs
  	version 16
 	preserve
@@ -109,37 +109,30 @@ program define _gig_nbs
 		qui gen byte nbsMSNT_sex = 1 if `sex' == "`male'"
 		qui replace nbsMSNT_sex = 0 if `sex' == "`female'"
 		
-		// Merge + interpolate if needed using Mata (see interpolate_coeffs.ado)
-		local xlimlow = 231
-		local xlimhigh = 300
-		tempvar interp
-		qui gen int `interp' = 0
-		qui replace `interp' = 1 if ///
-			0 != mod(nbsMSNT_gest_age, 1) & ///
-			`gest_age' >= `xlimlow'  & `gest_age' <= `xlimhigh'
-		qui	merge m:1 nbsMSNT_gest_age nbsMSNT_sex using "`filepath'", ///
-			nogenerate keep(1 3)
-			
-		qui levelsof `interp', clean local(interp_local)
-		if inlist(`interp_local', 1) {
-		mata retrieve_coefficients( ///
-		  "`interp'", ///
-		  "nbsMSNT_gest_age", ///
-		  "nbsMSNT_sex", ///
-		  "`n'", ///
-		  "`filepath'", ///
-		  "nbsMSNT_mu nbsMSNT_sigma nbsMSNT_nu nbsMSNT_tau",
-		  "iMu iSigma iNu iTau")
-		}
-		tempvar mu sigma nu tau
+		// Append, then interpolate in Mata (see gigs_ipolate_coeffs.ado)
 		qui {
+			tempvar n appended need_interp
+			qui append using "`filepath'", gen(`appended')
+			gen `n' = _n
+			gen `need_interp' = 0
+			replace `need_interp' = `appended' == 0
+			mata gigs_ipolate_coeffs(
+				"nbsMSNT_gest_age", ///
+				"nbsMSNT_sex", ///
+				"nbsMSNT_mu nbsMSNT_sigma nbsMSNT_nu nbsMSNT_tau", ///
+				"`n'", ///
+				"`need_interp'", ///
+				"`appended'" ///
+			)
+			drop if `appended' == 1
+			tempvar mu sigma nu tau
 			gen double `mu' = nbsMSNT_mu
 			gen double `sigma' = nbsMSNT_sigma
 			gen double `nu' = nbsMSNT_nu
 			gen double `tau' = nbsMSNT_tau
+			drop nbsMSNT_gest_age nbsMSNT_sex nbsMSNT_mu nbsMSNT_sigma ///
+				nbsMSNT_nu nbsMSNT_tau `interp'	
 		}
-		drop nbsMSNT_gest_age nbsMSNT_sex nbsMSNT_mu nbsMSNT_sigma ///
-			nbsMSNT_nu nbsMSNT_tau `interp'	
 		
 		tempvar sex_as_numeric median gest_age_weeks vpns_median vpns_stddev
 		qui {
