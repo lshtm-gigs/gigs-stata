@@ -112,7 +112,7 @@ compare_who_gs <- function(acronym, sex, z_or_p) {
     "percentiles"
   }
   reference <- gigs::who_gs[[acronym]][[sex_str]][[z_or_p_r]]
-  tolerance <- 10e-4
+  tolerance <- 10e-5
 
   if (!all(is.na(stata)) & !is.null(reference)) {
     cat("\t")
@@ -152,7 +152,7 @@ compare_interpolation <- function(standard, acronym, sex) {
     dplyr::mutate(r_col = eval(gigs_expr),
                   difference = r_col - stata_col)
 
-  tolerance <- 0.0001
+  tolerance <- testthat::testthat_tolerance()
   stata <- tbl$stata_col
   reference <- tbl$r_col
   nice_standard <- toupper(stringr::str_replace(standard, "_", " "))
