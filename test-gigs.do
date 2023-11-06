@@ -3,8 +3,9 @@
 // 0. Load in all scripts as most recent version --> i.e. NOT a version of gigs 
 // from `net install'.
 clear all
-foreach file in "_gclassify_sga.ado" "_gclassify_stunting.ado" ///
-				"_gclassify_wasting.ado" "_gclassify_wfa.ado" ///
+foreach file in "_gclassify_sga.ado" "_gclassify_svn.ado" ///
+				"_gclassify_stunting.ado" "_gclassify_wasting.ado" ///
+				"_gclassify_wfa.ado" ///
 				"_gig_nbs.ado" "_gig_png.ado" "_gwho_gs.ado" ///
 				"interpolate_coeffs.ado" {
 	run "`file'"

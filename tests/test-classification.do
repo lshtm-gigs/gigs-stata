@@ -14,6 +14,20 @@ else {
 	local SGA "1"
 }
 
+// Test SVN
+cap frame drop classify_svn
+cap frame create classify_svn
+cap frame change classify_svn
+use "`test_data'/tester_svn.dta", clear
+qui do "_gclassify_svn.ado"
+egen svn = classify_svn(weight_kg), gest_age(gest_age) sex(sex) sexcode(m=M, f=F)
+if inlist(svn == svn_expected, 0) {
+	local SVN "0"
+}
+else {
+	local SVN "1"
+}
+
 // Test stunting
 capture frame drop classify_stunting
 frame create classify_stunting
@@ -65,8 +79,9 @@ else {
 
 cap frame change default 
 cap frame drop classify_*
-foreach classification in "SGA" "Stunting" "Wasting" "WFA" {
+foreach classification in "SGA" "SVN" "Stunting" "Wasting" "WFA" {
 	if "`classification'" == "SGA" local name "_gclassify_sga.ado"
+	if "`classification'" == "SVN" local name "_gclassify_svn.ado"
 	if "`classification'" == "Stunting" local name "_gclassify_stunting.ado"
 	if "`classification'" == "Wasting" local name "_gclassify_wasting.ado"
 	if "`classification'" == "WFA" local name "_gclassify_wfa.ado"

@@ -28,6 +28,12 @@
 {cmdab:sexc:ode}{cmd:(}{cmdab:m:ale=}{it:code}{cmd:,} {cmdab:f:emale=}{it:code}{cmd:)}
 
 {p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
+{cmd:classify_svn}{cmd:(}{varname}{cmd:)} 
+{ifin}{cmd:,} 
+{cmdab:gest:_age}{cmd:(}{varname}{cmd:)} {cmdab:sex}{cmd:(}{varname}{cmd:)}
+{cmdab:sexc:ode}{cmd:(}{cmdab:m:ale=}{it:code}{cmd:,} {cmdab:f:emale=}{it:code}{cmd:)}
+
+{p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
 {cmd:classify_stunting}{cmd:(}{varname}{cmd:)} 
 {ifin}{cmd:,} 
 {cmdab:ga:_at_birth}{cmd:(}{varname}{cmd:)} {cmdab:age_days}{cmd:(}{varname}{cmd:)}
@@ -88,11 +94,28 @@
 
 {pmore}{varname} is the variable name for newborn weight in your dataset (for
  example, {cmd:weight_kg}, {cmd:mean_wgt}).
+ 
+{p 4 4 2}{hi:classify_sga(}{varname}{cmd:)} is used to classify small 
+ vulnerable newborns according to the methods of the Lancet's 2023 Small 
+ Vulnerable Newborn Series. It produces a variable with the following values and
+ labels:
+ 
+{col 9}Value{col 17}Label{col 56}Centile range{col 80}Term status
+{col 9}{hline 68}
+{col 10}{cmd:-2}{col 17}Preterm SGA{col 56}<10th centile{col 80}Preterm
+{col 10}{cmd:-1}{col 17}Preterm non-SGA{col 56}>=10th centile{col 80}Preterm
+{col 11}{cmd:0}{col 17}Term SGA{col 56}<10th centile{col 80}Term
+{col 11}{cmd:1}{col 17}Term non-SGA{col 56}>=10th centile{col 80}Term
+ 
+{pmore}This function takes one argument:
 
-{p 4 4 2}{hi:classify_stunting(}{varname}{cmd:)} is used to classify stunting in infants up to five
- years old using the INTERGROWTH-21st standards for postnatal growth or WHO
- Child Growth Standards as appropriate. It produces a variable with the
- following values and labels:
+{pmore}{varname} is the variable name for newborn weight in your dataset (for
+ example, {cmd:weight_kg}, {cmd:mean_wgt}).
+
+{p 4 4 2}{hi:classify_stunting(}{varname}{cmd:)} is used to classify stunting in
+ infants up to five years old using the INTERGROWTH-21st standards for postnatal
+ growth or WHO Child Growth Standards as appropriate. It produces a variable 
+ with the following values and labels:
 
 {col 20}Value{col 27}Label{col 45}{it:Z}-score range
 {col 20}{hline 38}
