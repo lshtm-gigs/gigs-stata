@@ -10,7 +10,7 @@
 {viewerjumpto "Remarks" "ig_nbs##remarks"}{...}
 {viewerjumpto "Examples" "ig_nbs##examples"}{...}
 
-{hi:help classify_sga, help classify_stunting, help classify_wasting, help classify_wfa}{right: ({browse "https://www.overleaf.com/project/641db63564edd62fb54c963b":SJXX-X: st0001})}
+{hi:help classify_sga, help classify_svn, help classify_stunting, help classify_wasting, help classify_wfa}{right: ({browse "https://www.overleaf.com/project/641db63564edd62fb54c963b":SJXX-X: st0001})}
 {hline}
 
 {title:Title}
@@ -72,8 +72,8 @@
 {p 4 4 2}We have developed multiple functions for {cmd:egen}, as part of the
  Guidance for International Growth Standards (GIGS) project. Each of the
  functions described in this help file are used to classify growth indicators
- from anthropometric data, namely size-for-gestational age, stunting, wasting,
- and underweight.
+ from anthropometric data, namely size-for-gestational age, small vulnerable
+ newborn (SVN) types, stunting, wasting, and underweight/weight-for-age.
 
 {marker functions}{...}
 {title:Functions for egen}
@@ -95,17 +95,17 @@
 {pmore}{varname} is the variable name for newborn weight in your dataset (for
  example, {cmd:weight_kg}, {cmd:mean_wgt}).
  
-{p 4 4 2}{hi:classify_sga(}{varname}{cmd:)} is used to classify small 
- vulnerable newborns according to the methods of the Lancet's 2023 Small 
- Vulnerable Newborn Series. It produces a variable with the following values and
- labels:
+{p 4 4 2}{hi:classify_sn(}{varname}{cmd:)} is used to classify small
+ vulnerable newborns according to both their term status and
+ size-for-gestational age in the INTERGROWTH-21st weight-for-gestational age
+ standards. It produces a variable with the following values and labels:
  
-{col 9}Value{col 17}Label{col 56}Centile range{col 80}Term status
+{col 9}Value{col 17}Label{col 38}Term status{col 56}Centile range
 {col 9}{hline 68}
-{col 10}{cmd:-2}{col 17}Preterm SGA{col 56}<10th centile{col 80}Preterm
-{col 10}{cmd:-1}{col 17}Preterm non-SGA{col 56}>=10th centile{col 80}Preterm
-{col 11}{cmd:0}{col 17}Term SGA{col 56}<10th centile{col 80}Term
-{col 11}{cmd:1}{col 17}Term non-SGA{col 56}>=10th centile{col 80}Term
+{col 10}{cmd:-2}{col 17}Preterm SGA{col 38}Preterm{col 56}<10th centile
+{col 10}{cmd:-1}{col 17}Preterm non-SGA{col 38}Preterm{col 56}>=10th centile
+{col 11}{cmd:0}{col 17}Term SGA{col 38}Term{col 56}<10th centile
+{col 11}{cmd:1}{col 17}Term non-SGA{col 38}Term{col 56}>=10th centile
  
 {pmore}This function takes one argument:
 
@@ -178,7 +178,7 @@
  in either  order, and the comma is optional. Quotes around the codes are not
  allowed, even if your sex variable is a string.
 
-{dlgtab:Size-for-GA classification}
+{dlgtab:Size-for-GA/SVN classification}
 
 {phang}{opt gest:_age(varname numeric)} specifies gestational age in days for
  newborns. Any value outside the range of valid gestational ages as specified in
@@ -202,7 +202,7 @@
  in either  order, and the comma is optional. Quotes around the codes are not
  allowed, even if your {cmd:lenht_method()} variable is a string.
 
-{dlgtab:Wasting classification}
+{dlgtab:Stunting classification}
 
 {phang}{opt lenht:_cm(varname numeric)} specifies the length or height in cm for
  each observation. The method used to obtain these values should be recorded in
