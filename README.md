@@ -4,11 +4,11 @@
 <!-- badges: end -->
 
 ## About
-Produced as part of the Guidance for International Growth Standards (GIGS) project, 
-`gigs` provides a single, simple interface for working with the WHO Child Growth
-Standards and outputs from the INTERGROWTH-21<sup>st</sup> project. You will 
-find functions for converting between anthropometric measures (e.g. weight or 
-length) to z-scores and centiles, and the inverse. Also included are 
+Produced as part of the Guidance for International Growth Standards (GIGS) 
+project, `gigs` provides a single, simple interface for working with the WHO 
+Child Growth Standards and outputs from the INTERGROWTH-21<sup>st</sup> project.
+You will find functions for converting between anthropometric measures (e.g. 
+weight or length) to z-scores and centiles, and the inverse. Also included are 
 functions for classifying newborn and infant growth according to 
 literature-based cut-offs.
 
@@ -90,9 +90,11 @@ files.
 Each conversion function has similar syntax. The main function call determines
 the set of standards in use, the `acronym` parameter specifies which component 
 standard is being used, and the `conversion` parameter specifies the type of 
-conversion you wish to perform. The `sex()` and `sexcode()` options are used to 
-give the function sex data - as the growth standards are sex-specific, the
-standards cannot be applied correctly without this information.
+conversion you wish to perform. This `conversion` parameter can take one of four
+values: `"v2z"` (value-to-z-score), `"v2c"` (value-to-centile), `"z2v"` 
+(z-score-to-value), `"c2v"` (centile-to-value). The `sex()` and `sexcode()` 
+options are used to  give the function sex data - as the growth standards are 
+sex-specific, the standards cannot be applied correctly without this information.
 
 ### INTERGROWTH-21<sup>st</sup> Newborn Size standards, including very preterm
 This function can be used to convert between measurements and 
@@ -121,7 +123,8 @@ cut-offs. These publications are discussed in the attached [paper]().
 #### Size for gestational age
 ![](./readme/readme_csga.png)
 
-This function outputs a variable with the following values and labels:
+This function outputs a variable with the following values and labels. Severely
+SGA infants are only labelled if the `severe` option is specified:
 
 | Value | Meaning                               | Centile range                      |
 |-------|---------------------------------------|------------------------------------|
@@ -130,10 +133,26 @@ This function outputs a variable with the following values and labels:
 | 0     | Appropriate for gestational age (AGA) | 10<sup>th</sup> to 90<sup>th</sup> |
 | 1     | Large for gestational age (LGA)       | \>90<sup>th</sup>                  |
 
+#### Small vulnerable newborns
+![](./readme/readme_csvn.png)
+
+This function outputs a variable with the following values and labels:
+
+| Value | Meaning     | Term Status | Centile range                      |
+|-------|-------------|-------------|------------------------------------|
+| -4    | Preterm SGA | Preterm     | <10<sup>th</sup>                   |
+| -3    | Preterm AGA | Preterm     | 10<sup>th</sup> to 90<sup>th</sup> |
+| -2    | Preterm LGA | Preterm     | \>90<sup>th</sup>                  |
+| -1    | Term    SGA | Term        | <10<sup>th</sup>                   |
+| 0     | Term    AGA | Term        | 10<sup>th</sup> to 90<sup>th</sup> |
+| 1     | Term    LGA | Term        | \>90<sup>th</sup>                  |
+
+
 #### Stunting
 ![](./readme/readme_cstunting.png)
 
-The function outputs a variable with the following values and labels:
+The function outputs a variable with the following values and labels. Outlier
+observations are only labelled if the `outliers` option is specified:
 
 | Value | Meaning         | Z-score range |
 |-------|-----------------|---------------|
@@ -145,7 +164,8 @@ The function outputs a variable with the following values and labels:
 #### Wasting
 ![](./readme/readme_cwasting.png)
 
-The function outputs a variable with the following values and labels:
+The function outputs a variable with the following values and labels. Outlier
+observations are only labelled if the `outliers` option is specified:
 
 | Value | Meaning        | Z-score range |
 |-------|----------------|---------------|
@@ -158,7 +178,8 @@ The function outputs a variable with the following values and labels:
 #### Weight-for-age
 ![](./readme/readme_cwfa.png)
 
-The function outputs a variable with the following values and labels:
+The function outputs a variable with the following values and labels. Outlier
+observations are only labelled if the `outliers` option is specified:
 
 | Value | Meaning              | Z-score range |
 |-------|----------------------|---------------|
@@ -283,10 +304,6 @@ remove any observations which were not made at birth. We then use the
 ```
 
 ## Known issues and bug reporting
-For coefficient-based standards (i.e. the `who_gs()` standards and some of the `ig_nbs()`
-standards), providing floats/doubles to the `xvar()` or `gest_days()` options may result 
-in massive slowdowns. This is going to be addressed in a coming update.
-
 We kindly request that users note any bugs, issues, or feature requests on the GitHub 
 [issues page](https://github.com/lshtm-gigs/gigs-stata/issues).
 
