@@ -1,7 +1,7 @@
 capture program drop _gig_png
 capture program drop Badsexvar_png
 capture program drop Badsyntax_png
-*! version 0.2.4 (SJxx-x: dmxxxx)
+*! version 0.3.0 (SJxx-x: dmxxxx)
 program define _gig_png
  	version 16
 	preserve
@@ -31,21 +31,22 @@ program define _gig_png
 		*/ "or" as text " wfl" as error "."
 		exit 198
 	}
-	capture assert inlist("`conversion'", "v2p", "v2z", "p2v", "z2v")
+	capture assert inlist("`conversion'", "v2c", "v2z", "c2v", "z2v")
 	if _rc {
 		di as text "`conversion'" as error " is an invalid chart code. The " /*
-		*/ as error "only valid choices are " as text "v2p, v2z, p2v," as /*
+		*/ as error "only valid choices are " as text "v2c, v2z, c2v," as /*
 		*/ error " or " as text "z2v" as error "."
 		exit 198
 	}
+	
+	syntax [if] [in], Xvar(varname numeric) sex(varname) SEXCode(string) /*
+		*/ [BY(string)]
 	
 	if `"`by'"' != "" {
 		_egennoby ig_png() `"`by'"'
 		/* NOTREACHED */
 	}
-	
-	syntax [if] [in], Xvar(varname numeric) sex(varname) SEXCode(string)
-	
+		
 	local 1 `sexcode'
 	*zap commas to spaces (i.e. commas indulged)
 	local 1 : subinstr local 1 "," " ", all
@@ -122,19 +123,19 @@ program define _gig_png
 			if "`acronym'" == "wfl" & `sex' == "`female'"
 			
 		tempvar q p z
-		if "`conversion'" == "v2z" | "`conversion'" == "v2p" {
+		if "`conversion'" == "v2z" | "`conversion'" == "v2c" {
 			gen double `q' = `input'
 			gen double `z' = (log(`q') - `mu') / `sigma' 
 			replace `z' = (`q' - `mu') / `sigma' ///
 				if inlist("`acronym'", "hcfa", "wfl")
 			replace `return' = `z'
-			if "`conversion'" == "v2p" {
+			if "`conversion'" == "v2c" {
 				qui replace `return' = normal(`z')  
 			}
 		}
-		else if "`conversion'" == "z2v" | "`conversion'" == "p2v" {
+		else if "`conversion'" == "z2v" | "`conversion'" == "c2v" {
 			gen double `z' = `input'
-			if "`conversion'" == "p2v" {
+			if "`conversion'" == "c2v" {
 				replace `z' = invnormal(`input')  
 			}
 			gen double `q' = exp(`mu' + `z' * `sigma')

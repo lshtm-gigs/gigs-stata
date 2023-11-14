@@ -1,7 +1,7 @@
-capture program drop _gclassify_sga
-capture program drop SGA_Badsyntax
+capture program drop _gclassify_svn
+capture program drop SVN_Badsyntax
 *! version 0.3.0 (SJxx-x: dmxxxx)
-program define _gclassify_sga
+program define _gclassify_svn
 	version 16
 	preserve
 
@@ -19,10 +19,10 @@ program define _gclassify_sga
 	}
 	
 	syntax [if] [in], GEST_days(varname numeric) sex(varname) SEXCode(string) /*
-		*/ [SEVere by(string)]
+		*/ [by(string)]
 	
 	if `"`by'"' != "" {
-		_egennoby classify_sga() `"`by'"'
+		_egennoby classify_svn() `"`by'"'
 		/* NOTREACHED */
 	}
 	
@@ -35,7 +35,7 @@ program define _gclassify_sga
 		if "`2'" ~= "=" | "`5'" ~= "=" | /*
 		*/ "`4'" ~= substr("female", 1, length("`4'")) | /*
 		*/ "`7'" ~= "" {
- 			SGA_Badsyntax
+ 			SVN_Badsyntax
  		}
  		local male "`3'"
   		local female "`6'"
@@ -44,37 +44,36 @@ program define _gclassify_sga
 	    if "`2'" ~= "=" | "`5'" ~= "=" | /*
  		*/ "`4'" ~= substr("male", 1, length("`4'") | /*
  		*/ "`7'" ~= "" {
- 			SGA_Badsyntax
+ 			SVN_Badsyntax
  		}
  		local male "`6'"
  		local female "`3'"
  	} 
-	else SGA_Badsyntax	
+	else SVN_Badsyntax	
 
     marksample touse
 
- 	tempvar p_temp
-	egen double `p_temp' = ig_nbs(`input', "wfga", "v2c"), ///
-		gest_days(`gest_days') sex(`sex') sexcode(m="`male'", f="`female'")
+ 	tempvar sga is_term is_sga
 	qui {
-	    generate `type' `return' = 0
-	    replace `return' = -1 if float(`p_temp') < 0.1
-	    replace `return' = 1 if float(`p_temp') > 0.9
-	    replace `return' = . if `p_temp' == . | `touse' == 0
+		egen double `sga' = classify_sga(`input'), ///
+			gest_days(`gest_days') sex(`sex') sexcode(m="`male'", f="`female'")
+		gen `is_term' = `gest_days' >= 259 // 259 days = 37 weeks
+	    gen `type' `return' = .
+	    replace `return' = -4 if `is_term' == 0 & `sga' == -1
+	    replace `return' = -3 if `is_term' == 0 & `sga' == 0
+        replace `return' = -2 if `is_term' == 0 & `sga' == 1
+        replace `return' = -1 if `is_term' == 1 & `sga' == -1
+        replace `return' =  0 if `is_term' == 1 & `sga' == 0
+        replace `return' =  1 if `is_term' == 1 & `sga' == 1
+        replace `return' =  . if `sga' == . | `touse' == 0
 	}
-	cap la de sga_labels -1 "SGA" 0 "AGA" 1 "LGA"
-	cap la de sev_sga_labels -2 "severely SGA" -1 "SGA" 0 "AGA" 1 "LGA"
-	if "`severe'"=="" {
-		la val `return' sga_labels
-	}
-	else {
-		replace `return' = -2 if float(`p_temp') < 0.03
-	    la val `return' sev_sga_labels
-	}
+	cap la de svn_labels -4 "Preterm SGA" -3 "Preterm AGA" -2 "Preterm LGA" ///
+	    -1 "Term SGA" 0 "Term AGA" 1 "Term LGA"
+	la val `return' svn_labels
 	restore, not
 end
 
-program SGA_Badsyntax
+program SVN_Badsyntax
 	di as err "sexcode() option invalid: see {help classify_sga}"
 	exit 198
 end

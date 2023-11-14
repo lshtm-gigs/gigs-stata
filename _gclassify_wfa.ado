@@ -1,5 +1,5 @@
 capture program drop _gclassify_wfa
-*! version 0.2.4 (SJxx-x: dmxxxx)
+*! version 0.3.0 (SJxx-x: dmxxxx)
 program define _gclassify_wfa
 	version 16
 	preserve
@@ -17,13 +17,13 @@ program define _gclassify_wfa
 		error 198
 	}
 	
+	syntax [if] [in], GEST_days(varname numeric) age_days(varname) /*
+		*/ sex(varname) SEXCode(string) [OUTliers BY(string)]
+	
 	if `"`by'"' != "" {
 		_egennoby classify_wfa() `"`by'"'
 		/* NOTREACHED */
 	}
-
-	syntax [if] [in], GA_at_birth(varname numeric) age_days(varname) ///
-		sex(varname) SEXCode(string) 
 
 	local 1 `sexcode'
 	local 1 : subinstr local 1 "," " ", all
@@ -53,17 +53,17 @@ program define _gclassify_wfa
 
 	tempvar pma_weeks acronym z_WHO z_PNG z standard 
 	qui {
-		gen double `pma_weeks' = round((`age_days' + `ga_at_birth') / 7)
+		gen double `pma_weeks' = floor((`age_days' + `gest_days') / 7)
 		egen double `z_PNG' = ig_png(`weight_kg', "wfa", "v2z"), ///
 			xvar(`pma_weeks') sex(`sex') sexcode(m="`male'", f="`female'")
 		egen double `z_WHO' = who_gs(`weight_kg', "wfa", "v2z"), xvar(`age_days') ///
 			sex(`sex') sexcode(m="`male'", f="`female'")
 	
 		gen double `z' = `z_PNG' if ///
-		    `ga_at_birth' >= 182 & `ga_at_birth' < 259 & ///
+		    `gest_days' >= 182 & `gest_days' < 259 & ///
 			`pma_weeks' >= 27 & `pma_weeks' < 64 
 		replace `z' = `z_WHO' if ///
-			`ga_at_birth' < 182 | `ga_at_birth' >= 259 | `pma_weeks' < 27 | ///
+			`gest_days' < 182 | `gest_days' >= 259 | `pma_weeks' < 27 | ///
 			`pma_weeks' >= 64
 
 		generate `type' `return' = .
@@ -71,12 +71,21 @@ program define _gclassify_wfa
 		replace `return' = -2 if float(`z') <= -3
 		replace `return' = 0 if float(abs(`z')) < 2
 		replace `return' = 1 if float(`z') >= 2
-		replace `return' = -10 if float(abs(`z')) > 5
 		replace `return' = . if `z' == . | `touse' == 0
 	}
-	capture label define wfa_labels -10 "implausible" ///
-		-2 "severely underweight" -1 "underweight" 0 "normal" 1 "overweight"
-	label values `return' wfa_labels
+	cap la def wfa_labs -2 "severely underweight" -1 "underweight" ///
+	    0 "normal" 1 "overweight"
+	cap la def wfa_labs_out -2 "severely underweight" -1 "underweight" ///
+	    0 "normal" 1 "overweight" 999 "outlier"
+
+	if "`outliers'"=="" {
+		la val `return' wfa_labs
+	}
+	else  {
+		qui replace `return' = 999 if float(`z') < -6 | float(`z') > 5 & ///
+			`return' != .
+		lab val `return' wfa_labs_out
+	}
 	restore, not
 end
 

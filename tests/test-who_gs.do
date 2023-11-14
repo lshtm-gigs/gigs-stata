@@ -45,7 +45,7 @@ program define make_who_gs_tbl
 			rename measure `colname'
 		}
 	}
-	if ("`conversion'" == "p2v") {
+	if ("`conversion'" == "c2v") {
 		foreach cent in 0.001 0.01 0.03 0.05 0.10 0.15 0.25 0.50 0.75 0.85 0.90 0.95 0.97 0.99 0.999 {
 			if (`cent' ==  0.001) { 
 				local colname = "P01"
@@ -106,7 +106,7 @@ end
 
 foreach acronym in "wfa" "bfa" "lhfa" "hcfa" "wfh" "wfl" "acfa" "ssfa" "tsfa" {
 	foreach sex in "male" "female" {
-		foreach conversion in "p2v" "z2v" {
+		foreach conversion in "c2v" "z2v" {
 			local _frame = "who_gs_`acronym'_`conversion'_`sex'"
 			cap frame drop `_frame'
 			cap frame create `_frame'
@@ -151,7 +151,7 @@ foreach acronym in "wfa" "bfa" "lhfa" "hcfa" "wfh" "wfl" "acfa" "ssfa" "tsfa" {
 				ds SD*, not
 				local colnames `r(varlist)' SD3neg SD2neg SD1neg SD0 SD1 SD2 SD3
 			}
-			if "`conversion'" == "p2v" {
+			if "`conversion'" == "c2v" {
 				ds P*, not
 				local colnames `r(varlist)' P03 P05 P10 P50 P90 P95 P97
 			}

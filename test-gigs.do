@@ -3,17 +3,18 @@
 // 0. Load in all scripts as most recent version --> i.e. NOT a version of gigs 
 // from `net install'.
 clear all
-foreach file in "_gclassify_sga.ado" "_gclassify_stunting.ado" ///
-				"_gclassify_wasting.ado" "_gclassify_wfa.ado" ///
+foreach file in "_gclassify_sga.ado" "_gclassify_svn.ado" ///
+				"_gclassify_stunting.ado" "_gclassify_wasting.ado" ///
+				"_gclassify_wfa.ado" ///
 				"_gig_nbs.ado" "_gig_png.ado" "_gwho_gs.ado" ///
-				"interpolate_coeffs.ado" {
+				"gigs_ipolate_coeffs.ado" {
 	run "`file'"
 }
 
 // Install rsource (R from Stata) if not already installed
 // cap ssc install rsource, replace
 
-//   1. Generate .dta files with standards using "z2v/p2v" conversions
+//   1. Generate .dta files with standards using "z2v/c2v" conversions
 local outputs "tests/outputs"
 cap mkdir "`outputs'"
 foreach standard in "who_gs" "ig_nbs" "ig_png" "interpolation" {
@@ -40,5 +41,4 @@ else if "`c(os)'"=="Windows" {
 }
 
 //	3. Test classification functions
-run "tests/test-classification.do"
-clear all
+do "tests/test-classification.do"

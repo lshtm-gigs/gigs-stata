@@ -1,7 +1,7 @@
 capture program drop _gwho_gs
 capture program drop Badsexvar_who
 capture program drop Badsyntax_who
-*! version 0.2.4 (SJxx-x: dmxxxx)
+*! version 0.3.0 (SJxx-x: dmxxxx)
 program define _gwho_gs
 	version 16
 	preserve
@@ -33,20 +33,21 @@ program define _gwho_gs
 		*/ "."
 		exit 198
 	}
-	capture assert inlist("`conversion'", "v2p", "v2z", "p2v", "z2v")
+	capture assert inlist("`conversion'", "v2c", "v2z", "c2v", "z2v")
 	if _rc {
 		di as text "`conversion'" as error " is an invalid chart code. The " /*
-		*/ as error "only valid choices are " as text "v2p, v2z, p2v," as /*
+		*/ as error "only valid choices are " as text "v2c, v2z, c2v," as /*
 		*/ error " or " as text "z2v" as error "."
 		exit 198
 	}
+	
+	syntax [if] [in], Xvar(varname numeric) sex(varname) SEXCode(string)  /*
+		*/ [BY(string)]
 	
 	if `"`by'"' != "" {
 		_egennoby who_gs() `"`by'"'
 		/* NOTREACHED */
 	}
-	
-	syntax [if] [in], Xvar(varname numeric) sex(varname) SEXCode(string)
 	
 	local 1 `sexcode'
 	*zap commas to spaces (i.e. commas indulged)
@@ -91,8 +92,6 @@ program define _gwho_gs
 	local basename = "whoLMS_" + "`acronym'" + ".dta"
 	qui findfile "`basename'"
 	local filepath = "`r(fn)'"
-	tempvar n
-	gen `n' = _n
 	
 	// Initialise new variables for merging
 	foreach var in xvar sex L M S {
@@ -130,38 +129,35 @@ program define _gwho_gs
 	qui gen byte whoLMS_sex = 1 if `sex' == "`male'"
 	qui replace whoLMS_sex = 0 if `sex' == "`female'"
 	
-	// Interpolate if needed using Mata (see interpolate_coeffs.ado)
-	tempvar interp
-	qui gen int `interp' = 0
-	qui replace `interp' = 1 if ///
-		0 != mod(whoLMS_xvar, 1) & `xvar' >= `xlimlow'  & `xvar' <= `xlimhigh'
-	qui merge m:1 whoLMS_xvar whoLMS_sex using "`filepath'", ///
-		nogenerate keep(1 3)
-		
-	qui levelsof `interp', clean local(interp_local)
-	if inlist(`interp_local', 1) {
-		noi mata retrieve_coefficients("`interp'", ///
-								   "whoLMS_xvar", ///
-							       "whoLMS_sex", ///
-							       "`n'", ///
-							       "`filepath'", ///
-							       "whoLMS_L whoLMS_M whoLMS_S",
-							       "iL iM iS")
-	}
-
-	tempvar L M S
-	gen double `L' = whoLMS_L
-	// Errors were creeping in from interpolated values being extremely close to
-	// zero without being set as zero. This line replaces extremely small values
-	// in `L' with zero to ensure a correction for skewness isn't performed when
-	// unnecessary.
-	replace `L' = 0 if abs(`L') < 1.414 * 10^-16
-	gen double `M' = whoLMS_M
-	gen double `S' = whoLMS_S 
-	drop whoLMS_xvar whoLMS_sex whoLMS_L whoLMS_M whoLMS_S `interp'
+	// Append, then interpolate in Mata (see gigs_ipolate_coeffs.ado)
+ 	qui {
+		tempvar n appended need_interp
+		append using "`filepath'", gen(`appended')
+		gen `n' = _n
+		gen `need_interp' = 0
+		replace `need_interp' = `appended' == 0
+		mata gigs_ipolate_coeffs("whoLMS_xvar", ///
+								 "whoLMS_sex", ///
+								 "whoLMS_L whoLMS_M whoLMS_S", ///
+								 "`n'", ///
+								 "`need_interp'", ///
+								 "`appended'")
+		drop if `appended' == 1
+		tempvar L M S
+		gen double `L' = whoLMS_L
+		// Errors were creeping in from interpolated values being extremely close to
+		// zero without being set as zero. This line replaces extremely small values
+		// in `L' with zero to ensure a correction for skewness isn't performed when
+		// unnecessary.
+		replace `L' = 0 if abs(`L') < 1.414 * 10^-16 // aka Stata double precision
+		gen double `M' = whoLMS_M
+		gen double `S' = whoLMS_S
+		drop whoLMS_xvar whoLMS_sex whoLMS_L whoLMS_M whoLMS_S ///
+			`appended' `interp' `n_premerge' `n_postmerge'
+ 	}
 	
 	qui generate `type' `return' = .
-	if "`conversion'" == "v2p" | "`conversion'" == "v2z" {
+	if "`conversion'" == "v2c" | "`conversion'" == "v2z" {
 		tempvar _z z_out
 		qui {
 			gen double `_z' = (abs((`input'  / `M') ^ `L') - 1) / (`S' * `L')
@@ -185,14 +181,14 @@ program define _gwho_gs
 			}
 			replace `return' = `_z'		
 		}
-		if "`conversion'" == "v2p" {
+		if "`conversion'" == "v2c" {
 			qui replace `return' = normal(`_z')
 		}
 	}
-	else if "`conversion'" == "p2v" | "`conversion'" == "z2v" {
+	else if "`conversion'" == "c2v" | "`conversion'" == "z2v" {
 		tempvar z _q q_out
 		qui gen `z' = `input'
-		if "`conversion'" == "p2v" {
+		if "`conversion'" == "c2v" {
 			qui replace `z' = invnormal(`z')
 		}
 		qui {

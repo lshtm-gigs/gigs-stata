@@ -44,7 +44,7 @@ program define make_ig_png_tbl
 			rename measure `colname'
 		}
 	}
-	if ("`conversion'" == "p2v") {
+	if ("`conversion'" == "c2v") {
 		foreach cent in 0.03 0.05 0.1 0.5 0.9 0.95 0.97 {
 			if (`cent' ==  0.03) { 
 				local colname = "P03"
@@ -86,7 +86,7 @@ end
 
 foreach acronym in "wfa" "lfa" "hcfa" "wfl" {
 	foreach sex in "male" "female" {
-		foreach conversion in "z2v" "p2v" {
+		foreach conversion in "z2v" "c2v" {
 			local _frame = "ig_png_`acronym'_`conversion'_`sex'"
 			cap frame drop `_frame'
 			cap frame create `_frame'
@@ -116,7 +116,7 @@ foreach acronym in "wfa" "lfa" "hcfa" "wfl" {
 			if "`conversion'" == "z2v" {
 				local colnames SD3neg SD2neg SD1neg SD0 SD1 SD2 SD3
 			}
-			if "`conversion'" == "p2v" {
+			if "`conversion'" == "c2v" {
 				local colnames P03 P05 P10 P50 P90 P95 P97
 			}
 			cap merge 1:1 `xname' `colnames' using "`path'"

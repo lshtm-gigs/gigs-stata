@@ -1,5 +1,5 @@
 capture program drop _gclassify_stunting
-*! version 0.2.4 (SJxx-x: dmxxxx)
+*! version 0.3.0 (SJxx-x: dmxxxx)
 program define _gclassify_stunting
 	version 16
 	preserve
@@ -16,15 +16,15 @@ program define _gclassify_stunting
 	if `"`paren'"' != ")" {
 		error 198
 	}
-	
+
+	syntax [if] [in], GEST_days(varname numeric) age_days(varname numeric) /*
+		*/ sex(varname) SEXCode(string) [OUTliers BY(string)]
+
 	if `"`by'"' != "" {
 		_egennoby classify_stunting() `"`by'"'
 		/* NOTREACHED */
 	}
-
-	syntax [if] [in], GA_at_birth(varname numeric) age_days(varname numeric) /*
-		*/ lenht_method(varname) LENHTCode(string) sex(varname) SEXCode(string) 
-
+	
 	local 1 `sexcode'
 	local 1 : subinstr local 1 "," " ", all
 	tokenize `"`1'"', parse("= ")
@@ -48,79 +48,43 @@ program define _gclassify_stunting
  		local female "`3'"
  	} 
 	else StuntingSex_Badsyntax	
-	
-	local 2 `lenhtcode'
-	local 2 : subinstr local 2 "," " ", all
-	tokenize `"`2'"', parse("= ")
-	
- 	if "`1'" == substr("length", 1, length("`1'")) {
-		if "`2'" ~= "=" | "`5'" ~= "=" | /*
-		*/ "`4'" ~= substr("height", 1, length("`4'")) | /*
-		*/ "`7'" ~= "" {
- 			StuntingLenht_Badsyntax
- 		}
- 		local length "`3'"
-  		local height "`6'"
-	} 
-	else if "`1'" == substr("height", 1, length("`1'")) {
-	    if "`2'" ~= "=" | "`5'" ~= "=" | /*
- 		*/ "`4'" ~= substr("length", 1, length("`4'") | /*
- 		*/ "`7'" ~= "" {
- 			StuntingLenht_Badsyntax
- 		}
- 		local length "`6'"
- 		local height "`3'"
- 	} 
-	else StuntingLenht_Badsyntax
 
 	marksample touse
-
-	tempvar lenht_cm
-	qui {
-		generate double `lenht_cm' = `input'
-		replace `lenht_cm' = `lenht_cm' - 0.7 ///
-			if `age_days' >= 731 & `lenht_method' == "`length'"
-		replace `lenht_cm' = `lenht_cm' + 0.7 ///
-			if `age_days' < 731 & `lenht_method' == "`height'"
-	}
-
 	tempvar pma_weeks z_PNG z_WHO z
 	qui {
-		gen double `pma_weeks' = round((`age_days' + `ga_at_birth') / 7)
-		egen double `z_PNG' = ig_png(`lenht_cm', "lfa", "v2z"), ///
+		gen double `pma_weeks' = floor((`age_days' + `gest_days') / 7)
+		egen double `z_PNG' = ig_png(`input', "lfa", "v2z"), ///
 			xvar(`pma_weeks') sex(`sex') sexcode(m="`male'", f="`female'")
-		egen double `z_WHO' = who_gs(`lenht_cm', "lhfa", "v2z"), ///
+		egen double `z_WHO' = who_gs(`input', "lhfa", "v2z"), ///
 			xvar(`age_days') sex(`sex') sexcode(m="`male'", f="`female'")
 
 		gen double `z' = `z_PNG' if ///
-		    `ga_at_birth' >= 182 & `ga_at_birth' < 259 & ///
-			`pma_weeks' >= 27 & `pma_weeks' < 64 
-		replace `z' = `z_WHO' if ///
-			`ga_at_birth' < 182 | `ga_at_birth' >= 259 | `pma_weeks' < 27 | ///
-			`pma_weeks' >= 64
+		    `gest_days' >= 182 & `gest_days' < 259 & ///
+			`pma_weeks' >= 27 & `pma_weeks' <= 64
+		replace `z' = `z_WHO' if `gest_days' >= 259 | ///
+		    (`gest_days' < 259 & `pma_weeks' > 64)
 		
 		generate `type' `return' = .
 		replace `return' = -1 if float(`z') <= -2
 		replace `return' = -2 if float(`z') <= -3
-		replace `return' = -10 if float(`z') < -6
 		replace `return' = 0 if float(`z') > -2
-		replace `return' = -10 if float(`z') > 6
 		replace `return' = . if `z' == . | `touse' == 0
 	}
-	capture label define stunting_labels -10 "implausible" ///
-	   -2 "severe stunting"  -1 "stunting" 0 "normal"
-	label values `return' stunting_labels
+	cap la de stunting_labs -2 "severe stunting" -1 "stunting" 0 "normal"
+	cap la de stunting_labs_out -2 "severe stunting" -1 "stunting" 0 "normal" /*
+	    */ 999 "outlier"
+	if "`outliers'"=="" {
+		la val `return' stunting_labs
+	}
+	else  {
+		qui replace `return' = 999 if abs(float(`z')) > 6 & `return' != .
+		la val `return' stunting_labs_out
+	}
 	restore, not
 end
 
 capture prog drop StuntingSex_Badsyntax
 program StuntingSex_Badsyntax
 	di as err "sexcode() option invalid: see {help ig_nbs}"
-	exit 198
-end
-
-capture prog drop StuntingLenht_Badsyntax
-program StuntingLenht_Badsyntax
-	di as err "lenhtcode() option invalid: see {help classify_stunting}"
 	exit 198
 end

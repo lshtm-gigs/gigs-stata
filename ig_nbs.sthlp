@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 1.0 28 Apr 2023}{...}
+{* *! version 0.3.0 14 Nov 2023}{...}
 {vieweralsosee "" "--"}{...}
 {vieweralsosee "gigs: Classification functions" "help classify_sga"}{...}
 {viewerjumpto "Syntax" "ig_nbs##syntax"}{...}
@@ -25,7 +25,7 @@
 {p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
 {cmd:ig_nbs}{cmd:(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
 {ifin}{cmd:,} 
-{cmdab:gest:_age}{cmd:(}{varname}{cmd:)} {cmdab:sex}{cmd:(}{varname}{cmd:)}
+{cmdab:gest:_days}{cmd:(}{varname}{cmd:)} {cmdab:sex}{cmd:(}{varname}{cmd:)}
 {cmdab:sexc:ode}{cmd:(}{cmdab:m:ale=}{it:code}{cmd:,} {cmdab:f:emale=}{it:code}{cmd:)}
 
 {p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
@@ -58,18 +58,18 @@ also {it:fcn} dependent.
 
 {p 4 4 2}We have developed multiple functions for {cmd:egen} as part of the
  Guidance for International Growth Standards (GIGS) project. Each of these
- functions converts between anthropometric measures and z-scores/percentiles, 
+ functions converts between anthropometric measures and z-scores/centiles,
  for a range of different growth standards.
 
 {marker functions}{...}
 {title:Functions for egen}
 
 {p 4 4 2}{hi:ig_nbs(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
- converts between newborn anthropometric data and z-scores/percentiles in
+ converts between newborn anthropometric data and z-scores/centiles in
  the INTERGROWTH-21st Newborn Size Standards. It has three arguments:
 
 {pmore}{varname} is the variable name in your dataset which you want to convert
- to a z-score, percentile or anthropometric measure (for example, 
+ to a z-score, centile or anthropometric measure (for example,
  {cmd:weight_kg}, {cmd:fat_mass_kg}).
 
 {pmore}{it:acronym} defines the INTERGROWTH-21st Newborn Size standard by which
@@ -77,16 +77,16 @@ also {it:fcn} dependent.
  the {help ig_nbs##standards:Available Standards} section below.
 
 {pmore}{it:conversion} defines the type of conversion to be performed on
- {varname}, and must be one of {cmd:"v2z"} (value-to-z-score), {cmd:"v2p"} 
- (value-to-percentile), {cmd:"p2v"} (percentile-to-value), or {cmd:"z2v"}
+ {varname}, and must be one of {cmd:"v2z"} (value-to-z-score), {cmd:"v2c"}
+ (value-to-centile), {cmd:"c2v"} (centile-to-value), or {cmd:"z2v"}
  (z-score-to-value).
 
 {p 4 4 2}{hi:ig_png(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
- converts between newborn anthropometric data and z-scores/percentiles in
+ converts between newborn anthropometric data and z-scores/centiles in
  the INTERGROWTH-21st Newborn Size Standards. It has three arguments:
 
 {pmore}{varname} is the variable name in your dataset which you want to convert
- to a z-score, percentile or anthropometric measure (for example, 
+ to a z-score, centile or anthropometric measure (for example,
  {cmd:weight_kg}, {cmd:headcirc_cm}).
 
 {pmore}{it:acronym} defines the INTERGROWTH-21st Postnatal Growth standard by
@@ -94,16 +94,16 @@ also {it:fcn} dependent.
  listed in the {help ig_nbs##standards:Available Standards} section below.
 
 {pmore}{it:conversion} defines the type of conversion to be performed on
- {varname}, and must be one of {cmd:"v2z"} (value-to-z-score), {cmd:"v2p"} 
- (value-to-percentile), {cmd:"p2v"} (percentile-to-value), or {cmd:"z2v"}
+ {varname}, and must be one of {cmd:"v2z"} (value-to-z-score), {cmd:"v2c"}
+ (value-to-centile), {cmd:"c2v"} (centile-to-value), or {cmd:"z2v"}
  (z-score-to-value).
 
 {p 4 4 2}{hi:who_gs(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
- converts between newborn anthropometric data and z-scores/percentiles in
+ converts between newborn anthropometric data and z-scores/centiles in
  the WHO Child Growth Standards. It has three arguments:
 
 {pmore}{varname} is the variable name in your dataset which you want to convert
- to a z-score, percentile or anthropometric measure (for example, 
+ to a z-score, centile or anthropometric measure (for example,
  {cmd:armcirc_cm}, {cmd:BMI}).
 
 {pmore}{it:acronym} defines the WHO Child Growth Standard by which to convert
@@ -111,8 +111,8 @@ also {it:fcn} dependent.
  {help ig_nbs##standards:Available Standards} section below.
 
 {pmore}{it:conversion} defines the type of conversion to be performed on
- {varname}, and must be one of {cmd:"v2z"} (value-to-z-score), {cmd:"v2p"} 
- (value-to-percentile), {cmd:"p2v"} (percentile-to-value), or {cmd:"z2v"}
+ {varname}, and must be one of {cmd:"v2z"} (value-to-z-score), {cmd:"v2c"}
+ (value-to-centile), {cmd:"c2v"} (centile-to-value), or {cmd:"z2v"}
  (z-score-to-value).
 
 {marker options}{...}
@@ -128,31 +128,24 @@ also {it:fcn} dependent.
  in either  order, and the comma is optional. Quotes around the codes are not
  allowed, even if your sex variable is a string. 
 
-{dlgtab:INTERGROWTH-21st Newborn Size Standards}
-
-{phang}{opt gest:_age(varname numeric)} specifies gestational age in days for
- newborns. Any value outside the range of valid gestational ages as specified by
- the acronym argument (see {help ig_nbs##tab1:Table 1}) will return a missing
- value.
-
-{dlgtab:INTERGROWTH-21st Postnatal Growth of Preterm Infants Standards}
-
 {phang}{opt x:var(varname numeric)} specifies the variable used with supplied
- sex values to standardise the measure of interest. This is usually
- post-menstrual age (in exact weeks) but may also be length or height (in cm) if
- using the {cmd:{bf:wfl}} standard. See {help ig_nbs##tab2:Table 2} for
+ sex values to standardise the measure of interest. In the INTERGROWTH-21st
+ Postnatal Growth standards ({cmd:ig_png()}) this is usually post-menstrual age
+ in whole weeks, but may also be length in cm if using the {cmd:wfl} standard.
+ In the WHO Child Growth standards, {cmd:xvar()} is usually age in days, but may
+ also be length or height (in cm) if using either the {cmd:wfl} or {cmd:wfh}
+ standards. See Tables {help ig_nbs##tab2:2} and {help ig_nbs##tab3:3} for
  appropriate {cmd:{it:x}} variables for each possible acronym value. Any
  {cmd:{it:x}} variable values outside the ranges described below will return a
  missing value.
 
-{dlgtab:WHO Child Growth Standards}
+{dlgtab:INTERGROWTH-21st Newborn Size Standards}
 
-{phang}{opt x:var(varname numeric)} specifies the variable used with supplied
- sex values to standardise the measure of interest. This is usually age (in days)
- but may also be length or height (in cm) if using either the {cmd:wfl} or
- {cmd:wfh} standards. See {help ig_nbs##tab3:Table 3} for appropriate
- {cmd:{it:x}} variables for each possible acronym value. Any {cmd:{it:x}}
- variable values outside the ranges described below will return a missing value.
+{phang}{opt gest:_days(varname numeric)} specifies gestational age in days for
+ newborns. Any value outside the range of valid gestational ages as specified by
+ the acronym argument (see {help ig_nbs##tab1:Table 1}) will return a missing
+ value.
+
 
 {marker standards}{...}
 {title:Available Standards}
@@ -160,7 +153,7 @@ also {it:fcn} dependent.
 {marker tab1}{...}
 {col 5}{ul:INTERGROWTH-21st Newborn Size Standards}
 
-{col 5}{it:acronym}{col 20}Description{col 41}Measurement{col 57}{cmd:gest_age()} range
+{col 5}{it:acronym}{col 20}Description{col 41}Measurement{col 57}{cmd:gest_days()} range
 {col 5}{col 44}unit
 {col 5}{hline 77}
 {col 6}{cmd:wfga}{col 20}weight-for-GA{col 45}kg{col 57}168-300 days
@@ -190,15 +183,15 @@ also {it:fcn} dependent.
 {col 5}{it:acronym}{col 20}Description{col 42}Measurement{col 57}{cmd:xvar()} range
 {col 5}{col 45}unit
 {col 5}{hline 77}
-{col 6}{cmd:hfa}{col 15}length/height-for-age{col 46}cm{col 57}0-1856 days
-{col 6}{cmd:wfa}{col 19}weight-for-age{col 46}kg{col 57}0-1856 days
-{col 6}{cmd:bfa}{col 20}BMI-for-age{col 44}kg/m^2{col 57}0-1856 days
-{col 6}{cmd:hcfa}{col 13}head circumference-for-age{col 46}cm{col 57}0-1856 days
-{col 6}{cmd:wfl}{col 17}weight-for-length{col 46}kg{col 57}45-110 cm
-{col 6}{cmd:wfh}{col 17}weight-for-height{col 46}kg{col 57}65-120 cm
-{col 6}{cmd:acfa}{col 14}arm circumference-for-age{col 46}cm{col 57}91-1856 days
-{col 6}{cmd:ssfa}{col 12}subscapular skinfold-for-age{col 46}mm{col 57}91-1856 days
-{col 6}{cmd:tsfa}{col 15}triceps skinfold-for-age{col 46}mm{col 57}91-1856 days
+{col 6}{cmd:hfa}{col 16}length/height-for-age{col 46}cm{col 57}0-1856 days
+{col 6}{cmd:wfa}{col 20}weight-for-age{col 46}kg{col 57}0-1856 days
+{col 6}{cmd:bfa}{col 21}BMI-for-age{col 44}kg/m^2{col 57}0-1856 days
+{col 6}{cmd:hcfa}{col 14}head circumference-for-age{col 46}cm{col 57}0-1856 days
+{col 6}{cmd:wfl}{col 18}weight-for-length{col 46}kg{col 57}45-110 cm
+{col 6}{cmd:wfh}{col 18}weight-for-height{col 46}kg{col 57}65-120 cm
+{col 6}{cmd:acfa}{col 15}arm circumference-for-age{col 46}cm{col 57}91-1856 days
+{col 6}{cmd:ssfa}{col 13}subscapular skinfold-for-age{col 46}mm{col 57}91-1856 days
+{col 6}{cmd:tsfa}{col 16}triceps skinfold-for-age{col 46}mm{col 57}91-1856 days
 {col 5}{hline 77}
 
 {marker remarks}{...}
@@ -212,17 +205,17 @@ also {it:fcn} dependent.
 {marker examples}{...}
 {title:Examples}
 
-{pstd}Getting percentiles from values ({cmd: "v2p"}) in the INTERGROWTH-21st
+{pstd}Getting centiles from values ({cmd: "v2c"}) in the INTERGROWTH-21st
  Newborn Size Standard for weight-for-gestational age ({cmd:"wfga"}), where 
  {cmd:sex} contains the codes {cmd:1} and {cmd:2}:{p_end}
-{phang2}{cmd:. egen z_wfga = ig_nbs(weight,"wfga","v2p"), gest_age(ga_weeks * 7) sex(sex) sexcode(male=1, female=2)}
+{phang2}{cmd:. egen z_wfga = ig_nbs(weight,"wfga","v2c"), gest_days(ga_weeks * 7) sex(sex) sexcode(male=1, female=2)}
 
-{pstd}Getting z-scores from values ({cmd: "v2p"}) in the INTERGROWTH-21st
+{pstd}Getting z-scores from values ({cmd: "v2c"}) in the INTERGROWTH-21st
  Newborn Size Standard for weight-for-gestational age ({cmd:"wfga"}), where 
  {cmd:sex} contains the codes {cmd:M} and {cmd:F}:{p_end}
-{phang2}{cmd:. egen z_lfa = ig_png(len_cm,"lfa","v2z"), pma_weeks(pma) sex(sex) sexcode(male=M, female=F)}
+{phang2}{cmd:. egen z_lfa = ig_png(len_cm,"lfa","v2z"), xvar(pma) sex(sex) sexcode(male=M, female=F)}
 
-{pstd}Getting values for z-scores ({cmd: "v2p"}) in the WHO Child Growth
+{pstd}Getting values for z-scores ({cmd: "v2c"}) in the WHO Child Growth
  Standard for arm circumference-for-age ({cmd:"acfa"}), where 
  {cmd:sex} contains the codes {cmd:Male} and {cmd:Female}:{p_end}
 {phang2}{cmd:. egen z_acfa = who_gs(zscores,"acfa","z2v"), xvar(age_days) sex(sex) sexcode(male=Male, female=Female)}
