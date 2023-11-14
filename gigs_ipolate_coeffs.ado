@@ -27,16 +27,6 @@ mata:
 		string rowvector tokens_coeffs
 		tokens_coeffs = tokens(colnames_coeff)
 		
-		// Store lgl vars for appended/interpolated
-		real rowvector lgl_interped; real rowvector lgl_appended
-		lgl_interped = st_data(., colname_interp)
-		lgl_appended = st_data(., colname_append)
-		
-		// Get x variables and sexes into Mata
-		real rowvector x_all; real rowvector sex_all
-		x_all = st_data(., colname_xvar)
-		sex_all = st_data(., colname_sex)
-		
 		// Get x variables and sexes of APPENDED rows
 		real rowvector x_appended; real rowvector sex_appended
 		real rowvector rows_appended; 
@@ -79,7 +69,6 @@ mata:
 			
 			// Retrieve coeffs; interpolate w/ mm_ipolate(); store in a view
 			real matrix coeff_view; real rowvector coeff
-			real rowvector ipolate_results
 			real scalar idx
 			for (idx=1; idx<=length(tokens_coeffs); idx++) {
 				coeff = st_data(rows_curr_sex_append, tokens_coeffs[idx])
