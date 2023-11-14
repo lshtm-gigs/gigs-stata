@@ -62,7 +62,7 @@ foreach acronym in "wfga" "lfga" "hcfga" {
 		gen sex = "`sex'"
 		gen z = 1
  		qui egen double stata_col = ig_nbs(z, "`acronym'", "z2v"), ///
-		  gest_age(age_days) sex(sex) sexcode(m=M, f=F)
+		  gest_days(age_days) sex(sex) sexcode(m=M, f=F)
 		local path = "`test_interp_outputs'/ig_nbs_`acronym'_`sex'_interped.dta"
 		save `path', replace
 	}

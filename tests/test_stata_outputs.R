@@ -3,7 +3,7 @@ cli_redbold <- function(text) cli::col_red(cli::style_bold(text))
 compare_ig_nbs <- function(acronym, sex, z_or_p) {
   sex_str <- if (sex == "M") "male" else if (sex == "F") "female"
 
-  z_or_p_stata <- if (z_or_p == "z") "z2v"  else if (z_or_p == "p") "p2v"
+  z_or_p_stata <- if (z_or_p == "z") "z2v"  else if (z_or_p == "p") "c2v"
   dta <- file.path("tests", "outputs", "ig_nbs",
             paste0(acronym, "_", z_or_p_stata, "_", sex_str, ".dta"))
 
@@ -58,7 +58,7 @@ compare_ig_nbs <- function(acronym, sex, z_or_p) {
 compare_ig_png <- function(acronym, sex, z_or_p, interactive = FALSE) {
   sex_str <- if (sex == "M") "male" else if (sex == "F") "female"
 
-  z_or_p_stata <- if (z_or_p == "z") "z2v"  else if (z_or_p == "p") "p2v"
+  z_or_p_stata <- if (z_or_p == "z") "z2v"  else if (z_or_p == "p") "c2v"
   dta <- file.path("tests", "outputs", "ig_png",
             paste0(acronym, "_", z_or_p_stata, "_", sex_str, ".dta"))
 
@@ -93,12 +93,12 @@ compare_ig_png <- function(acronym, sex, z_or_p, interactive = FALSE) {
   }
 }
 
-compare_who_gs <- function(acronym, sex, z_or_p) {
+compare_who_gs <- function(acronym, sex, z_or_c) {
   sex_str <- if (sex == "M") "male" else if (sex == "F") "female"
 
-  z_or_p_stata <- if (z_or_p == "z") "z2v"  else if (z_or_p == "p") "p2v"
+  z_or_c_stata <- if (z_or_c == "z") "z2v"  else if (z_or_c == "c") "c2v"
   dta <- file.path("tests", "outputs", "who_gs",
-            paste0(acronym, "_", z_or_p_stata, "_", sex_str, ".dta"))
+            paste0(acronym, "_", z_or_c_stata, "_", sex_str, ".dta"))
 
   stata <- if (file.exists(dta)) haven::read_dta(file = dta) else {
       cat("\t")
@@ -106,7 +106,7 @@ compare_who_gs <- function(acronym, sex, z_or_p) {
       return(FALSE)
   }
 
-  z_or_p_r <- if (stringr::str_detect(z_or_p, pattern = "z")) {
+  z_or_p_r <- if (stringr::str_detect(z_or_c, pattern = "z")) {
     "zscores"
   } else {
     "percentiles"
@@ -182,22 +182,22 @@ wait_time_secs <- 1
 cli::cli_h1(text = "INTERGROWTH-21st Newborn Size Standards")
 acronyms <- rep.int(names(gigs::ig_nbs), times = rep(4, length(names(gigs::ig_nbs))))
 sexes <- rep_len(c("M", "M", "F", "F"), length.out = length(acronyms))
-zp <- rep_len(c("z", "p", "z", "p"), length.out = length(acronyms))
-ig_nbs <- mapply(FUN = compare_ig_nbs, acronyms, sexes, zp)
+zc <- rep_len(c("z", "c", "z", "c"), length.out = length(acronyms))
+ig_nbs <- mapply(FUN = compare_ig_nbs, acronyms, sexes, zc)
 if (!interactive()) Sys.sleep(wait_time_secs)
 
 cli::cli_h1(text = "INTERGROWTH-21st Postnatal Growth Standards")
 acronyms <- rep.int(names(gigs::ig_png), times = rep(4, length(names(gigs::ig_png))))
 sexes <- rep_len(c("M", "M", "F", "F"), length.out = length(acronyms))
-zp <- rep_len(c("z", "p", "z", "p"), length.out = length(acronyms))
-ig_png <- mapply(FUN = compare_ig_png, acronyms, sexes, zp)
+zc <- rep_len(c("z", "c", "z", "c"), length.out = length(acronyms))
+ig_png <- mapply(FUN = compare_ig_png, acronyms, sexes, zc)
 if (!interactive()) Sys.sleep(wait_time_secs)
 
 cli::cli_h1(text = "WHO Child Growth Standards")
 acronyms <- rep.int(names(gigs::who_gs), times = rep(4, length(names(gigs::who_gs))))
 sexes <- rep_len(c("M", "M", "F", "F"), length.out = length(acronyms))
-zp <- rep_len(c("z", "p", "z", "p"), length.out = length(acronyms))
-who_gs <- mapply(FUN = compare_who_gs, acronyms, sexes, zp)
+zc <- rep_len(c("z", "c", "z", "c"), length.out = length(acronyms))
+who_gs <- mapply(FUN = compare_who_gs, acronyms, sexes, zc)
 if (!interactive()) Sys.sleep(wait_time_secs)
 
 cli::cli_h1(text = "Interpolation of coefficients")
