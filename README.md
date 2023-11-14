@@ -8,7 +8,7 @@ Produced as part of the Guidance for International Growth Standards (GIGS) proje
 `gigs` provides a single, simple interface for working with the WHO Child Growth
 Standards and outputs from the INTERGROWTH-21<sup>st</sup> project. You will 
 find functions for converting between anthropometric measures (e.g. weight or 
-length) to z-scores and percentiles, and the inverse. Also included are 
+length) to z-scores and centiles, and the inverse. Also included are 
 functions for classifying newborn and infant growth according to 
 literature-based cut-offs.
 
@@ -40,15 +40,15 @@ files.
   Component standards
   </summary>
 
-  | Acronym  | Description                                | Unit  | `gest_age()` range |
-  |----------|--------------------------------------------|-------|--------------------|
-  | `wfga`   | Weight-or-gestational age                  | kg    | 168 to 300 days    |
-  | `lfga`   | Length-for-gestational age                 | cm    | 168 to 300 days    |
-  | `hcfga`  | Head circumference-for-gestational age     | cm    | 168 to 300 days    |
-  | `wlrfga` | Weight-to-length ratio-for-gestational age | kg/cm | 168 to 300 days    |
-  | `ffmfga` | Fat-free mass-for-gestational age          | kg    | 266 to 294 days    |
-  | `bfpfga` | Body fat percentage-for-gestational age    | %     | 266 to 294 days    |
-  | `fmfga`  | Fat mass-for-gestational age               | kg    | 266 to 294 days    |
+  | Acronym  | Description                                | Unit  | `gest_days()` range |
+  |----------|--------------------------------------------|-------|---------------------|
+  | `wfga`   | Weight-or-gestational age                  | kg    | 168 to 300 days     |
+  | `lfga`   | Length-for-gestational age                 | cm    | 168 to 300 days     |
+  | `hcfga`  | Head circumference-for-gestational age     | cm    | 168 to 300 days     |
+  | `wlrfga` | Weight-to-length ratio-for-gestational age | kg/cm | 168 to 300 days     |
+  | `ffmfga` | Fat-free mass-for-gestational age          | kg    | 266 to 294 days     |
+  | `bfpfga` | Body fat percentage-for-gestational age    | %     | 266 to 294 days     |
+  | `fmfga`  | Fat mass-for-gestational age               | kg    | 266 to 294 days     |
 
   </details>
 - `ig_png` - INTERGROWTH-21<sup>st</sup> standards for postnatal growth in
@@ -78,8 +78,8 @@ files.
   | `bfa`   | BMI-for-age                  | kg/m<sup>2</sup> | 0 to 1856 days  |
   | `lhfa`  | length/height-for-age        | cm               | 0 to 1856 days  |
   | `hcfa`  | head circumference-for-age   | cm               | 0 to 1856 days  |
-  | `wfl`   | weight-for-height            | kg               | 45 to 110 cm    |
-  | `wfh`   | weight-for-length            | kg               | 65 to 120 cm    |
+  | `wfl`   | weight-for-length            | kg               | 45 to 110 cm    |
+  | `wfh`   | weight-for-height            | kg               | 65 to 120 cm    |
   | `acfa`  | arm circumference-for-age    | cm               | 91 to 1856 days |
   | `ssfa`  | subscapular skinfold-for-age | mm               | 91 to 1856 days |
   | `tsfa`  | triceps skinfold-for-age     | mm               | 91 to 1856 days |
@@ -96,21 +96,21 @@ standards cannot be applied correctly without this information.
 
 ### INTERGROWTH-21<sup>st</sup> Newborn Size standards, including very preterm
 This function can be used to convert between measurements and 
-z-scores/percentiles in each of the INTERGROWTH-21<sup>st</sup> Newborn Size
+z-scores/centiles in each of the INTERGROWTH-21<sup>st</sup> Newborn Size
 Standards. 
 
 ![](./readme/readme_ignbs.png)
 
 ### INTERGROWTH-21<sup>st</sup> Postnatal Growth standards
 This function can be used to convert between measurements and 
-z-scores/percentiles in each of the INTERGROWTH-21<sup>st</sup> Postnatal 
+z-scores/centiles in each of the INTERGROWTH-21<sup>st</sup> Postnatal 
 Growth of Preterm Infants Standards.
 
 ![](./readme/readme_igpng.png)
 
 ### WHO Child Growth Standards
 This function can be used to convert between measurements and 
-z-scores/percentiles in each of the WHO Child Growth Standards.
+z-scores/centiles in each of the WHO Child Growth Standards.
 
 ![](./readme/readme_whogs.png)
 
@@ -284,7 +284,7 @@ remove any observations which were not made at birth. We then use the
 
 ## Known issues and bug reporting
 For coefficient-based standards (i.e. the `who_gs()` standards and some of the `ig_nbs()`
-standards), providing floats/doubles to the `xvar()` or `gest_age()` options may result 
+standards), providing floats/doubles to the `xvar()` or `gest_days()` options may result 
 in massive slowdowns. This is going to be addressed in a coming update.
 
 We kindly request that users note any bugs, issues, or feature requests on the GitHub 

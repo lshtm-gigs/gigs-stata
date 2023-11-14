@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.2.4 05 Sep 2023}{...}
+{* *! version 0.3.0 14 Nov 2023}{...}
 {vieweralsosee "" "--"}{...}
 {vieweralsosee "gigs: Conversion functions" "help ig_nbs"}{...}
 {vieweralsosee "gigs: Classification functions" "help classify_sga"}{...}
@@ -25,7 +25,7 @@
 {p 4 4 2}We have developed multiple functions for {cmd:egen}, which are 
  described in the documentation pages linked to from the 'Also see' section on 
  this page. These functions either convert between anthropometric measures and 
- z-scores/percentiles, or classify growth according to literature-based 
+ z-scores/centiles, or classify growth according to literature-based
  cut-offs, including from the DHS.
 
 {marker authors}{...}
@@ -35,6 +35,11 @@
 {pstd}Maternal, Adolescent, Reproductive, and Child Health (MARCH) Center{p_end}
 {pstd}London School of Hygiene and Tropical Medicine{p_end}
 {pstd}London, U.K.{p_end}
+{pstd}simon.parker@lshtm.ac.uk{p_end}
+
+{pstd}Linda Vesel{p_end}
+{pstd}Brigham and Women’s Hospital, Boston{p_end}
+{pstd}Massachusetts, U.S.A.{p_end}
 {pstd}simon.parker@lshtm.ac.uk{p_end}
 
 {pstd}Eric O. Ohuma{p_end}
