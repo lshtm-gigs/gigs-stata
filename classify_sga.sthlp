@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.2.4 24 Sep 2023}{...}
+{* *! version 0.3.0 24 Sep 2023}{...}
 {vieweralsosee "" "--"}{...}
 {vieweralsosee "gigs: Classification functions" "help classify_sga"}{...}
 {viewerjumpto "Syntax" "ig_nbs##syntax"}{...}
@@ -24,35 +24,37 @@
 {p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
 {cmd:classify_sga}{cmd:(}{varname}{cmd:)} 
 {ifin}{cmd:,} 
-{cmdab:gest:_age}{cmd:(}{varname}{cmd:)} {cmdab:sex}{cmd:(}{varname}{cmd:)}
+{cmdab:gest:_days}{cmd:(}{varname}{cmd:)} {cmdab:sex}{cmd:(}{varname}{cmd:)}
 {cmdab:sexc:ode}{cmd:(}{cmdab:m:ale=}{it:code}{cmd:,} {cmdab:f:emale=}{it:code}{cmd:)}
+[{cmdab:sev:ere}]
 
 {p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
 {cmd:classify_svn}{cmd:(}{varname}{cmd:)} 
 {ifin}{cmd:,} 
-{cmdab:gest:_age}{cmd:(}{varname}{cmd:)} {cmdab:sex}{cmd:(}{varname}{cmd:)}
+{cmdab:gest:_days}{cmd:(}{varname}{cmd:)} {cmdab:sex}{cmd:(}{varname}{cmd:)}
 {cmdab:sexc:ode}{cmd:(}{cmdab:m:ale=}{it:code}{cmd:,} {cmdab:f:emale=}{it:code}{cmd:)}
 
 {p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
 {cmd:classify_stunting}{cmd:(}{varname}{cmd:)} 
 {ifin}{cmd:,} 
-{cmdab:ga:_at_birth}{cmd:(}{varname}{cmd:)} {cmdab:age_days}{cmd:(}{varname}{cmd:)}
-{cmd:lenht_method}{cmd:(}{varname}{cmd:)} {cmdab:lenhtc:ode}{cmd:(}{cmdab:l:ength=}{it:code}{cmd:,} {cmdab:h:eight=}{it:code}{cmd:)}
+{cmdab:gest:_days}{cmd:(}{varname}{cmd:)} {cmdab:age_days}{cmd:(}{varname}{cmd:)}
 {cmdab:sex}{cmd:(}{varname}{cmd:)} {cmdab:sexc:ode}{cmd:(}{cmdab:m:ale=}{it:code}{cmd:,} {cmdab:f:emale=}{it:code}{cmd:)}
+[{cmdab:out:liers}]
 
 {p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
 {cmd:classify_wasting}{cmd:(}{varname}{cmd:)} 
 {ifin}{cmd:,} 
-{cmdab:lenht:_cm}{cmd:(}{varname}{cmd:)} {cmd:lenht_method}{cmd:(}{varname}{cmd:)}
-{cmdab:lenhtc:ode}{cmd:(}{cmdab:l:ength=}{it:code}{cmd:,} {cmdab:h:eight=}{it:code}{cmd:)}
+{cmdab:lenht:_cm}{cmd:(}{varname}{cmd:)}
 {cmdab:sex}{cmd:(}{varname}{cmd:)}
 {cmdab:sexc:ode}{cmd:(}{cmdab:m:ale=}{it:code}{cmd:,} {cmdab:f:emale=}{it:code}{cmd:)}
+[{cmdab:out:liers}]
 
 {p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
 {cmd:classify_wfa}{cmd:(}{varname}{cmd:)} 
 {ifin}{cmd:,} 
-{cmdab:ga:_at_birth}{cmd:(}{varname}{cmd:)} {cmd:age_days}{cmd:(}{varname}{cmd:)}
+{cmdab:gest:_days}{cmd:(}{varname}{cmd:)} {cmd:age_days}{cmd:(}{varname}{cmd:)}
 {cmdab:sexc:ode}{cmd:(}{cmdab:m:ale=}{it:code}{cmd:,} {cmdab:f:emale=}{it:code}{cmd:)}
+[{cmdab:out:liers}]
 
 {p 4 4 2}{cmd:by} cannot be used with these functions.
 
@@ -95,17 +97,19 @@
 {pmore}{varname} is the variable name for newborn weight in your dataset (for
  example, {cmd:weight_kg}, {cmd:mean_wgt}).
  
-{p 4 4 2}{hi:classify_sn(}{varname}{cmd:)} is used to classify small
+{p 4 4 2}{hi:classify_svn(}{varname}{cmd:)} is used to classify small
  vulnerable newborns according to both their term status and
  size-for-gestational age in the INTERGROWTH-21st weight-for-gestational age
  standards. It produces a variable with the following values and labels:
  
 {col 9}Value{col 17}Label{col 38}Term status{col 56}Centile range
 {col 9}{hline 68}
-{col 10}{cmd:-2}{col 17}Preterm SGA{col 38}Preterm{col 56}<10th centile
-{col 10}{cmd:-1}{col 17}Preterm non-SGA{col 38}Preterm{col 56}>=10th centile
-{col 11}{cmd:0}{col 17}Term SGA{col 38}Term{col 56}<10th centile
-{col 11}{cmd:1}{col 17}Term non-SGA{col 38}Term{col 56}>=10th centile
+{col 10}{cmd:-4}{col 17}Preterm SGA{col 38}Preterm{col 56}<10th centile
+{col 10}{cmd:-3}{col 17}Preterm AGA{col 38}Preterm{col 56}10th to 90th centile
+{col 10}{cmd:-2}{col 17}Preterm LGA{col 38}Preterm{col 56}>90th centile
+{col 10}{cmd:-1}{col 17}Term SGA{col 38}Term{col 56}<10th centile
+{col 10}{cmd: 0}{col 17}Term AGA{col 38}Term{col 56}10th to 90th centile
+{col 10}{cmd: 1}{col 17}Term LGA{col 38}Term{col 56}>=10th centile
  
 {pmore}This function takes one argument:
 
@@ -115,14 +119,15 @@
 {p 4 4 2}{hi:classify_stunting(}{varname}{cmd:)} is used to classify stunting in
  infants up to five years old using the INTERGROWTH-21st standards for postnatal
  growth or WHO Child Growth Standards as appropriate. It produces a variable 
- with the following values and labels:
+ with the following values and labels, where 'outlier' classifications are only
+ applied if the {cmd:outliers} option is specified by the user.
 
 {col 20}Value{col 27}Label{col 45}{it:Z}-score range
 {col 20}{hline 38}
-{col 22}{cmd:-2} {col 27}Severe stunting{col 45}-5 to -3
-{col 22}{cmd:-1} {col 27}Stunting       {col 45}-3 to -2
-{col 23}{cmd:0}  {col 27}Not stunting    {col 45}-2 to 5
-{col 21}{cmd:-10}{col 27}Implausible     {col 45}<-5 or >5
+{col 21}{cmd: -2}{col 27}Severe stunting{col 45}-5 to -3
+{col 21}{cmd: -1}{col 27}Stunting       {col 45}-3 to -2
+{col 21}{cmd:  0}{col 27}Normal         {col 45}-2 to 5
+{col 21}{cmd:999}{col 27}Outlier        {col 45}<-5 or >5
  
 {pmore}This function takes one argument:
 
@@ -132,15 +137,16 @@
 {p 4 4 2}{hi:classify_wasting(}{varname}{cmd:)} is used to classify wasting in
  infants up to five years old using the WHO Child Growth Standards for
  weight-for-length and weight-for-height as appropriate. It produces a variable
- with the following values and labels:
+ with the following values and labels, where 'outlier' classifications are only
+ applied if the {cmd:outliers} option is specified by the user.
 
 {col 20}Value{col 27}Label{col 45}{it:Z}-score range
 {col 20}{hline 38}
-{col 22}{cmd:-2} {col 27}Severe wasting{col 45}-5 to -3
-{col 22}{cmd:-1} {col 27}Wasting       {col 45}-3 to -2
-{col 23}{cmd:0}  {col 27}Normal        {col 45}-2 to 2
-{col 23}{cmd:1}  {col 27}Overweight    {col 45}2 to 5
-{col 21}{cmd:-10}{col 27}Implausible   {col 45}<-5 or >5
+{col 21}{cmd: -2}{col 27}Severe wasting{col 45}-5 to -3
+{col 21}{cmd: -1}{col 27}Wasting       {col 45}-3 to -2
+{col 21}{cmd:  0}{col 27}Normal        {col 45}-2 to 2
+{col 21}{cmd:  1}{col 27}Overweight    {col 45}2 to 5
+{col 21}{cmd:999}{col 27}Outlier       {col 45}<-5 or >5
 
 {pmore}This function takes one argument:
 
@@ -150,15 +156,16 @@
 {p 4 4 2}{hi:classify_wfa(}{varname}{cmd:)} is used to classify weight-for-age
  in infants up to five years old using the INTERGROWTH-21st standards for
  postnatal growth or WHO Child Growth Standards as appropriate. It produces a
- variable with the following values and labels:
+ variable with the following values and labels, where 'outlier' classifications
+ are only applied if the {cmd:outliers} option is specified by the user.
 
-{col 20}Value{col 27}Label{col 50}{it:Z}-score range
+{col 20}Value    {col 27}Label               {col 50}{it:Z}-score range
 {col 20}{hline 43}
-{col 22}{cmd:-2} {col 27}Severely underweight{col 50}-6 to -3
-{col 22}{cmd:-1} {col 27}Underweight         {col 50}-3 to -2
-{col 23}{cmd:0}  {col 27}Normal weight       {col 50}-2 to 2
-{col 23}{cmd:1}  {col 27}Overweight          {col 50} 2 to 5
-{col 21}{cmd:-10}{col 27}Implausible         {col 50}<-6 or >5
+{col 21}{cmd: -2}{col 27}Severely underweight{col 50}-6 to -3
+{col 21}{cmd: -1}{col 27}Underweight         {col 50}-3 to -2
+{col 21}{cmd:  0}{col 27}Normal weight       {col 50}-2 to 2
+{col 21}{cmd:  1}{col 27}Overweight          {col 50} 2 to 5
+{col 21}{cmd:999}{col 27}Outlier             {col 50}<-6 or >5
 
 {pmore}This function takes one argument:
 
@@ -180,27 +187,17 @@
 
 {dlgtab:Size-for-GA/SVN classification}
 
-{phang}{opt gest:_age(varname numeric)} specifies gestational age in days for
+{phang}{opt gest:_days(varname numeric)} specifies gestational age in days for
  newborns. Any value outside the range of valid gestational ages as specified in
  the {help ig_nbs##tab1:ig_nbs() documentation} will return a missing value.
 
 {dlgtab:Wasting classification}
 
-{phang}{opt ga:_at_birth(varname numeric)} specifies the gestational age at
+{phang}{opt gest:_days(varname numeric)} specifies the gestational age at
  birth in days for each observation.
 
 {phang}{opt age_days(varname numeric)} specifies age in days for each
  observation.
-
-{phang}{opt lenht_method(varname numeric)} specifies whether recumbent length or
- standing height were used to measure infant size for each observation. The
- codes for {cmd:length} and {cmd:height} must be provided by the
- {cmd:lenht_code()} option.
-
-{phang}{cmdab:lenhtc:ode}{cmd:(}{cmdab:l:ength=}{it:code}{cmd:,} {cmdab:h:eight=}{it:code}{cmd:)}
- specifies the codes for {cmd:length} and {cmd:height}. The codes can be specified
- in either  order, and the comma is optional. Quotes around the codes are not
- allowed, even if your {cmd:lenht_method()} variable is a string.
 
 {dlgtab:Stunting classification}
 
@@ -208,19 +205,9 @@
  each observation. The method used to obtain these values should be recorded in
  {cmd:lenht method()}.
 
-{phang}{opt lenht_method(varname numeric)} specifies whether recumbent length or
- standing height were used to measure infant size for each observation. The
- codes for {cmd:length} and {cmd:height} must be provided by the
- {cmd:lenht_code()} option.
-
-{phang}{cmdab:lenhtc:ode}{cmd:(}{cmdab:l:ength=}{it:code}{cmd:,} {cmdab:h:eight=}{it:code}{cmd:)}
- specifies the codes for {cmd:length} and {cmd:height}. The codes can be specified
- in either  order, and the comma is optional. Quotes around the codes are not
- allowed, even if your {cmd:lenht_method()} variable is a string.
-
 {dlgtab:Weight-for-age classification}
 
-{phang}{opt ga:_at_birth(varname numeric)} specifies the gestational age at
+{phang}{opt gest:_days(varname numeric)} specifies the gestational age at
  birth in days for each observation.
 
 {phang}{opt age_days(varname numeric)} specifies age in days for each
@@ -238,19 +225,19 @@
 {title:Examples}
 
 {pstd}Classifying SGA, where {cmd:sex} contains the codes {cmd:1} and {cmd:2}:{p_end}
-{phang2}{cmd:. egen sga = classify_sga(weight_kg), gest_age(ga_days) sex(sex) sexcode(male=1, female=2)}
+{phang2}{cmd:. egen sga = classify_sga(weight_kg), gest_days(ga_days) sex(sex) sexcode(male=1, female=2)}
 
 {pstd}Classifying stunting, where {cmd:sex} contains the codes {cmd:M} and {cmd:F}:{p_end}
-{phang2}{cmd:. egen stunting = classify_stunting(weight_kg), ga_at_birth(ga_days) age_days(age) sex(sex) sexcode(male=M, female=F)}
+{phang2}{cmd:. egen stunting = classify_stunting(weight_kg), gest_days(ga_days) age_days(age) sex(sex) sexcode(male=M, female=F)}
 
-{pstd}Classifying wasting, where {cmd:sex} contains the codes {cmd:M} and {cmd:F} and {cmd:lenht_method} contains the codes {cmd:Length} and {cmd:Height}:{p_end}
-{phang2}{cmd:. egen wasting = classify_wasting(weight_kg), lenht(lenht_cm) lenht_method(method) lenhtcode(length=Length, height=Height) sex(sex) sexcode(male=M, female=F)}
+{pstd}Classifying wasting, where {cmd:sex} contains the codes {cmd:M} and {cmd:F}:{p_end}
+{phang2}{cmd:. egen wasting = classify_wasting(weight_kg), lenht(lenht_cm) sex(sex) sexcode(male=M, female=F)}
 
 {pstd}You can use just the first letters of the {cmd:sexcode()} and {cmd:lenhtcode()} arguments instead:{p_end}
-{phang2}{cmd:. egen wasting = classify_wasting(weight_kg), lenht(lenht_cm) lenht_method(method) lenhtcode(l=Length, h=Height) sex(sex) sexcode(m=M, f=F)}
+{phang2}{cmd:. egen wasting = classify_wasting(weight_kg), lenht(lenht_cm) sex(sex) sexcode(m=Male, f=Female)}
 
 {pstd}Classifying weight-for-age, where {cmd:sex} contains the codes {cmd:Male} and {cmd:Female}:{p_end}
-{phang2}{cmd:. egen wfa = classify_wfa(weight_kg), ga_at_birth(ga_days) age_days(age) sex(sex) sexcode(m=Male, f=Female)}
+{phang2}{cmd:. egen wfa = classify_wfa(weight_kg), gest_days(ga_days) age_days(age) sex(sex) sexcode(m=Male, f=Female)}
 
 {marker authors}{...}
 {title:Authors}
