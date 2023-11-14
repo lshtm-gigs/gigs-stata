@@ -54,8 +54,7 @@ program define _gclassify_sga
     marksample touse
 
  	tempvar p_temp
-	egen double `p_temp' = ig_nbs(`input', "wfga", "v2p"), ///
-		gest_age(`gest_age') sex(`sex') sexcode(m="`male'", f="`female'")
+	egen double `p_temp' = ig_nbs(`input', "wfga", "v2c"), ///
 		gest_days(`gest_days') sex(`sex') sexcode(m="`male'", f="`female'")
 	qui {
 	    generate `type' `return' = 0

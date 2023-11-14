@@ -32,20 +32,21 @@ program define _gig_nbs
 		*/ as error "."
 		exit 198
 	}
-	capture assert inlist("`conversion'", "v2p", "v2z", "p2v", "z2v")
+	capture assert inlist("`conversion'", "v2c", "v2z", "c2v", "z2v")
 	if _rc {
 		di as text "`conversion'" as error " is an invalid chart code. The " /*
-		*/ as error "only valid choices are " as text "v2p, v2z, p2v," as /*
+		*/ as error "only valid choices are " as text "v2c, v2z, c2v," as /*
 		*/ error " or " as text "z2v" as error "."
 		exit 198
 	}
+	
+	syntax [if] [in], GEST_days(varname numeric) sex(varname) SEXCode(string) /*
+		*/ [BY(string)]
 	
 	if `"`by'"' != "" {
 		_egennoby ig_nbs() `"`by'"'
 		/* NOTREACHED */
 	}
-	
-	syntax [if] [in], gest_age(varname numeric) sex(varname) SEXCode(string)
 	
 	local 1 `sexcode'
 	*zap commas to spaces (i.e. commas indulged)
@@ -105,7 +106,7 @@ program define _gig_nbs
 				exit 110
 			}
 		}
-		qui gen double nbsMSNT_gest_age = `gest_age'
+		qui gen double nbsMSNT_gest_age = `gest_days'
 		qui gen byte nbsMSNT_sex = 1 if `sex' == "`male'"
 		qui replace nbsMSNT_sex = 0 if `sex' == "`female'"
 		
@@ -139,7 +140,7 @@ program define _gig_nbs
 			generate `sex_as_numeric' = 1 if `sex' == "`male'"
 			replace `sex_as_numeric' = 0 if `sex' == "`female'"
 			generate `gest_age_weeks' = .
-			replace `gest_age_weeks' = `gest_age' / 7  if `gest_age' >= 168
+			replace `gest_age_weeks' = `gest_days' / 7  if `gest_days' >= 168
 				
 			gen double `vpns_median' = .
 			replace `vpns_median' = ///
@@ -156,7 +157,7 @@ program define _gig_nbs
 			replace `vpns_stddev' = sqrt(2.4334810) if "`acronym'" == "hcfga"
 		}
 
-		if "`conversion'" == "v2p" | "`conversion'" == "v2z" {
+		if "`conversion'" == "v2c" | "`conversion'" == "v2z" {
 			tempvar q cdf p_pST3 p_out
 			qui {
 				gen double `q' = `input'
@@ -185,7 +186,7 @@ program define _gig_nbs
 		}
 		else {
 			tempvar p
-			if "`conversion'" == "p2v" {
+			if "`conversion'" == "c2v" {
 				qui gen double `p' = `input'
 			}
 			else if "`conversion'" == "z2v" {
@@ -222,44 +223,44 @@ program define _gig_nbs
 			gen byte `sex_as_numeric' = .
 			replace `sex_as_numeric' = 1 if `sex' == "`male'"
 			replace `sex_as_numeric' = 0 if `sex' == "`female'"
-			gen double `ga' = `gest_age' / 7
+			gen double `ga' = `gest_days' / 7
 			
 			gen double `mu' = .
 			replace `mu' = ///
 				3.400617 + (-0.0103163 * `ga' ^ 2) + ///
 				(0.0003407 * `ga' ^ 3) + (0.1382809 * `sex_as_numeric') ///
-				if `gest_age' < 231
+				if `gest_days' < 231
 			replace `mu' = ///
 				-17.84615 + (-3778.768 * (`ga' ^ -1)) + ///
 				(1291.477 * ((`ga' ^ -1) * log(`ga'))) /// 
-				if `gest_age' >= 231 & `sex' == "`male'"
+				if `gest_days' >= 231 & `sex' == "`male'"
 			replace `mu' = ///
 				-5.542927 + (0.0018926 * (`ga' ^ 3)) + ///
 				(-0.0004614 * ((`ga' ^ 3)* log(`ga'))) ///
-				if `gest_age' >= 231 & `sex' == "`female'"    
+				if `gest_days' >= 231 & `sex' == "`female'"
 			
 			gen double `sigma' = .
-			replace `sigma' = sqrt(0.3570057) if `gest_age' < 231
+			replace `sigma' = sqrt(0.3570057) if `gest_days' < 231
 			replace `sigma' = 1.01047 + (-0.0080948 * `ga') ///
-				if `gest_age' >= 231 & `sex' == "`male'"
+				if `gest_days' >= 231 & `sex' == "`male'"
 			replace `sigma' = 0.6806229 ///
-				if `gest_age' >= 231 & `sex' == "`female'"		
+				if `gest_days' >= 231 & `sex' == "`female'"
 		}
 		tempvar q p z
-		if "`conversion'" == "v2z" | "`conversion'" == "v2p" {
+		if "`conversion'" == "v2z" | "`conversion'" == "v2c" {
 			qui {
 				gen double `q' = `input'
 				gen double `z' = (`q' - `mu') / `sigma'
 				replace `return' = `z'
 			}
-			if "`conversion'" == "v2p" {
+			if "`conversion'" == "v2c" {
 				qui replace `return' = normal(`z')  
 			}
 		}
-		else if "`conversion'" == "z2v" | "`conversion'" == "p2v" {
+		else if "`conversion'" == "z2v" | "`conversion'" == "c2v" {
 			qui {
 				gen double `z' = `input'
-				if "`conversion'" == "p2v" {
+				if "`conversion'" == "c2v" {
 					qui replace `z' = invnormal(`input')  
 				}
 				gen double `q' = `z' * `sigma' + `mu'
@@ -269,7 +270,7 @@ program define _gig_nbs
 	}
 	else if inlist("`acronym'", "ffmfga", "bfpfga", "fmfga") {
 		tempvar mu sigma
-		qui generate `check_ga' = 0 if `gest_age' < 266 | `gest_age' > 294
+		qui generate `check_ga' = 0 if `gest_days' < 266 | `gest_days' > 294
 		
 		// Find reference GAMLSS coeffecients
 		local basename = "ig_nbsNORMBODYCOMP.dta"
@@ -296,27 +297,27 @@ program define _gig_nbs
 			sort `n'
 			gen double `mu' = ///
 				nbsBC_intercept + ///
-				nbsBC_x * `gest_age' + ///
-				nbsBC_x2 * (`gest_age' ^ 2) + ///
-				nbsBC_x3 * (`gest_age' ^ 3)
+				nbsBC_x * `gest_days' + ///
+				nbsBC_x2 * (`gest_days' ^ 2) + ///
+				nbsBC_x3 * (`gest_days' ^ 3)
 			gen double `sigma' = nbsBC_sigma
 			drop nbsBC_* `n'
 		}
 		tempvar q p z
-		if "`conversion'" == "v2z" | "`conversion'" == "v2p" {
+		if "`conversion'" == "v2z" | "`conversion'" == "v2c" {
 			qui {
 				gen double `q' = `input'
 				gen double `z' = (`q' - `mu') / `sigma'
 				replace `return' = `z'
 			}
-			if "`conversion'" == "v2p" {
+			if "`conversion'" == "v2c" {
 				qui replace `return' = normal(`z')  
 			}
 		}
-		else if "`conversion'" == "z2v" | "`conversion'" == "p2v" {
+		else if "`conversion'" == "z2v" | "`conversion'" == "c2v" {
 			qui {
 				gen double `z' = `input'
-				if "`conversion'" == "p2v" {
+				if "`conversion'" == "c2v" {
 					qui replace `z' = invnormal(`input')  
 				}
 				gen double `q' = `mu' + (`z' * `sigma')
@@ -326,7 +327,7 @@ program define _gig_nbs
 		}
 	}
 	qui {
-		cap gen `check_ga' = `gest_age' >= 168 & `gest_age' <= 300
+		cap gen `check_ga' = `gest_days' >= 168 & `gest_days' <= 300
         	gen `check_sex' = `sex' == "`male'" | `sex' == "`female'"
 		if "`sex_was_str'" == "0" destring(`sex'), replace
 		replace `return' = . ///

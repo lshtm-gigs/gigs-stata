@@ -33,20 +33,21 @@ program define _gwho_gs
 		*/ "."
 		exit 198
 	}
-	capture assert inlist("`conversion'", "v2p", "v2z", "p2v", "z2v")
+	capture assert inlist("`conversion'", "v2c", "v2z", "c2v", "z2v")
 	if _rc {
 		di as text "`conversion'" as error " is an invalid chart code. The " /*
-		*/ as error "only valid choices are " as text "v2p, v2z, p2v," as /*
+		*/ as error "only valid choices are " as text "v2c, v2z, c2v," as /*
 		*/ error " or " as text "z2v" as error "."
 		exit 198
 	}
+	
+	syntax [if] [in], Xvar(varname numeric) sex(varname) SEXCode(string)  /*
+		*/ [BY(string)]
 	
 	if `"`by'"' != "" {
 		_egennoby who_gs() `"`by'"'
 		/* NOTREACHED */
 	}
-	
-	syntax [if] [in], Xvar(varname numeric) sex(varname) SEXCode(string)
 	
 	local 1 `sexcode'
 	*zap commas to spaces (i.e. commas indulged)
@@ -156,7 +157,7 @@ program define _gwho_gs
  	}
 	
 	qui generate `type' `return' = .
-	if "`conversion'" == "v2p" | "`conversion'" == "v2z" {
+	if "`conversion'" == "v2c" | "`conversion'" == "v2z" {
 		tempvar _z z_out
 		qui {
 			gen double `_z' = (abs((`input'  / `M') ^ `L') - 1) / (`S' * `L')
@@ -180,14 +181,14 @@ program define _gwho_gs
 			}
 			replace `return' = `_z'		
 		}
-		if "`conversion'" == "v2p" {
+		if "`conversion'" == "v2c" {
 			qui replace `return' = normal(`_z')
 		}
 	}
-	else if "`conversion'" == "p2v" | "`conversion'" == "z2v" {
+	else if "`conversion'" == "c2v" | "`conversion'" == "z2v" {
 		tempvar z _q q_out
 		qui gen `z' = `input'
-		if "`conversion'" == "p2v" {
+		if "`conversion'" == "c2v" {
 			qui replace `z' = invnormal(`z')
 		}
 		qui {
