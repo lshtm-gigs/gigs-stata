@@ -1,6 +1,6 @@
 capture program drop _gclassify_svn
 capture program drop SVN_Badsyntax
-*! version 0.2.4 (SJxx-x: dmxxxx)
+*! version 0.3.0 (SJxx-x: dmxxxx)
 program define _gclassify_svn
 	version 16
 	preserve
@@ -18,12 +18,13 @@ program define _gclassify_svn
 		error 198
 	}
 	
+	syntax [if] [in], GEST_days(varname numeric) sex(varname) SEXCode(string) /*
+		*/ [by(string)]
+	
 	if `"`by'"' != "" {
-		_egennoby classify_sga() `"`by'"'
+		_egennoby classify_svn() `"`by'"'
 		/* NOTREACHED */
 	}
-	
-	syntax [if] [in], gest_age(varname numeric) sex(varname) SEXCode(string)
 	
 	local 1 `sexcode'
 	*zap commas to spaces (i.e. commas indulged)
@@ -55,19 +56,20 @@ program define _gclassify_svn
  	tempvar sga is_term is_sga
 	qui {
 		egen double `sga' = classify_sga(`input'), ///
-			gest_age(`gest_age') sex(`sex') sexcode(m="`male'", f="`female'")
-		gen `is_sga' = `sga' < 0
-		gen `is_term' = `gest_age' >= 259 // 259 days = 37 weeks
+			gest_days(`gest_days') sex(`sex') sexcode(m="`male'", f="`female'")
+		gen `is_term' = `gest_days' >= 259 // 259 days = 37 weeks
 	    gen `type' `return' = .
-	    replace `return' = -2 if !`is_term' & `is_sga'
-	    replace `return' = -1 if !`is_term' & !`is_sga'
-	    replace `return' = 1 if `is_term' & `is_sga'
-		replace `return' = 2 if `is_term' & !`is_sga'
-	    replace `return' = . if `sga' == . | `touse' == 0
-	} 
-	capture label define svn_labels ///
-		-2 "Preterm SGA" -1 "Preterm non-SGA" 1 "Term SGA" 2 "Term non-SGA"
-	label values `return' svn_labels
+	    replace `return' = -4 if `is_term' == 0 & `sga' == -1
+	    replace `return' = -3 if `is_term' == 0 & `sga' == 0
+        replace `return' = -2 if `is_term' == 0 & `sga' == 1
+        replace `return' = -1 if `is_term' == 1 & `sga' == -1
+        replace `return' =  0 if `is_term' == 1 & `sga' == 0
+        replace `return' =  1 if `is_term' == 1 & `sga' == 1
+        replace `return' =  . if `sga' == . | `touse' == 0
+	}
+	cap la de svn_labels -4 "Preterm SGA" -3 "Preterm AGA" -2 "Preterm LGA" ///
+	    -1 "Term SGA" 0 "Term AGA" 1 "Term LGA"
+	la val `return' svn_labels
 	restore, not
 end
 
