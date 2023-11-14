@@ -1,14 +1,14 @@
 cli_redbold <- function(text) cli::col_red(cli::style_bold(text))
 
-compare_ig_nbs <- function(acronym, sex, z_or_p) {
+compare_ig_nbs <- function(acronym, sex, z_or_c) {
   sex_str <- if (sex == "M") "male" else if (sex == "F") "female"
 
-  z_or_p_stata <- if (z_or_p == "z") "z2v"  else if (z_or_p == "p") "c2v"
+  z_or_c_stata <- if (z_or_c == "z") "z2v"  else if (z_or_c == "c") "c2v"
   dta <- file.path("tests", "outputs", "ig_nbs",
-            paste0(acronym, "_", z_or_p_stata, "_", sex_str, ".dta"))
+            paste0(acronym, "_", z_or_c_stata, "_", sex_str, ".dta"))
 
   stata <- if (file.exists(dta)) haven::read_dta(file = dta) else {
-    is_bodycomp_z2v <- z_or_p_stata == "z2v" & (acronym %in% c("fmfga", "ffmfga", "bfpfga"))
+    is_bodycomp_z2v <- z_or_c_stata == "z2v" & (acronym %in% c("fmfga", "ffmfga", "bfpfga"))
     if (is_bodycomp_z2v) {
       cli::cli_alert_info(text = "File not found: {.file {dta}}")
       return(TRUE)
@@ -18,7 +18,7 @@ compare_ig_nbs <- function(acronym, sex, z_or_p) {
     }
   }
 
-  z_or_p_r <- if (stringr::str_detect(z_or_p, pattern = "z")) {
+  z_or_p_r <- if (stringr::str_detect(z_or_c, pattern = "z")) {
     "zscores"
   } else {
     "percentiles"
@@ -55,10 +55,10 @@ compare_ig_nbs <- function(acronym, sex, z_or_p) {
   }
 }
 
-compare_ig_png <- function(acronym, sex, z_or_p, interactive = FALSE) {
+compare_ig_png <- function(acronym, sex, z_or_c, interactive = FALSE) {
   sex_str <- if (sex == "M") "male" else if (sex == "F") "female"
 
-  z_or_p_stata <- if (z_or_p == "z") "z2v"  else if (z_or_p == "p") "c2v"
+  z_or_p_stata <- if (z_or_c == "z") "z2v"  else if (z_or_c == "c") "c2v"
   dta <- file.path("tests", "outputs", "ig_png",
             paste0(acronym, "_", z_or_p_stata, "_", sex_str, ".dta"))
 
@@ -68,7 +68,7 @@ compare_ig_png <- function(acronym, sex, z_or_p, interactive = FALSE) {
       return(FALSE)
   }
 
-  z_or_p_r <- if (stringr::str_detect(z_or_p, pattern = "z")) {
+  z_or_p_r <- if (stringr::str_detect(z_or_c, pattern = "z")) {
     "zscores"
   } else {
     "percentiles"
