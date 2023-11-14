@@ -1,6 +1,6 @@
 capture program drop _gclassify_sga
 capture program drop SGA_Badsyntax
-*! version 0.2.4 (SJxx-x: dmxxxx)
+*! version 0.3.0 (SJxx-x: dmxxxx)
 program define _gclassify_sga
 	version 16
 	preserve
@@ -18,12 +18,13 @@ program define _gclassify_sga
 		error 198
 	}
 	
+	syntax [if] [in], GEST_days(varname numeric) sex(varname) SEXCode(string) /*
+		*/ [SEVere by(string)]
+	
 	if `"`by'"' != "" {
 		_egennoby classify_sga() `"`by'"'
 		/* NOTREACHED */
 	}
-	
-	syntax [if] [in], gest_age(varname numeric) sex(varname) SEXCode(string)
 	
 	local 1 `sexcode'
 	*zap commas to spaces (i.e. commas indulged)
@@ -55,15 +56,22 @@ program define _gclassify_sga
  	tempvar p_temp
 	egen double `p_temp' = ig_nbs(`input', "wfga", "v2p"), ///
 		gest_age(`gest_age') sex(`sex') sexcode(m="`male'", f="`female'")
+		gest_days(`gest_days') sex(`sex') sexcode(m="`male'", f="`female'")
 	qui {
 	    generate `type' `return' = 0
 	    replace `return' = -1 if float(`p_temp') < 0.1
 	    replace `return' = 1 if float(`p_temp') > 0.9
-	    replace `return' = -2 if float(`p_temp') < 0.03
 	    replace `return' = . if `p_temp' == . | `touse' == 0
-	} 
-	capture label define sga_labels -2 "severely SGA" -1 "SGA" 0 "AGA" 1 "LGA"
-	label values `return' sga_labels
+	}
+	cap la de sga_labels -1 "SGA" 0 "AGA" 1 "LGA"
+	cap la de sev_sga_labels -2 "severely SGA" -1 "SGA" 0 "AGA" 1 "LGA"
+	if "`severe'"=="" {
+		la val `return' sga_labels
+	}
+	else {
+		replace `return' = -2 if float(`p_temp') < 0.03
+	    la val `return' sev_sga_labels
+	}
 	restore, not
 end
 
