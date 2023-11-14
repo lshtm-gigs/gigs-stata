@@ -1,5 +1,5 @@
 capture program drop _gclassify_wasting
-*! version 0.2.4 (SJxx-x: dmxxxx)
+*! version 0.3.0 (SJxx-x: dmxxxx)
 program define _gclassify_wasting
 	version 16
 	preserve
@@ -16,14 +16,15 @@ program define _gclassify_wasting
 	if `"`paren'"' != ")" {
 		error 198
 	}
-	
+
+	syntax [if] [in], LENHT_cm(varname numeric) /*
+		*/ GEST_days(varname numeric) age_days(varname numeric) /*
+		*/ sex(varname) SEXCode(string) [OUTliers BY(string)]
+
 	if `"`by'"' != "" {
 		_egennoby classify_wasting() `"`by'"'
 		/* NOTREACHED */
 	}
-	
-	syntax [if] [in], LENHT_cm(varname numeric) lenht_method(varname) ///
-		LENHTCode(string) sex(varname) SEXCode(string) 
 	
 	local 1 `sexcode'
 	local 1 : subinstr local 1 "," " ", all
@@ -47,56 +48,51 @@ program define _gclassify_wasting
  		local male "`6'"
  		local female "`3'"
  	} 
-	else WastingSex_Badsyntax	
-	
-	local 2 `lenhtcode'
-	local 2 : subinstr local 2 "," " ", all
-	tokenize `"`2'"', parse("= ")
-	
- 	if "`1'" == substr("length", 1, length("`1'")) {
-		if "`2'" ~= "=" | "`5'" ~= "=" | /*
-		*/ "`4'" ~= substr("height", 1, length("`4'")) | /*
-		*/ "`7'" ~= "" {
- 			WastingLenht_Badsyntax
- 		}
- 		local length "`3'"
-  		local height "`6'"
-	} 
-	else if "`1'" == substr("height", 1,length("`1'")) {
-	    if "`2'" ~= "=" | "`5'" ~= "=" | /*
- 		*/ "`4'" ~= substr("length", 1, length("`4'") | /*
- 		*/ "`7'" ~= "" {
- 			WastingLenht_Badsyntax
- 		}
- 		local length "`6'"
- 		local height "`3'"
- 	} 
-	else WastingLenht_Badsyntax
+	else WastingSex_Badsyntax
 
 	marksample touse
 
-	tempvar z z_height z_length
+	tempvar z z_WHO_wfh z_WHO_wfl z_png
 	qui {
-		egen double `z_height' = who_gs(`weight_kg', "wfh", "v2z"), ///
-			xvar(`lenht_cm') sex(`sex') sexcode(m="`male'", f="`female'") 
-		egen double `z_length' = who_gs(`weight_kg', "wfl", "v2z"), ///
+		egen double `z_WHO_wfl' = who_gs(`weight_kg', "wfl", "v2z"), ///
 			xvar(`lenht_cm') sex(`sex') sexcode(m="`male'", f="`female'")
-	
+		egen double `z_WHO_wfh' = who_gs(`weight_kg', "wfh", "v2z"), ///
+			xvar(`lenht_cm') sex(`sex') sexcode(m="`male'", f="`female'")
+		egen double `z_png' = ig_png(`weight_kg', "wfl", "v2z"), ///
+			xvar(`lenht_cm') sex(`sex') sexcode(m="`male'", f="`female'")
+		
+		tempvar pma_weeks use_png use_who
+		gen double `pma_weeks' = floor((`age_days' + `gest_days') / 7)
+		gen byte `use_png' = 1 if `gest_days' >= 182 & `gest_days' < 259 & ///
+			`pma_weeks' >= 27 & `pma_weeks' <= 64
+		
 		gen double `z' = .
-		replace `z' = `z_length' if `lenht_method' == "`length'"
-		replace `z' = `z_height' if `lenht_method' == "`height'"
+		replace `z' = `z_png' if `use_png' == 1
+		replace `z' = `z_WHO_wfl' if `gest_days' >= 259 & ///
+			`age_days' < 731
+		replace `z' = `z_WHO_wfh' if `gest_days' >= 259 & ///
+			`age_days' >= 731
+		
 		
 		gen `type' `return' = .
 		replace `return' = -1 if float(`z') <= -2
 		replace `return' = -2 if float(`z') <= -3
 		replace `return' = 0 if abs(float(`z')) < 2
 		replace `return' = 1 if float(`z') >= 2
-		replace `return' = -10 if abs(float(`z')) > 5
-		replace `return' = . if `z' == . | `touse' == 0
+		replace `return' = . if `z' == . | `touse' == 0 | `gest_days' == .
 	}	
-	capture label define wasting_labels -10 "implausible" ///
-	    -2 "severe wasting"  -1 "wasting" 0 "normal" 1 "overweight"
-	label values `return' wasting_labels
+	cap la def wasting_labs -2 "severe wasting"  -1 "wasting" ///
+	    0 "normal" 1 "overweight"
+	cap la def wasting_labs_out -2 "severe wasting"  -1 "wasting" ///
+	    0 "normal" 1 "overweight" 999 "outlier"
+	
+	if "`outliers'"=="" {
+		la val `return' wasting_labs
+	}
+	else {
+		qui replace `return' = 999 if abs(float(`z')) > 5 & `return' != .
+		la val `return' wasting_labs_out
+	}
 	restore, not
 end
 
