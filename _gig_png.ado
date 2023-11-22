@@ -1,7 +1,7 @@
 capture program drop _gig_png
 capture program drop Badsexvar_png
 capture program drop Badsyntax_png
-*! version 0.3.0 (SJxx-x: dmxxxx)
+*! version 0.3.1 (SJxx-x: dmxxxx)
 program define _gig_png
  	version 16
 	preserve

@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.3.0 14 Nov 2023}{...}
+{* *! version 0.3.1 22 Nov 2023}{...}
 {vieweralsosee "" "--"}{...}
 {vieweralsosee "gigs: Classification functions" "help classify_sga"}{...}
 {viewerjumpto "Syntax" "ig_nbs##syntax"}{...}

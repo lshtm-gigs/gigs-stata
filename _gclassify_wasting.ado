@@ -1,5 +1,5 @@
 capture program drop _gclassify_wasting
-*! version 0.3.0 (SJxx-x: dmxxxx)
+*! version 0.3.1 (SJxx-x: dmxxxx)
 program define _gclassify_wasting
 	version 16
 	preserve
