@@ -48,7 +48,6 @@
 {pstd}London, U.K.{p_end}
 {pstd}eric.ohuma@lshtm.ac.uk{p_end}
 
-
 {title:Also see}
 
 {p 4 14 2}Conversion functions: {help ig_nbs:documentation}

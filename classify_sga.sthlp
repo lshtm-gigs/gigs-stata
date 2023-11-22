@@ -172,12 +172,20 @@
 
 {pmore}This function takes one argument:
 
-{pmore}{varname}is the variable name for weight in kg in your dataset (for
+{pmore}{varname} is the variable name for weight in kg in your dataset (for
  example, {cmd:weight_kg}, {cmd:mean_wgt}).
  
 {marker options}{...}
 {title:Options}
 {dlgtab:Non-specific}
+
+{phang}{opt gest:_days(varname numeric)} specifies gestational age in days for
+ newborns. In {cmd:classify_sga()} and {cmd:classify_sga()},any value outside
+ the range of valid gestational ages as specified in the
+ {help ig_nbs##tab1:ig_nbs() documentation} will return a missing value. In the
+ other classification functions, this variable is used to compute post-menstrual
+ ages, and therefore determines which growth standard is applied for each
+ observation.
 
 {phang}{opt sex(varname)} specifies the sex variable. It can be int, byte, or
  string. The codes for {cmd:male} and {cmd:female} must be specified by the 
@@ -188,33 +196,19 @@
  in either  order, and the comma is optional. Quotes around the codes are not
  allowed, even if your sex variable is a string.
 
-{dlgtab:Size-for-GA/SVN classification}
+{dlgtab:Wasting, stunting, weight-for-age (underweight) classifications}
 
-{phang}{opt gest:_days(varname numeric)} specifies gestational age in days for
- newborns. Any value outside the range of valid gestational ages as specified in
- the {help ig_nbs##tab1:ig_nbs() documentation} will return a missing value.
+{phang}{opt age_days(varname numeric)} specifies age in days for each
+ observation. This variable is used to compute post-menstrual
+ ages, and therefore determines which growth standard is applied for each
+ observation.
 
 {dlgtab:Wasting classification}
 
-{phang}{opt gest:_days(varname numeric)} specifies the gestational age at
- birth in days for each observation.
-
-{phang}{opt age_days(varname numeric)} specifies age in days for each
- observation.
-
-{dlgtab:Stunting classification}
-
 {phang}{opt lenht:_cm(varname numeric)} specifies the length or height in cm for
- each observation. The method used to obtain these values should be recorded in
- {cmd:lenht method()}.
-
-{dlgtab:Weight-for-age classification}
-
-{phang}{opt gest:_days(varname numeric)} specifies the gestational age at
- birth in days for each observation.
-
-{phang}{opt age_days(varname numeric)} specifies age in days for each
- observation.
+ each observation. It is assumed that where {hi:age_days()} is less than 731,
+ recumbent length measurements are provided, and that where {hi:age_days()} is
+ more than or equal to 731, standing height measurements are provided.
 
 {marker remarks}{...}
 {title:Remarks}
@@ -238,17 +232,20 @@
 {pstd}Classifying SGA, where {cmd:sex} contains the codes {cmd:1} and {cmd:2}:{p_end}
 {phang2}{cmd:. egen sga = classify_sga(weight_kg), gest_days(ga_days) sex(sex) sexcode(male=1, female=2)}
 
+{pstd}Include severe SGA classifications with the {opt:severe} option:{p_end}
+{phang2}{cmd:. egen sga = classify_sga(weight_kg), gest_days(ga_days) sex(sex) sexcode(male=1, female=2) severe}
+
 {pstd}Classifying stunting, where {cmd:sex} contains the codes {cmd:M} and {cmd:F}:{p_end}
 {phang2}{cmd:. egen stunting = classify_stunting(weight_kg), gest_days(ga_days) age_days(age) sex(sex) sexcode(male=M, female=F)}
 
-{pstd}Classifying wasting, where {cmd:sex} contains the codes {cmd:M} and {cmd:F}:{p_end}
-{phang2}{cmd:. egen wasting = classify_wasting(weight_kg), lenht(lenht_cm) sex(sex) sexcode(male=M, female=F)}
+{pstd}Classifying wasting, where {cmd:sex} contains the codes {cmd:m} and {cmd:f}:{p_end}
+{phang2}{cmd:. egen wasting = classify_wasting(weight_kg), lenht_cm(lenht_cm) gest_days(ga_days) age_days(age) sex(sex) sexcode(male=m, female=f)}
 
-{pstd}You can use just the first letters of the {cmd:sexcode()} and {cmd:lenhtcode()} arguments instead:{p_end}
-{phang2}{cmd:. egen wasting = classify_wasting(weight_kg), lenht(lenht_cm) sex(sex) sexcode(m=Male, f=Female)}
+{pstd}You can use just the first letters of the {cmd:lenht_cm()}, {cmd:gest_days()}, and {cmd:sexcode()} arguments instead:{p_end}
+{phang2}{cmd:. egen wasting = classify_wasting(weight_kg), lenht(lenht_cm) gest(ga_days) age_days(age) sex(sex) sexc(m=Male, f=Female)}
 
-{pstd}Classifying weight-for-age, where {cmd:sex} contains the codes {cmd:Male} and {cmd:Female}:{p_end}
-{phang2}{cmd:. egen wfa = classify_wfa(weight_kg), gest_days(ga_days) age_days(age) sex(sex) sexcode(m=Male, f=Female)}
+{pstd}Request that gigs classifies outlier/implasuible values with the {opt:outliers} option:{p_end}
+{phang2}{cmd:. egen wasting = classify_wasting(weight_kg), lenht(lenht_cm) gest(ga_days) age_days(age) sex(sex) sexc(m=Male, f=Female) outliers}
 
 {marker authors}{...}
 {title:Authors}
