@@ -211,7 +211,7 @@ interpolation <- mapply(FUN = compare_interpolation, standards, acronyms, sexes)
 if (!interactive()) Sys.sleep(wait_time_secs)
 
 cli::cli_h1(text = "Overall")
-overall <- c(ig_nbs, ig_png, who_gs, interpolation)
+overall <- unlist(c(ig_nbs, ig_png, who_gs, interpolation))
 if (all(overall)) {
   cli::cli_alert_success(text = "All tests passed!")
 } else {
@@ -220,5 +220,3 @@ if (all(overall)) {
   num_failed <- num_overall - num_passed
   cli::cli_alert_danger(text = "{num_failed} of {num_overall} test{?s} failed.")
 }
-
-if (!interactive()) Sys.sleep(time = 20)

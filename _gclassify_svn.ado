@@ -1,6 +1,6 @@
 capture program drop _gclassify_svn
 capture program drop SVN_Badsyntax
-*! version 0.3.0 (SJxx-x: dmxxxx)
+*! version 0.3.1 (SJxx-x: dmxxxx)
 program define _gclassify_svn
 	version 16
 	preserve

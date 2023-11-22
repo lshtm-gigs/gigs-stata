@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.3.0 14 Nov 2023}{...}
+{* *! version 0.3.1 22 Nov 2023}{...}
 {vieweralsosee "" "--"}{...}
 {vieweralsosee "gigs: Conversion functions" "help ig_nbs"}{...}
 {vieweralsosee "gigs: Classification functions" "help classify_sga"}{...}
@@ -47,7 +47,6 @@
 {pstd}London School of Hygiene and Tropical Medicine{p_end}
 {pstd}London, U.K.{p_end}
 {pstd}eric.ohuma@lshtm.ac.uk{p_end}
-
 
 {title:Also see}
 

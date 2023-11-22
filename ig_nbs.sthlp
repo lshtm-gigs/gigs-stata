@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.3.0 14 Nov 2023}{...}
+{* *! version 0.3.1 22 Nov 2023}{...}
 {vieweralsosee "" "--"}{...}
 {vieweralsosee "gigs: Classification functions" "help classify_sga"}{...}
 {viewerjumpto "Syntax" "ig_nbs##syntax"}{...}
@@ -146,7 +146,6 @@ also {it:fcn} dependent.
  the acronym argument (see {help ig_nbs##tab1:Table 1}) will return a missing
  value.
 
-
 {marker standards}{...}
 {title:Available Standards}
 
@@ -200,7 +199,10 @@ also {it:fcn} dependent.
 {pstd}These functions will return missing values where values are outside the
  ranges given above, but otherwise will not automatically detect data
  errors. Ensure you check your data before using these functions or you may
- receive incorrect results.
+ receive incorrect results. Additionally, when providing centiles to the
+ function with {cmd: "c2v"}, ensure your inputs are between 0 and 1, or the
+ function will return missing values (e.g. for 25th centile, use 0.25; for 95th
+ centile, use 0.95).
 
 {marker examples}{...}
 {title:Examples}

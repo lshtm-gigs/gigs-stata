@@ -1,4 +1,4 @@
-*! version 0.3.0 (SJxx-x: dmxxxx)
+*! version 0.3.1 (SJxx-x: dmxxxx)
 version 16
 mata:
 	mata set matastrict on
