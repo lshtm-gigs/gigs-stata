@@ -2,13 +2,12 @@
 {* *! version 0.3.1 22 Nov 2023}{...}
 {vieweralsosee "" "--"}{...}
 {vieweralsosee "gigs: Classification functions" "help classify_sga"}{...}
-{viewerjumpto "Syntax" "ig_nbs##syntax"}{...}
-{viewerjumpto "Description" "ig_nbs##description"}{...}
-{viewerjumpto "Functions" "ig_nbs##functions"}{...}
-{viewerjumpto "Options" "ig_nbs##options"}{...}
-{viewerjumpto "Available Standards" "ig_nbs##standards"}{...}
-{viewerjumpto "Remarks" "ig_nbs##remarks"}{...}
-{viewerjumpto "Examples" "ig_nbs##examples"}{...}
+{viewerjumpto "Syntax" "classify_sga##syntax"}{...}
+{viewerjumpto "Description" "classify_sga##description"}{...}
+{viewerjumpto "Functions" "classify_sga##functions"}{...}
+{viewerjumpto "Options" "classify_sga##options"}{...}
+{viewerjumpto "Remarks" "classify_sga##remarks"}{...}
+{viewerjumpto "Examples" "classify_sga##examples"}{...}
 
 {hi:help classify_sga, help classify_svn, help classify_stunting, help classify_wasting, help classify_wfa}{right: ({browse "https://www.overleaf.com/project/641db63564edd62fb54c963b":SJXX-X: st0001})}
 {hline}
@@ -117,10 +116,11 @@
  example, {cmd:weight_kg}, {cmd:mean_wgt}).
 
 {p 4 4 2}{hi:classify_stunting(}{varname}{cmd:)} is used to classify stunting in
- infants up to five years old using the INTERGROWTH-21st standards for postnatal
- growth or WHO Child Growth Standards as appropriate. It produces a variable 
- with the following values and labels, where 'outlier' classifications are only
- applied if the {cmd:outliers} option is specified by the user.
+ infants up to five years old using appropriate INTERGROWTH-21st/WHO
+ length/height-for-age standards for each observation, based on their
+ gestational age and age in days. It produces a variable with the following
+ values and labels, where 'outlier' classifications are only applied if the
+ {cmd:outliers} option is specified by the user.
 
 {col 20}Value{col 27}Label{col 45}{it:Z}-score range
 {col 20}{hline 38}
@@ -135,10 +135,12 @@
  example, {cmd:meaninflen}, {cmd:lenht}).
  
 {p 4 4 2}{hi:classify_wasting(}{varname}{cmd:)} is used to classify wasting in
- infants up to five years old using the WHO Child Growth Standards for
- weight-for-length and weight-for-height as appropriate. It produces a variable
- with the following values and labels, where 'outlier' classifications are only
- applied if the {cmd:outliers} option is specified by the user.
+ infants up to five years old using the INTERGROWTH-21st Postnatal Growth/WHO
+ Child Growth standards for weight-for-length and weight-for-height as
+ appropriate, based on each observation's gestational age and age in days. It
+ produces a variable with the following values and labels, where 'outlier'
+ classifications are only applied if the {cmd:outliers} option is specified by
+ the user.
 
 {col 20}Value{col 27}Label{col 45}{it:Z}-score range
 {col 20}{hline 38}
@@ -154,8 +156,9 @@
  example, {cmd:weight_kg}, {cmd:mean_wgt}).
 
 {p 4 4 2}{hi:classify_wfa(}{varname}{cmd:)} is used to classify weight-for-age
- in infants up to five years old using the INTERGROWTH-21st standards for
- postnatal growth or WHO Child Growth Standards as appropriate. It produces a
+ in infants up to five years old using the INTERGROWTH-21st Newborn
+ Size/Postnatal Growth standards or WHO Child Growth Standards as appropriate,
+ based on each observation's gestational age and age in days. It produces a
  variable with the following values and labels, where 'outlier' classifications
  are only applied if the {cmd:outliers} option is specified by the user.
 
@@ -215,6 +218,14 @@
 
 {marker remarks}{...}
 {title:Remarks}
+
+{pstd}These functions apply z-scoring based on the gestational age and age in
+ days of each observation. In general, observations with a gestational age of
+ zero days are analysed with {cmd:ig_nbs()}. Preterm infants with a
+ post-menstrual age of 27 to 64 weeks (inclusive) are analysed with
+ {cmd:ig_png()}. Term infants and preterm infants over 64 weeks' PMA are
+ analysed with {cmd:who_gs()}. Check out the source code on GitHub to see which
+ standards are applied in each function.
 
 {pstd}These functions will return missing values where values are outside the
  ranges specified for the {help ig_nbs##tab1:gigs conversion functions},
