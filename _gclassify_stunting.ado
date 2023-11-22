@@ -50,18 +50,22 @@ program define _gclassify_stunting
 	else StuntingSex_Badsyntax	
 
 	marksample touse
-	tempvar pma_weeks z_PNG z_WHO z
+	tempvar pma_weeks pma_wks_floored z_NBS z_PNG z_WHO z
 	qui {
-		gen double `pma_weeks' = floor((`age_days' + `gest_days') / 7)
+		gen double `pma_weeks' = (`age_days' + `gest_days') / 7
+		gen double `pma_wks_floored' = floor(`pma_weeks')
+		
+		egen double `z_NBS' = ig_nbs(`input', "lfga", "v2z"), ///
+			gest_days(`gest_days') sex(`sex') sexcode(m="`male'", f="`female'")
 		egen double `z_PNG' = ig_png(`input', "lfa", "v2z"), ///
-			xvar(`pma_weeks') sex(`sex') sexcode(m="`male'", f="`female'")
+			xvar(`pma_wks_floored') sex(`sex') sexcode(m="`male'", f="`female'")
 		egen double `z_WHO' = who_gs(`input', "lhfa", "v2z"), ///
 			xvar(`age_days') sex(`sex') sexcode(m="`male'", f="`female'")
-
-		gen double `z' = `z_PNG' if ///
-		    `gest_days' >= 182 & `gest_days' < 259 & ///
+		
+		gen double `z' = `z_NBS' if `age_days' == 0
+		replace `z' = `z_PNG' if `age_days' > 0 & `gest_days' < 259 & ///
 			`pma_weeks' >= 27 & `pma_weeks' <= 64
-		replace `z' = `z_WHO' if `gest_days' >= 259 | ///
+		replace `z' = `z_WHO' if `age_days' > 0 & `gest_days' >= 259 | ///
 		    (`gest_days' < 259 & `pma_weeks' > 64)
 		
 		generate `type' `return' = .

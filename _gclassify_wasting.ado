@@ -54,25 +54,22 @@ program define _gclassify_wasting
 
 	tempvar z z_WHO_wfh z_WHO_wfl z_png
 	qui {
+		egen double `z_png' = ig_png(`weight_kg', "wfl", "v2z"), ///
+			xvar(`lenht_cm') sex(`sex') sexcode(m="`male'", f="`female'")
 		egen double `z_WHO_wfl' = who_gs(`weight_kg', "wfl", "v2z"), ///
 			xvar(`lenht_cm') sex(`sex') sexcode(m="`male'", f="`female'")
 		egen double `z_WHO_wfh' = who_gs(`weight_kg', "wfh", "v2z"), ///
 			xvar(`lenht_cm') sex(`sex') sexcode(m="`male'", f="`female'")
-		egen double `z_png' = ig_png(`weight_kg', "wfl", "v2z"), ///
-			xvar(`lenht_cm') sex(`sex') sexcode(m="`male'", f="`female'")
 		
 		tempvar pma_weeks use_png use_who
-		gen double `pma_weeks' = floor((`age_days' + `gest_days') / 7)
-		gen byte `use_png' = 1 if `gest_days' >= 182 & `gest_days' < 259 & ///
+		gen double `pma_weeks' = (`age_days' + `gest_days') / 7
+		gen byte `use_png' = 1 if `gest_days' < 259 & ///
 			`pma_weeks' >= 27 & `pma_weeks' <= 64
 		
 		gen double `z' = .
 		replace `z' = `z_png' if `use_png' == 1
-		replace `z' = `z_WHO_wfl' if `gest_days' >= 259 & ///
-			`age_days' < 731
-		replace `z' = `z_WHO_wfh' if `gest_days' >= 259 & ///
-			`age_days' >= 731
-		
+		replace `z' = `z_WHO_wfl' if `use_png' != 1 & `age_days' < 731
+		replace `z' = `z_WHO_wfh' if `use_png' != 1 & `age_days' >= 731
 		
 		gen `type' `return' = .
 		replace `return' = -1 if float(`z') <= -2
