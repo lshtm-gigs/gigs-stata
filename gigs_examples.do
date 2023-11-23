@@ -1,36 +1,29 @@
 use life6mo
 list in f/10, noobs abbreviate(10) sep(10)
 
-local 40weeks 7 * 40
-local 37weeks 7 * 37 
+local 37weeks 7 * 37
 
-tempvar agedays
 gen agedays = pma - gestage
-egen waz_who = who_gs(meaninfwgt/1000, "wfa", "v2z") if gestage > `37weeks', ///
+egen double waz_who = who_gs(meaninfwgt/1000, "wfa", "v2z") ///
+    if gestage >= `37weeks' & agedays > 0, ///
 	xvar(agedays) sex(sex) sexcode(m=1, f=2)
 drop agedays
-list in f/100 if gestage > 259, noobs sep(10)
+list  in f/100 if gestage > 259, noobs sep(10)
 
-egen waz_nbs = ig_nbs(meaninfwgt/1000, "wfga", "v2z") ///
-	if visitweek == 0, ///
-	gest_age(gestage) sex(sex) sexcode(m=1, f=2)
+egen double waz_nbs = ig_nbs(meaninfwgt/1000, "wfga", "v2z") ///
+	if agedays == 0, ///
+	gest_days(gestage) sex(sex) sexcode(m=1, f=2)
 
-gen pma_weeks = round(pma/7, 1)
-egen waz_png = ig_png(meaninfwgt/1000, "wfa", "v2z") ///
-	if gestage < `37weeks' & visitweek > 0 & visitweek <= 18, ///
-	pma_weeks(pma_weeks) sex(sex) sexcode(m=1, f=2)
-drop pma_weeks
+gen pma_weeks = pma / 7
+gen pma_weeks_floored = floor(pma / 7)
+egen double waz_png = ig_png(meaninfwgt/1000, "wfa", "v2z") ///
+	if gestage < `37weeks' & agedays > 0, ///
+	xvar(pma_weeks_floored) sex(sex) sexcode(m=1, f=2)
+drop pma_weeks pma_weeks_floored
 
-gen age_corrected = (pma - gestage) + (gestage - `40weeks')
-egen waz_whocorr = who_gs(meaninfwgt/1000, "wfa", "v2z") ///
-	if gestage < `37weeks' & visitweek == 26, ///
-	xvar(age_corrected) sex(sex) sexcode(m=1, f=2)
-drop age_corrected
-
-gen waz = waz_who if gestage > `37weeks'
-replace waz = waz_nbs if visitweek == 0
-replace waz = waz_png if gestage < `37weeks' & visitweek > 0 & visitweek <= 18
-replace waz = waz_whocorr if gestage < `37weeks' & visitweek == 26
+gen double waz = waz_who if gestage > `37weeks'
+replace waz = waz_png if gestage < `37weeks'
+replace waz = waz_nbs if agedays == 0
 
 list gestage pma visitweek waz_* waz in f/10, noobs sep(10)
 drop waz_*
