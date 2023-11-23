@@ -110,7 +110,7 @@ program define _gig_nbs
 		qui gen byte nbsMSNT_sex = 1 if `sex' == "`male'"
 		qui replace nbsMSNT_sex = 0 if `sex' == "`female'"
 		
-		// Append, then interpolate in Mata (see gigs_ipolate_coeffs.ado)
+		// Append, then interpolate in Mata (see gigs_ipolate_coeffs.mata)
 		qui {
 			tempvar n appended need_interp
 			qui append using "`filepath'", gen(`appended')
