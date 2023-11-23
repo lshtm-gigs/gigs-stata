@@ -197,7 +197,6 @@ contains weight measurements for term and preterm infants from birth
 
 ```stata
 . use life6mo
-. local 40weeks 7 * 40
 . local 37weeks 7 * 37
 . list in f/10, noobs abbreviate(10) sep(10)
  ___________________________________________________________
@@ -224,24 +223,24 @@ INTERGROWTH-21<sup>st</sup> Newborn Size Standards, WHO/INTERGROWTH Postnatal
 standards after birth).
 
 ```stata
-. egen waz_nbs = ig_nbs(meaninfwgt/1000, "wfga", "v2z") ///
->     if visitweek == 0, ///
->     gest_age(gestage) sex(sex) sexcode(m=1, f=2)
-(7,308 missing values generated)
+. egen double waz_nbs = ig_nbs(meaninfwgt/1000, "wfga", "v2z") ///
+>     if agedays == 0, ///
+>     gest_days(gestage) sex(sex) sexcode(m=1, f=2)
+(8,228 missing values generated)
 
-. gen agedays = pma - gestage
-. egen waz_who = who_gs(meaninfwgt/1000, "wfa", "v2z") ///
->     if gestage > `37weeks´ & visitweek > 0, ///
+. egen double waz_who = who_gs(meaninfwgt/1000, "wfa", "v2z") ///
+>     if agedays > 0 & gestage >= `37weeks', ///
 >     xvar(agedays) sex(sex) sexcode(m=1, f=2)
-(4,657 missing values generated)
-. drop agedays
+(4,073 missing values generated)
 
-. gen pma_weeks = round(pma/7, 1)
-. egen waz_png = ig_png(meaninfwgt/1000, "wfa", "v2z") ///
->     if gestage < `37weeks´ & visitweek > 0 & visitweek <= 18, ///
->     pma_weeks(pma_weeks) sex(sex) sexcode(m=1, f=2)
-(5,391 missing values generated)
-. drop pma_weeks
+
+. gen pma_weeks = pma / 7
+. gen pma_weeks_floored = floor(pma / 7)
+. egen double waz_png = ig_png(meaninfwgt/1000, "wfa", "v2z") ///
+>     if gestage < `37weeks' & agedays > 0, ///
+>     xvar(pma_weeks_floored) sex(sex) sexcode(m=1, f=2)
+(4,659 missing values generated)
+. drop pma_weeks pma_weeks_floored
 
 . gen age_corrected = pma - `40weeks´
 . egen waz_whocorr = who_gs(meaninfwgt/1000, "wfa", "v2z") ///
@@ -254,33 +253,28 @@ standards after birth).
 We can then combine these WAZs into one overall `waz` variable:
 
 ```stata
-. gen waz = waz_who if gestage > `37weeks´
-(4,657 missing values generated)
+. gen double waz = waz_who if gestage > `37weeks'
+(4,749 missing values generated)
+. replace waz = waz_png if gestage < `37weeks'
+(3,757 real changes made)
+. replace waz = waz_nbs if agedays == 0
+(188 real changes made)
 
-. replace waz = waz_nbs if visitweek == 0
-(1,112 real changes made, 4 to missing)
-
-. replace waz = waz_png if gestage < `37weeks´ & visitweek > 0 & visitweek <= 18
-(3,025 real changes made)
-
-. replace waz = waz_whocorr if gestage < `37weeks´ & visitweek == 26
-(420 real changes made)
-
-. list gestage pma visitweek waz_* waz in f/10, noobs
- __________________________________________________________________________
-| gestage   pma   week   waz_who   waz_nbs   waz_png   waz_whocorr   waz   |
-|--------------------------------------------------------------------------|
-| 132       133   0      .         .         .         .             .     |
-| 132       139   1      .         .         .         .             .     |
-| 132       146   2      .         .         .         .             .     |
-| 132       162   4      .         .         .         .             .     |
-| 132       174   6      .         .         .         .             .     |
-| 132       203   10     .         .         7.859     .             7.859 |
-| 132       230   14     .         .         6.699     .             6.699 |
-| 132       258   18     .         .         5.612     .             5.612 |
-| 132       317   26     .         .         .         3.512         3.512 |
-| 237       238   0      .         -.712     .         .             -.712 |
-|--------------------------------------------------------------------------|
+. list visitweek gestage pma waz_* waz in f/10, noobs sep(10)
+  +------------------------------------------------------------------------+
+  | visitw~k   gestage   pma   waz_nbs   waz_who      waz_png          waz |
+  |------------------------------------------------------------------------|
+  |        0       132   133         .         .            .            . |
+  |        1       132   139         .         .            .            . |
+  |        2       132   146         .         .            .            . |
+  |        4       132   162         .         .            .            . |
+  |        6       132   174         .         .            .            . |
+  |       10       132   203         .         .    7.8594946    7.8594946 |
+  |       14       132   230         .         .    7.2548282    7.2548282 |
+  |       18       132   258         .         .    6.0985216    6.0985216 |
+  |       26       132   317         .         .    3.8344571    3.8344571 |
+  |        0       237   238         .         .   -.43606208   -.43606208 |
+  +------------------------------------------------------------------------+
 ```
 
 This `waz` variable can then be used to determine whether infants are 
@@ -294,13 +288,12 @@ remove any observations which were not made at birth. We then use the
 `classify_sga()` command to give us our classifications:
 ```stata
 . use life6mo, clear
-. drop if visitweek != 0
+. keep if (gestage - pma) == 0
 (7,303 observations deleted)
-```
-```
+
 . egen sga = classify_sga(meaninfwgt/1000), ///
->     gest_age(gestage) sex(sex) sexcode(m=1, f=2)
-(5 missing values generated)
+>     gest_days(gestage) sex(sex) sexcode(m=1, f=2)
+(2 missing values generated)
 ```
 
 ## Known issues and bug reporting
