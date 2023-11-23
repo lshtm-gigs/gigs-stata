@@ -129,7 +129,7 @@ program define _gwho_gs
 	qui gen byte whoLMS_sex = 1 if `sex' == "`male'"
 	qui replace whoLMS_sex = 0 if `sex' == "`female'"
 	
-	// Append, then interpolate in Mata (see gigs_ipolate_coeffs.ado)
+	// Append, then interpolate in Mata (see gigs_ipolate_coeffs.mata)
  	qui {
 		tempvar n appended need_interp
 		append using "`filepath'", gen(`appended')
@@ -145,11 +145,11 @@ program define _gwho_gs
 		drop if `appended' == 1
 		tempvar L M S
 		gen double `L' = whoLMS_L
-		// Errors were creeping in from interpolated values being extremely close to
-		// zero without being set as zero. This line replaces extremely small values
-		// in `L' with zero to ensure a correction for skewness isn't performed when
-		// unnecessary.
-		replace `L' = 0 if abs(`L') < 1.414 * 10^-16 // aka Stata double precision
+        // Errors were creeping in from interpolated values being extremely
+        // close to zero without being set as zero. This line replaces extremely
+        // small values in `L' with zero to ensure a correction for skewness
+        // isn't performed when  unnecessary.
+		replace `L' = 0 if abs(`L') < 1.414 * 10^-16 // Stata double precision
 		gen double `M' = whoLMS_M
 		gen double `S' = whoLMS_S
 		drop whoLMS_xvar whoLMS_sex whoLMS_L whoLMS_M whoLMS_S ///

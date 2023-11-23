@@ -7,7 +7,7 @@ foreach file in "_gclassify_sga.ado" "_gclassify_svn.ado" ///
 				"_gclassify_stunting.ado" "_gclassify_wasting.ado" ///
 				"_gclassify_wfa.ado" ///
 				"_gig_nbs.ado" "_gig_png.ado" "_gwho_gs.ado" ///
-				"gigs_ipolate_coeffs.ado" {
+				"gigs_ipolate_coeffs.mata" {
 	run "`file'"
 }
 

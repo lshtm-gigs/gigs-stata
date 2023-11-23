@@ -3,7 +3,7 @@ version 16
 mata:
 	mata set matastrict on
 	
-	// Get interpolated coefficients for
+	// Get interpolated coefficients for coefficient-based growth standards
 	// 
 	// @param colname_xvar Name of a column with x values
 	// @param needs_interp Name of a column
@@ -79,4 +79,6 @@ mata:
 			}
 		}
 	}
+	
+	mata mosave gigs_ipolate_coeffs(), replace
 end
