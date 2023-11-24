@@ -42,8 +42,9 @@ egen sga = classify_sga(meaninfwgt/1000), ///
     gest_days(gestage) sex(sex) sexcode(m=1, f=2)
 gen term_status = "Preterm" if gestage < `37weeks'
 replace term_status = "Term" if gestage >= `37weeks'
-graph bar (count), over(sga) by(term_status, ///
-    title("Size-for-GA category counts by term status") note("")) ///
-    ytitle("Frequency") ///
+graph bar, over(sga) by(term_status, ///
+    title("Percentage of each size-for-GA category by term status") ///
+    note("")) ///
+    ytitle("Percentage") ///
     scheme(sj)
 graph export "gigs_fig2.pdf"
