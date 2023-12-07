@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.3.2 23 Nov 2023}{...}
+{* *! version 0.4.0 07 Dec 2023}{...}
 {vieweralsosee "" "--"}{...}
 {vieweralsosee "gigs: Classification functions" "help classify_sga"}{...}
 {viewerjumpto "Syntax" "ig_nbs##syntax"}{...}
@@ -10,7 +10,7 @@
 {viewerjumpto "Remarks" "ig_nbs##remarks"}{...}
 {viewerjumpto "Examples" "ig_nbs##examples"}{...}
 
-{hi:help gigs, help ig_nbs, help ig_png, help who_gs}{right: ({browse "https://www.overleaf.com/project/641db63564edd62fb54c963b":SJXX-X: st0001})}
+{hi:help gigs, help ig_nbs, help ig_png, help ig_fet, help who_gs}{right: ({browse "https://www.overleaf.com/project/641db63564edd62fb54c963b":SJXX-X: st0001})}
 {hline}
 
 {title:Title}
@@ -33,6 +33,11 @@
 {ifin}{cmd:,} 
 {cmdab:x:var}{cmd:(}{varname}{cmd:)} {cmdab:sex}{cmd:(}{varname}{cmd:)}
 {cmdab:sexc:ode}{cmd:(}{cmdab:m:ale=}{it:code}{cmd:,} {cmdab:f:emale=}{it:code}{cmd:)}
+
+{p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
+{cmd:ig_fet}{cmd:(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
+{ifin}{cmd:,} 
+{cmdab:gest:_days}{cmd:(}{varname}{cmd:)}
 
 {p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
 {cmd:who_gs}{cmd:(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
@@ -98,6 +103,23 @@ also {it:fcn} dependent.
  (value-to-centile), {cmd:"c2v"} (centile-to-value), or {cmd:"z2v"}
  (z-score-to-value).
 
+{p 4 4 2}{hi:ig_fet(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
+ converts between newborn anthropometric data and z-scores/centiles in
+ the INTERGROWTH-21st Fetal Growth standards. It has three arguments:
+
+{pmore}{varname} is the variable name in your dataset which you want to convert
+ to a z-score, centile or anthropometric measure (for example,
+ {cmd:headcirc_mm}, {cmd:weight_g}).
+
+{pmore}{it:acronym} defines the INTERGROWTH-21st Fetal Growth standard by
+ which to convert the values in {varname}, and should be one of the acronyms
+ listed in the {help ig_nbs##standards:Available Standards} section below.
+
+{pmore}{it:conversion} defines the type of conversion to be performed on
+ {varname}, and must be one of {cmd:"v2z"} (value-to-z-score), {cmd:"v2c"}
+ (value-to-centile), {cmd:"c2v"} (centile-to-value), or {cmd:"z2v"}
+ (z-score-to-value).
+
 {p 4 4 2}{hi:who_gs(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
  converts between newborn anthropometric data and z-scores/centiles in
  the WHO Child Growth Standards. It has three arguments:
@@ -134,17 +156,17 @@ also {it:fcn} dependent.
  in whole weeks, but may also be length in cm if using the {cmd:wfl} standard.
  In the WHO Child Growth standards, {cmd:xvar()} is usually age in days, but may
  also be length or height (in cm) if using either the {cmd:wfl} or {cmd:wfh}
- standards. See Tables {help ig_nbs##tab2:2} and {help ig_nbs##tab3:3} for
+ standards. See Tables {help ig_nbs##tab2:2} and {help ig_nbs##tab4:4} for
  appropriate {cmd:{it:x}} variables for each possible acronym value. Any
  {cmd:{it:x}} variable values outside the ranges described below will return a
  missing value.
 
-{dlgtab:INTERGROWTH-21st Newborn Size Standards}
+{dlgtab:INTERGROWTH-21st Newborn Size/Fetal Growth standards}
 
 {phang}{opt gest:_days(varname numeric)} specifies gestational age in days for
  newborns. Any value outside the range of valid gestational ages as specified by
- the acronym argument (see {help ig_nbs##tab1:Table 1}) will return a missing
- value.
+ the acronym argument (see Tables {help ig_nbs##tab1:1} and {help 
+ ig_nbs##tab3:3}) will return a missing value.
 
 {marker standards}{...}
 {title:Available Standards}
@@ -170,13 +192,27 @@ also {it:fcn} dependent.
 {col 5}{it:acronym}{col 18}Description{col 42}Measurement{col 57}{cmd:xvar()} range
 {col 5}{col 45}unit
 {col 5}{hline 77}
-{col 6}{cmd:wfa}{col 17}weight-for-age{col 46}kg{col 57}27 to <64 exact weeks
-{col 6}{cmd:lfa}{col 17}length-for-age{col 46}cm{col 57}27 to <64 exact weeks
-{col 6}{cmd:hcfa}{col 13}head circumference-for-age{col 46}cm{col 57}27 to <64 exact weeks
+{col 6}{cmd:wfa}{col 17}weight-for-age{col 46}kg{col 57}27 to 64 weeks
+{col 6}{cmd:lfa}{col 17}length-for-age{col 46}cm{col 57}27 to 64 weeks
+{col 6}{cmd:hcfa}{col 13}head circumference-for-age{col 46}cm{col 57}27 to 64 weeks
 {col 6}{cmd:wfl}{col 16}weight-for-length{col 46}kg{col 57}35-65 cm
 {col 5}{hline 77}
 
 {marker tab3}{...}
+{col 5}{ul:INTERGROWTH-21st Fetal Growth standards}
+
+{col 5}{it:acronym}{col 18}Description{col 50}Measurement{col 64}{cmd:gest_days()} range
+{col 5}{col 53}unit
+{col 5}{hline 77}
+{col 6}{cmd:hcfga}{col 17}head circumference-for-GA{col 54}mm{col 67}98-280 days
+{col 6}{cmd:bpdfga}{col 17}biparietal diameter-for-GA{col 54}mm{col 67}98-280 days
+{col 6}{cmd:acfga}{col 17}abdominal circumference-for-GA{col 54}mm{col 67}98-280 days
+{col 6}{cmd:flfga}{col 17}femur length-for-GA{col 54}mm{col 67}98-280 days
+{col 6}{cmd:ofdfga}{col 17}occipitofrontal diameter-for-GA{col 54}mm{col 67}98-280 days
+{col 6}{cmd:efwfga}{col 17}estimated fetal weight-for-GA{col 54}g{col 67}154-280 days
+{col 5}{hline 77}
+
+{marker tab4}{...}
 {col 5}{ul:WHO Child Growth Standards}
 
 {col 5}{it:acronym}{col 20}Description{col 42}Measurement{col 57}{cmd:xvar()} range
