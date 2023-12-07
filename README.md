@@ -66,6 +66,22 @@ files.
   | `wfl`   | weight-for-length          | kg   | 35 to 65 cm           |
 
   </details>
+- `ig_fet` - INTERGROWTH-21<sup>st</sup> standards for fetal growth
+  <details>
+  <summary>
+  Component standards
+  </summary>
+  
+  | Acronym  | Description                     | Unit | `gest_days()` range |
+  |----------|---------------------------------|------|---------------------|
+  | `hcfga`  | head circumference-for-GA       | mm   | 98 to 280 days      |
+  | `bpdfga` | biparietal diameter-for-GA      | mm   | 98 to 280 days      |
+  | `acfga`  | abdominal circumference-for-GA  | mm   | 98 to 280 days      |
+  | `flfga`  | femur length-for-GA             | mm   | 98 to 280 days      |
+  | `ofdfga` | occipitofrontal diameter-for-GA | mm   | 98 to 280 days      |
+  | `efwfga` | estimated fetal weight-for-GA   | g    | 154 to 280 days     |
+
+  </details>  
 - `who_gs` - WHO Child Growth Standards for term infants
   <details>
   <summary>
@@ -109,6 +125,13 @@ z-scores/centiles in each of the INTERGROWTH-21<sup>st</sup> Postnatal
 Growth of Preterm Infants Standards.
 
 ![](./readme/readme_igpng.png)
+
+### INTERGROWTH-21<sup>st</sup> Fetal Growth standards
+This function can be used to convert between measurements and 
+z-scores/centiles in each of the INTERGROWTH-21<sup>st</sup> Fetal Growth
+standards.
+
+![](./readme/readme_igfet.png)
 
 ### WHO Child Growth Standards
 This function can be used to convert between measurements and 

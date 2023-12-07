@@ -6,7 +6,7 @@ clear all
 foreach file in "_gclassify_sga.ado" "_gclassify_svn.ado" ///
 				"_gclassify_stunting.ado" "_gclassify_wasting.ado" ///
 				"_gclassify_wfa.ado" ///
-				"_gig_nbs.ado" "_gig_png.ado" "_gwho_gs.ado" ///
+				"_gig_nbs.ado" "_gig_png.ado" "_gwho_gs.ado"  "_gig_fet.ado" ///
 				"gigs_ipolate_coeffs.mata" {
 	run "`file'"
 }
@@ -17,7 +17,7 @@ foreach file in "_gclassify_sga.ado" "_gclassify_svn.ado" ///
 //  1. Generate .dta files with standards using "z2v/c2v" conversions
 local outputs "tests/outputs"
 cap mkdir "`outputs'"
-foreach standard in "who_gs" "ig_nbs" "ig_png" "interpolation" {
+foreach standard in "who_gs" "ig_nbs" "ig_png" "ig_fet" "interpolation" {
 	cap mkdir "`outputs'/`standard'"
 	noi di "Running .dta file generation for `standard'"
 	run "tests/test-`standard'.do"

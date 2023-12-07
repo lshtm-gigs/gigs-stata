@@ -13,6 +13,14 @@
   be checked out on the R package website in the benchmarking article
   (https://lshtm-gigs.github.io/gigs/)
 */
+clear all
+foreach file in "_gclassify_sga.ado" "_gclassify_svn.ado" ///
+				"_gclassify_stunting.ado" "_gclassify_wasting.ado" ///
+				"_gclassify_wfa.ado" ///
+				"_gig_nbs.ado" "_gig_png.ado" "_gwho_gs.ado" ///
+				"gigs_ipolate_coeffs.mata" {
+	run "`file'"
+}
 
 foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
 	use "benchmarking/bench_dataset.dta", clear
@@ -24,28 +32,30 @@ foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
 }
 
 // gigs 0.3.2:
+// NOT RUN ON USUAL SYSTEM --> run on Intel i7-1265U w/ 16.0 GB RAM; Win11
+// TODO: Run on usual PC
 // Number of inputs: 1
-// Average over 25 runs: 0.007 seconds
-// Number of inputs: 10
-// Average over 25 runs: 0.009 seconds
-// Number of inputs: 100
-// Average over 25 runs: 0.009 seconds
-// Number of inputs: 500
 // Average over 25 runs: 0.011 seconds
-// Number of inputs: 1000
+// Number of inputs: 10
 // Average over 25 runs: 0.012 seconds
+// Number of inputs: 100
+// Average over 25 runs: 0.012 seconds
+// Number of inputs: 500
+// Average over 25 runs: 0.013 seconds
+// Number of inputs: 1000
+// Average over 25 runs: 0.014 seconds
 // Number of inputs: 5000
-// Average over 25 runs: 0.027 seconds
+// Average over 25 runs: 0.022 seconds
 // Number of inputs: 10000
-// Average over 25 runs: 0.046 seconds
+// Average over 25 runs: 0.032 seconds
 // Number of inputs: 25000
-// Average over 25 runs: 0.101 seconds
+// Average over 25 runs: 0.064 seconds
 // Number of inputs: 50000
-// Average over 25 runs: 0.199 seconds
+// Average over 25 runs: 0.122 seconds
 // Number of inputs: 75000
-// Average over 25 runs: 0.300 seconds
+// Average over 25 runs: 0.187 seconds
 // Number of inputs: 100000
-// Average over 25 runs: 0.411 seconds
+// Average over 25 runs: 0.251 seconds
 
 // zanthro 1.0.2:
 // foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
@@ -90,7 +100,6 @@ egen z_anthro = zanthro(y, wa, WHO), xvar(x) gender(sex) ///
 // OLD VERSIONS OF GIGS --------------------------------------------------------
 // Kept to note how development is progressing
 
-stop
 // gigs 0.3.1:
 // Number of inputs: 1
 // Average over 25 runs: 0.008 seconds
