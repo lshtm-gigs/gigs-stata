@@ -33,8 +33,8 @@ program define _gig_png
 	}
 	capture assert inlist("`conversion'", "v2c", "v2z", "c2v", "z2v")
 	if _rc {
-		di as text "`conversion'" as error " is an invalid chart code. The " /*
-		*/ as error "only valid choices are " as text "v2c, v2z, c2v," as /*
+		di as text "`conversion'" as error " is an invalid conversion code. " /*
+		*/ as error "The only valid choices are " as text "v2c, v2z, c2v," as /*
 		*/ error " or " as text "z2v" as error "."
 		exit 198
 	}

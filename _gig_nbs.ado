@@ -34,8 +34,8 @@ program define _gig_nbs
 	}
 	capture assert inlist("`conversion'", "v2c", "v2z", "c2v", "z2v")
 	if _rc {
-		di as text "`conversion'" as error " is an invalid chart code. The " /*
-		*/ as error "only valid choices are " as text "v2c, v2z, c2v," as /*
+		di as text "`conversion'" as error " is an invalid conversion code. " /*
+		*/ as error "The only valid choices are " as text "v2c, v2z, c2v," as /*
 		*/ error " or " as text "z2v" as error "."
 		exit 198
 	}
@@ -331,7 +331,7 @@ program define _gig_nbs
         	gen `check_sex' = `sex' == "`male'" | `sex' == "`female'"
 		if "`sex_was_str'" == "0" destring(`sex'), replace
 		replace `return' = . ///
-  	        if  `check_ga' == 0 | `check_sex' == 0 | `touse' == 0
+  	        if `check_ga' == 0 | `check_sex' == 0 | `touse' == 0
     }
  	restore, not 
 end

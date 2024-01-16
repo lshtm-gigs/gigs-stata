@@ -35,8 +35,8 @@ program define _gwho_gs
 	}
 	capture assert inlist("`conversion'", "v2c", "v2z", "c2v", "z2v")
 	if _rc {
-		di as text "`conversion'" as error " is an invalid chart code. The " /*
-		*/ as error "only valid choices are " as text "v2c, v2z, c2v," as /*
+		di as text "`conversion'" as error " is an invalid conversion code. " /*
+		*/ as error "The only valid choices are " as text "v2c, v2z, c2v," as /*
 		*/ error " or " as text "z2v" as error "."
 		exit 198
 	}
@@ -187,7 +187,7 @@ program define _gwho_gs
 	}
 	else if "`conversion'" == "c2v" | "`conversion'" == "z2v" {
 		tempvar z _q q_out
-		qui gen `z' = `input'
+		qui gen double `z' = `input'
 		if "`conversion'" == "c2v" {
 			qui replace `z' = invnormal(`z')
 		}
@@ -216,8 +216,8 @@ program define _gwho_gs
 	}
 	qui {
 		tempvar check_xvar check_sex
-		gen int `check_xvar' = `xvar' >= `xlimlow'  & `xvar' <= `xlimhigh'
-		gen int `check_sex' = `sex' == "`male'" | `sex' == "`female'"
+		gen byte `check_xvar' = `xvar' >= `xlimlow'  & `xvar' <= `xlimhigh'
+		gen byte `check_sex' = `sex' == "`male'" | `sex' == "`female'"
 		if "`sex_was_str'" == "0" destring(`sex'), replace
 		replace `return' = . ///
 		    if `check_xvar' == 0 | `check_sex' == 0 | `touse' == 0
