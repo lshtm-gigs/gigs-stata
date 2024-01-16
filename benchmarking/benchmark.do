@@ -11,19 +11,16 @@
   The benchmarking table used is the same used to compare the different R 
   implementations against each other. The generation process for this table can
   be checked out on the R package website in the benchmarking article
-  (https://lshtm-gigs.github.io/gigs/)
+  (https://lshtm-gigs.github.io/gigs/).
+  
+  It is assumed that a user running this script has gigs installed, either as a 
+  stable release or dev version from GitHub.
 */
 clear all
-foreach file in "_gclassify_sga.ado" "_gclassify_svn.ado" ///
-				"_gclassify_stunting.ado" "_gclassify_wasting.ado" ///
-				"_gclassify_wfa.ado" ///
-				"_gig_nbs.ado" "_gig_png.ado" "_gwho_gs.ado" ///
-				"gigs_ipolate_coeffs.ado" {
-	run "`file'"
-}
 
+local bench_dataset_path "benchmarking/bench_dataset.dta" // can change
 foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
-	use "benchmarking/bench_dataset.dta", clear
+	use "`bench_dataset_path'", clear
 	qui drop if _n > `i'
 	di "Number of inputs: `i'"
 	bench, reps(25) restore last: ///
@@ -31,8 +28,29 @@ foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
 		xvar(x) sex(sex) sexcode(m=M, f=F)
 }
 
-// gigs 0.3.2:
-// NOT RUN ON USUAL SYSTEM --> run on Intel i7-1265U w/ 16.0 GB RAM on Win 11
+// gigs 0.4.0
+// Number of inputs: 1
+// Average over 25 runs: 0.009 seconds
+// Number of inputs: 10
+// Average over 25 runs: 0.008 seconds
+// Number of inputs: 100
+// Average over 25 runs: 0.009 seconds
+// Number of inputs: 500
+// Average over 25 runs: 0.010 seconds
+// Number of inputs: 1000
+// Average over 25 runs: 0.012 seconds
+// Number of inputs: 5000
+// Average over 25 runs: 0.028 seconds
+// Number of inputs: 10000
+// Average over 25 runs: 0.047 seconds
+// Number of inputs: 25000
+// Average over 25 runs: 0.104 seconds
+// Number of inputs: 50000
+// Average over 25 runs: 0.198 seconds
+// Number of inputs: 75000
+// Average over 25 runs: 0.296 seconds
+// Number of inputs: 100000
+// Average over 25 runs: 0.405 seconds
 
 
 // zanthro 1.0.2:
@@ -77,6 +95,30 @@ egen z_anthro = zanthro(y, wa, WHO), xvar(x) gender(sex) ///
 
 // OLD VERSIONS OF GIGS --------------------------------------------------------
 // Kept to note how development is progressing
+
+// gigs 0.3.2:
+// Number of inputs: 1
+// Average over 25 runs: 0.008 seconds
+// Number of inputs: 10
+// Average over 25 runs: 0.009 seconds
+// Number of inputs: 100
+// Average over 25 runs: 0.009 seconds
+// Number of inputs: 500
+// Average over 25 runs: 0.010 seconds
+// Number of inputs: 1000
+// Average over 25 runs: 0.012 seconds
+// Number of inputs: 5000
+// Average over 25 runs: 0.027 seconds
+// Number of inputs: 10000
+// Average over 25 runs: 0.045 seconds
+// Number of inputs: 25000
+// Average over 25 runs: 0.101 seconds
+// Number of inputs: 50000
+// Average over 25 runs: 0.195 seconds
+// Number of inputs: 75000
+// Average over 25 runs: 0.294 seconds
+// Number of inputs: 100000
+// Average over 25 runs: 0.405 seconds
 
 // gigs 0.3.1:
 // Number of inputs: 1

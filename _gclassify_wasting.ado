@@ -1,5 +1,5 @@
 capture program drop _gclassify_wasting
-*! version 0.3.1 (SJxx-x: dmxxxx)
+*! version 0.3.2 (SJxx-x: dmxxxx)
 program define _gclassify_wasting
 	version 16
 	preserve
@@ -76,7 +76,8 @@ program define _gclassify_wasting
 		replace `return' = -2 if float(`z') <= -3
 		replace `return' = 0 if abs(float(`z')) < 2
 		replace `return' = 1 if float(`z') >= 2
-		replace `return' = . if `z' == . | `touse' == 0 | `gest_days' == .
+		replace `return' = . if missing(`z') | `touse' == 0 | /*
+			*/ missing(`gest_days') 
 	}	
 	cap la def wasting_labs -2 "severe wasting"  -1 "wasting" ///
 	    0 "normal" 1 "overweight"
@@ -87,7 +88,7 @@ program define _gclassify_wasting
 		la val `return' wasting_labs
 	}
 	else {
-		qui replace `return' = 999 if abs(float(`z')) > 5 & `return' != .
+		qui replace `return' = 999 if abs(float(`z')) > 5 & !missing(`return')
 		la val `return' wasting_labs_out
 	}
 	restore, not

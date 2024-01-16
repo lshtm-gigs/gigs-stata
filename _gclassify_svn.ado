@@ -1,6 +1,6 @@
 capture program drop _gclassify_svn
 capture program drop SVN_Badsyntax
-*! version 0.3.1 (SJxx-x: dmxxxx)
+*! version 0.3.2 (SJxx-x: dmxxxx)
 program define _gclassify_svn
 	version 16
 	preserve
@@ -65,7 +65,7 @@ program define _gclassify_svn
         replace `return' = -1 if `is_term' == 1 & `sga' == -1
         replace `return' =  0 if `is_term' == 1 & `sga' == 0
         replace `return' =  1 if `is_term' == 1 & `sga' == 1
-        replace `return' =  . if `sga' == . | `touse' == 0
+        replace `return' =  . if missing(`sga') | `touse' == 0
 	}
 	cap la de svn_labels -4 "Preterm SGA" -3 "Preterm AGA" -2 "Preterm LGA" ///
 	    -1 "Term SGA" 0 "Term AGA" 1 "Term LGA"
@@ -74,6 +74,6 @@ program define _gclassify_svn
 end
 
 program SVN_Badsyntax
-	di as err "sexcode() option invalid: see {help classify_sga}"
+	di as err "sexcode() option invalid: see {help classify_svn}"
 	exit 198
 end

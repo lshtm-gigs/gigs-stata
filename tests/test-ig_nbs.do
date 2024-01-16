@@ -152,5 +152,46 @@ foreach acronym in "wfga" "lfga" "hcfga" "wlrfga" "bfpfga" "ffmfga" "fmfga" {
 	}
 }
 
+// Test that conversions work in both directions
+foreach acronym in "wfga" "lfga" "hcfga" "wlrfga" "ffmfga" "bfpfga" "fmfga" {
+	cap frame change default
+	cap clear
+	// Set x variable
+	cap drop ga_days
+	if inlist("`acronym'", "wfga", "lfga", "hcfga", "wlrfga", "ofdfga", /*
+		   */ "tcdfga", "gwgfga") {
+		qui set obs 133 // 24 to 42 weeks
+		range ga_days 168 300
+	}
+	else if inlist("`acronym'", "ffmfga", "bfpfga", "fmfga") {
+		qui set obs 5 // 15 to 36 weeks
+		range ga_days 266 294
+	}
+	recast int ga_days
+	
+	foreach sex in "M" "F" {
+		// Start with z2v, then v2c, then c2v, then v2z
+		cap drop sex z *from* *diffs *equal
+		gen sex = "M"
+		
+		gen double z = -1
+		egen double y_from_z = ig_nbs(z, "`acronym'", "z2v"), /* 
+			*/ gest(ga_days) sex(sex) sexcode(m=M, f=F)
+		egen double p_from_y = ig_nbs(y_from_z, "`acronym'", "v2c"), /* 
+			*/ gest(ga_days) sex(sex) sexcode(m=M, f=F)
+		egen double y_from_p = ig_nbs(p_from_y, "`acronym'", "c2v"), /* 
+			*/ gest(ga_days) sex(sex) sexcode(m=M, f=F)
+		egen double z_from_y = ig_nbs(y_from_p, "`acronym'", "v2z"), /* 
+			*/ gest(ga_days) sex(sex) sexcode(m=M, f=F)
+		
+		gen double z_diffs  = z - z_from_y
+		gen double y_diffs  = y_from_z - y_from_p
+		gen byte z_equal = abs(z_diffs) < 10^-14
+		gen byte y_equal = abs(y_diffs) < 10^-14
+		
+		assert z_equal == 1 & y_equal == 1
+	}
+}
+
 qui frame change default
 qui clear

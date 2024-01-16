@@ -34,7 +34,7 @@ files.
 ```
 
 ## Available standards
-- `ig_nbs` - INTERGROWTH-21<sup>st</sup> standards for newborn size
+* `ig_nbs` - INTERGROWTH-21<sup>st</sup> standards for newborn size
   <details>
   <summary>
   Component standards
@@ -66,6 +66,33 @@ files.
   | `wfl`   | weight-for-length          | kg   | 35 to 65 cm           |
 
   </details>
+* `ig_fet` - INTERGROWTH-21<sup>st</sup> fetal standards
+  <details><summary>Component standards</summary>
+
+  | Acronym  | Description                                                               | Unit | `x` range       |
+  |----------|---------------------------------------------------------------------------|------|-----------------|
+  | `hcfga`  | head circumference-for-gestational age                                    | mm   | 98 to 280 days  |
+  | `bpdfga` | biparietal diameter-for-gestational age                                   | mm   | 98 to 280 days  |
+  | `acfga`  | abdominal circumference-for-gestational age                               | mm   | 98 to 280 days  |
+  | `flfga`  | femur length-for-gestational age                                          | mm   | 98 to 280 days  |
+  | `ofdfga` | occipito-frontal diameter for-gestational age                             | mm   | 98 to 280 days  |
+  | `efwfga` | estimated fetal weight-for-gestational age                                | g    | 154 to 280 days |
+  | `sfhfga` | symphisis-fundal height-for-gestational age                               | mm   | 112 to 294 days |
+  | `crlfga` | crown-rump length-for-gestational age                                     | mm   | 58 to 105 days  |
+  | `gafcrl` | gestational age-for-crown-rump length                                     | days | 15 to 95 mm     |
+  | `gwgfga` | gestational weight gain-for-gestational age                               | kg   | 98 to 280 days  |
+  | `pifga`  | pulsatility index-for-gestational age                                     |      | 168 to 280 days |
+  | `rifga`  | resistance index-for-gestational age                                      |      | 168 to 280 days |
+  | `sdrfga` | systolic/diastolic ratio-for-gestational age                              |      | 168 to 280 days |
+  | `tcdfga` | transcerebellar diameter-for-gestational age                              | mm   | 98 to 280 days  |
+  | `tcdfga` | gestational age-for-transcerebellar diameter                              | mm   | 98 to 280 days  |
+  | `poffga` | parietal-occipital fissure-for-gestational age                            | mm   | 105 to 252 days |
+  | `sffga`  | Sylvian fissue-for-gestational age                                        | mm   | 105 to 252 days |
+  | `avfga`  | anterior horn of the lateral ventricle-for-gestational age                | mm   | 105 to 252 days |
+  | `pvfga`  | atrium of the posterior horn of the lateral ventricle-for-gestational age | mm   | 105 to 252 days |
+  | `cmfga`  | cisterna magna-for-gestational age                                        | mm   | 105 to 252 days |
+
+  </details>
 - `who_gs` - WHO Child Growth Standards for term infants
   <details>
   <summary>
@@ -93,8 +120,8 @@ standard is being used, and the `conversion` parameter specifies the type of
 conversion you wish to perform. This `conversion` parameter can take one of four
 values: `"v2z"` (value-to-z-score), `"v2c"` (value-to-centile), `"z2v"` 
 (z-score-to-value), `"c2v"` (centile-to-value). The `sex()` and `sexcode()` 
-options are used to  give the function sex data - as the growth standards are 
-sex-specific, the standards cannot be applied correctly without this information.
+options supply the non-fetal functions with sex data - without this, these
+sex-specific growth standards cannot be applied.
 
 ### INTERGROWTH-21<sup>st</sup> Newborn Size standards, including very preterm
 This function can be used to convert between measurements and 
@@ -104,20 +131,26 @@ Standards.
 ![](./readme/readme_ignbs.png)
 
 ### INTERGROWTH-21<sup>st</sup> Postnatal Growth standards
-This function can be used to convert between measurements and 
-z-scores/centiles in each of the INTERGROWTH-21<sup>st</sup> Postnatal 
-Growth of Preterm Infants Standards.
+This function can be used to convert between measurements and z-scores/centiles
+in each of the INTERGROWTH-21<sup>st</sup> Postnatal Growth of Preterm Infants
+Standards.
 
 ![](./readme/readme_igpng.png)
 
+### INTERGROWTH-21<sup>st</sup> Fetal Growth standards
+This function can be used to convert between measurements and z-scores/centiles
+in each of the INTERGROWTH-21<sup>st</sup> Fetal standards.
+
+![](./readme/readme_igfet.png)
+
 ### WHO Child Growth Standards
-This function can be used to convert between measurements and 
-z-scores/centiles in each of the WHO Child Growth Standards.
+This function can be used to convert between measurements and z-scores/centiles
+in each of the WHO Child Growth Standards.
 
 ![](./readme/readme_whogs.png)
 
 ### Classification functions
-These functions are used to classify infant growth according to published 
+These functions are used to classify infant growth according to published
 cut-offs. These publications are discussed in the attached [paper](). 
 
 #### Size for gestational age
