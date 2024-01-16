@@ -1,3 +1,4 @@
+frames reset
 local test_data "tests/inputs"
 
 // Test SGA
