@@ -1,5 +1,5 @@
 capture program drop _gclassify_wfa
-*! version 0.3.1 (SJxx-x: dmxxxx)
+*! version 0.3.2 (SJxx-x: dmxxxx)
 program define _gclassify_wfa
 	version 16
 	preserve
@@ -74,7 +74,7 @@ program define _gclassify_wfa
 		replace `return' = -2 if float(`z') <= -3
 		replace `return' = 0 if float(abs(`z')) < 2
 		replace `return' = 1 if float(`z') >= 2
-		replace `return' = . if `z' == . | `touse' == 0
+		replace `return' = . if missing(`z') | `touse' == 0
 	}
 	cap la def wfa_labs -2 "severely underweight" -1 "underweight" ///
 	    0 "normal" 1 "overweight"
@@ -86,7 +86,7 @@ program define _gclassify_wfa
 	}
 	else  {
 		qui replace `return' = 999 if float(`z') < -6 | float(`z') > 5 & ///
-			`return' != .
+			!missing(`return')
 		lab val `return' wfa_labs_out
 	}
 	restore, not

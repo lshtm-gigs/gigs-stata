@@ -1,5 +1,5 @@
 capture program drop _gclassify_stunting
-*! version 0.3.1 (SJxx-x: dmxxxx)
+*! version 0.3.2 (SJxx-x: dmxxxx)
 program define _gclassify_stunting
 	version 16
 	preserve
@@ -72,7 +72,7 @@ program define _gclassify_stunting
 		replace `return' = -1 if float(`z') <= -2
 		replace `return' = -2 if float(`z') <= -3
 		replace `return' = 0 if float(`z') > -2
-		replace `return' = . if `z' == . | `touse' == 0
+		replace `return' = . if missing(`z') | `touse' == 0
 	}
 	cap la de stunting_labs -2 "severe stunting" -1 "stunting" 0 "normal"
 	cap la de stunting_labs_out -2 "severe stunting" -1 "stunting" 0 "normal" /*
@@ -81,7 +81,7 @@ program define _gclassify_stunting
 		la val `return' stunting_labs
 	}
 	else  {
-		qui replace `return' = 999 if abs(float(`z')) > 6 & `return' != .
+		qui replace `return' = 999 if abs(float(`z')) > 6 & !missing(`return')
 		la val `return' stunting_labs_out
 	}
 	restore, not
@@ -89,6 +89,6 @@ end
 
 capture prog drop StuntingSex_Badsyntax
 program StuntingSex_Badsyntax
-	di as err "sexcode() option invalid: see {help ig_nbs}"
+	di as err "sexcode() option invalid: see {help classify_stunting}"
 	exit 198
 end

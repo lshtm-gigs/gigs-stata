@@ -1,6 +1,6 @@
 capture program drop _gclassify_sga
 capture program drop SGA_Badsyntax
-*! version 0.3.1 (SJxx-x: dmxxxx)
+*! version 0.3.2 (SJxx-x: dmxxxx)
 program define _gclassify_sga
 	version 16
 	preserve
@@ -60,7 +60,7 @@ program define _gclassify_sga
 	    generate `type' `return' = 0
 	    replace `return' = -1 if float(`p_temp') < 0.1
 	    replace `return' = 1 if float(`p_temp') > 0.9
-	    replace `return' = . if `p_temp' == . | `touse' == 0
+	    replace `return' = . if missing(`p_temp') | `touse' == 0
 	}
 	cap la de sga_labels -1 "SGA" 0 "AGA" 1 "LGA"
 	cap la de sev_sga_labels -2 "severely SGA" -1 "SGA" 0 "AGA" 1 "LGA"
