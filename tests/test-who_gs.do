@@ -176,3 +176,58 @@ foreach acronym in "wfa" "bfa" "lhfa" "hcfa" "wfh" "wfl" "acfa" "ssfa" "tsfa" {
 		}
 	}
 }
+
+// Test that conversions work in both directions
+foreach acronym in "wfa" "bfa" "lhfa" "hcfa" "wfh" "wfl" "acfa" "ssfa" "tsfa" {
+	cap frame change default
+	cap clear
+	// Set x variable
+	cap drop xvar
+	if inlist("`acronym'", "wfa", "bfa", "lhfa", "hcfa") {
+		qui set obs 1857 // 0 to 1856 days (by 1 day)
+		range xvar 0 1856
+		recast int xvar
+	}
+	else if "`acronym'" == "wfl" {
+		qui set obs 651 // 35.0 to 65.0 cm (by 0.1 cm)
+		range xvar 45 110
+		recast double xvar
+		qui replace xvar = round(xvar, 0.1)
+	}
+	else if "`acronym'" == "wfh" {
+		qui set obs 551 // 45.0 to 65.0 cm (by 0.1 cm)
+		range xvar 65 120
+		recast double xvar
+		qui replace xvar = round(xvar, 0.1)
+	}
+	else if inlist("`acronym'", "acfa", "tsfa", "ssfa") {
+		qui set obs 1766 // 91 to 1856 days (by 1 day)
+		range xvar 91 1856
+		recast int xvar
+	}
+		
+	foreach sex in "M" "F" {
+		// Start with z2v, then v2c, then c2v, then v2z
+		cap drop sex z *from* *diffs *equal
+		gen sex = "M"
+		
+		gen double z = -1
+		egen double y_from_z = who_gs(z, "`acronym'", "z2v"), /* 
+			*/ x(xvar) sex(sex) sexcode(m=M, f=F)
+		egen double p_from_y = who_gs(y_from_z, "`acronym'", "v2c"), /* 
+			*/ x(xvar) sex(sex) sexcode(m=M, f=F)
+		egen double y_from_p = who_gs(p_from_y, "`acronym'", "c2v"), /* 
+			*/ x(xvar) sex(sex) sexcode(m=M, f=F)
+		egen double z_from_y = who_gs(y_from_p, "`acronym'", "v2z"), /* 
+			*/ x(xvar) sex(sex) sexcode(m=M, f=F)
+		
+		gen double z_diffs  = z - z_from_y
+		gen double y_diffs  = y_from_z - y_from_p
+		gen byte z_equal = abs(z_diffs) < 8 * 10^-12
+		gen byte y_equal = abs(y_diffs) < 8 * 10^-12
+		
+		assert z_equal == 1 & y_equal == 1
+	}
+}
+
+clear

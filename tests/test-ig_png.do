@@ -141,4 +141,46 @@ foreach acronym in "wfa" "lfa" "hcfa" "wfl" {
 	}
 }
 
+// Test that conversions work in both directions
+foreach acronym in "wfa" "lfa" "hcfa" "wfl" {
+	cap frame change default
+	cap clear
+	// Set x variable
+	cap drop xvar
+	if inlist("`acronym'", "wfa", "lfa", "hcfa") {
+		qui set obs 38 // 27 to 64 weeks (by 1 week PMA)
+		range xvar 27 64
+		recast int xvar
+	}
+	else if "`acronym'" == "wfl" {
+		qui set obs 301 // 35.0 to 65.0 cm (by 0.1 cm)
+		range xvar 35 65
+		recast double xvar
+		qui replace xvar = round(xvar, 0.1)
+	}
+		
+	foreach sex in "M" "F" {
+		// Start with z2v, then v2c, then c2v, then v2z
+		cap drop sex z *from* *diffs *equal
+		gen sex = "M"
+		
+		gen double z = -1
+		egen double y_from_z = ig_png(z, "`acronym'", "z2v"), /* 
+			*/ x(xvar) sex(sex) sexcode(m=M, f=F)
+		egen double p_from_y = ig_png(y_from_z, "`acronym'", "v2c"), /* 
+			*/ x(xvar) sex(sex) sexcode(m=M, f=F)
+		egen double y_from_p = ig_png(p_from_y, "`acronym'", "c2v"), /* 
+			*/ x(xvar) sex(sex) sexcode(m=M, f=F)
+		egen double z_from_y = ig_png(y_from_p, "`acronym'", "v2z"), /* 
+			*/ x(xvar) sex(sex) sexcode(m=M, f=F)
+		
+		gen double z_diffs  = z - z_from_y
+		gen double y_diffs  = y_from_z - y_from_p
+		gen byte z_equal = abs(z_diffs) < 10^-14
+		gen byte y_equal = abs(y_diffs) < 10^-14
+		
+		assert z_equal == 1 & y_equal == 1
+	}
+}
+
 clear
