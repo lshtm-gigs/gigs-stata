@@ -1,5 +1,5 @@
-v 0.4.0
-d 'GIGS': Newborn and infant growth assessment using international growth standards
+v 0.4.1
+d 'GIGS': Fetal, neonatal, and infant growth assessment using international growth standards
 d 
 d gigs provides a single, simple interface for working with outputs from the INTERGROWTH-21st project and the WHO Child Growth standards. You will find functions for converting between anthropometric measures (e.g. weight or length) to z-scores and centiles, and the inverse. Also included are functions for classifying newborn and infant growth according to DHS guidelines.
 d 
@@ -40,3 +40,4 @@ F whoLMS_wfl.dta
 F who_gs.sthlp
 f gigs_examples.do
 f life6mo.dta
+f life6mo.sthlp
