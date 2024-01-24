@@ -191,7 +191,7 @@ observations are only labelled if the `outliers` option is specified:
 |-------|-----------------|---------------|
 | -2    | Severe stunting | -5 to -3      |
 | -1    | Stunting        | -3 to -2      |
-| 0     | Normal          | -2 to 5       |
+| 0     | Not stunting    | -2 to 5       |
 | -10   | Implausible     | \<-5 or \>5   |
 
 #### Wasting
@@ -204,7 +204,7 @@ observations are only labelled if the `outliers` option is specified:
 |-------|----------------|---------------|
 | -2    | Severe wasting | -5 to -3      |
 | -1    | Wasting        | -3 to -2      |
-| 0     | Normal         | -2 to 2       |
+| 0     | Not wasting    | -2 to 2       |
 | 1     | Overweight     | 2 to 5        |
 | -10   | Implausible    | \<-5 or \>5   |
 
