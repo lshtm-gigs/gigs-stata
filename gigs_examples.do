@@ -38,11 +38,11 @@ graph export "gigs_fig1.pdf"
 
 use life6mo, clear
 keep if (gestage - pma) == 0
-egen sga = classify_sga(meaninfwgt/1000), ///
+egen sfga = classify_sfga(meaninfwgt/1000), ///
     gest_days(gestage) sex(sex) sexcode(m=1, f=2)
 gen term_status = "Preterm" if gestage < `37weeks'
 replace term_status = "Term" if gestage >= `37weeks'
-graph bar, over(sga) by(term_status, ///
+graph bar, over(sfga) by(term_status, ///
     title("Percentage of each size-for-GA category by term status") ///
     note("")) ///
     ytitle("Percentage") ///

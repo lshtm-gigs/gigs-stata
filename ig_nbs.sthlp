@@ -1,7 +1,7 @@
 {smcl}
 {* *! version 0.4.0 07 Dec 2023}{...}
 {vieweralsosee "" "--"}{...}
-{vieweralsosee "gigs: Classification functions" "help classify_sga"}{...}
+{vieweralsosee "gigs: Classification functions" "help classify_sfga"}{...}
 {viewerjumpto "Syntax" "ig_nbs##syntax"}{...}
 {viewerjumpto "Description" "ig_nbs##description"}{...}
 {viewerjumpto "Functions" "ig_nbs##functions"}{...}
@@ -310,7 +310,7 @@ also {it:fcn} dependent.
 
 {title:Also see}
 
-{p 4 14 2}Classification functions: {help classify_sga:documentation}
+{p 4 14 2}Classification functions: {help classify_sfga:documentation}
 
 {p 4 14 2}Article: {it:Stata Journal}, volume XX, number X: {browse "https://www.overleaf.com/project/641db63564edd62fb54c963b":st0001}
 

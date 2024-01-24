@@ -1,6 +1,6 @@
 capture program drop _gclassify_svn
 capture program drop SVN_Badsyntax
-*! version 0.3.2 (SJxx-x: dmxxxx)
+*! version 0.4.0 (SJxx-x: dmxxxx)
 program define _gclassify_svn
 	version 16
 	preserve
@@ -53,18 +53,18 @@ program define _gclassify_svn
 
     marksample touse
 
- 	tempvar sga is_term is_sga
+ 	tempvar sfga is_term is_sfga
 	qui {
-		egen double `sga' = classify_sga(`input'), ///
+		egen double `sfga' = classify_sfga(`input'), ///
 			gest_days(`gest_days') sex(`sex') sexcode(m="`male'", f="`female'")
 		gen `is_term' = `gest_days' >= 259 // 259 days = 37 weeks
 	    gen `type' `return' = .
-	    replace `return' = -4 if `is_term' == 0 & `sga' == -1
-	    replace `return' = -3 if `is_term' == 0 & `sga' == 0
-        replace `return' = -2 if `is_term' == 0 & `sga' == 1
-        replace `return' = -1 if `is_term' == 1 & `sga' == -1
-        replace `return' =  0 if `is_term' == 1 & `sga' == 0
-        replace `return' =  1 if `is_term' == 1 & `sga' == 1
+	    replace `return' = -4 if `is_term' == 0 & `sfga' == -1
+	    replace `return' = -3 if `is_term' == 0 & `sfga' == 0
+        replace `return' = -2 if `is_term' == 0 & `sfga' == 1
+        replace `return' = -1 if `is_term' == 1 & `sfga' == -1
+        replace `return' =  0 if `is_term' == 1 & `sfga' == 0
+        replace `return' =  1 if `is_term' == 1 & `sfga' == 1
         replace `return' =  . if missing(`sga') | `touse' == 0
 	}
 	cap la de svn_labels -4 "Preterm SGA" -3 "Preterm AGA" -2 "Preterm LGA" ///

@@ -154,7 +154,7 @@ These functions are used to classify infant growth according to published
 cut-offs. These publications are discussed in the attached [paper](). 
 
 #### Size for gestational age
-![](./readme/readme_csga.png)
+![](./readme/readme_csfga.png)
 
 This function outputs a variable with the following values and labels. Severely
 SGA infants are only labelled if the `severe` option is specified:
@@ -318,20 +318,20 @@ individual children.
 This dataset contains information on weight at birth, so could be used to 
 calculate size-for-gestational age classifications. We can reload the data, then
 remove any observations which were not made at birth. We then use the 
-`classify_sga()` command to give us our classifications:
+`classify_sfga()` command to give us our classifications:
 ```stata
 . use life6mo, clear
 . keep if (gestage - pma) == 0
 (7,303 observations deleted)
 
-. egen sga = classify_sga(meaninfwgt/1000), ///
+. egen sfga = classify_sfga(meaninfwgt/1000), ///
 >     gest_days(gestage) sex(sex) sexcode(m=1, f=2)
 (2 missing values generated)
 ```
 
 ## Known issues and bug reporting
-We kindly request that users note any bugs, issues, or feature requests on the GitHub 
-[issues page](https://github.com/lshtm-gigs/gigs-stata/issues).
+We kindly request that users note any bugs, issues, or feature requests on the 
+GitHub [issues page](https://github.com/lshtm-gigs/gigs-stata/issues).
 
 Authors
 ------
