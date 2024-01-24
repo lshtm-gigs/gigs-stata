@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.1.0 24 Jan 2024}{...}
+{* *! version 0.1.1 24 Jan 2024}{...}
 {vieweralsosee "" "--"}{...}
 {vieweralsosee "gigs package" "help gigs"}{...}
 
@@ -17,7 +17,7 @@ observations.
 {col 5}{hline 88}
 {col 6}{cmd:id}{col 20}Unique ID for each infant in the dataset (1--300).
 {col 6}{cmd:gestage}{col 20}Best obstetric estimate of gestational age in days (201--311).
-{col 6}{cmd:sex}{col 20}Sex of the infant as a labelled integer (1 = Male/{bf:"M"}; 2 = Female/{bf:"F"}).
+{col 6}{cmd:sex}{col 20}Sex of the infant as an integer (1 = Male; 2 = Female).
 {col 6}{cmd:visitweek}{col 20}Chronological age in weeks (+/-1 week) when study visit occurred.
 {col 6}{cmd:pma}{col 20}Post-menstrual age in days (202--545)
 {col 6}{cmd:age_days}{col 20}Chronological age in days at each visit (0--245).
