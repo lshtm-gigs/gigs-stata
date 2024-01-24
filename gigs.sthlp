@@ -2,9 +2,9 @@
 {* *! version 0.4.0 07 Dec 2023}{...}
 {vieweralsosee "" "--"}{...}
 {vieweralsosee "gigs: Conversion functions" "help ig_nbs"}{...}
-{vieweralsosee "gigs: Classification functions" "help classify_sga"}{...}
+{vieweralsosee "gigs: Classification functions" "help classify_sfga"}{...}
 
-{hi: help ig_nbs, help classify_sga}{right: ({browse "https://www.overleaf.com/project/641db63564edd62fb54c963b":SJXX-X: st0001})}
+{hi: help ig_nbs, help classify_sfga}{right: ({browse "https://www.overleaf.com/project/641db63564edd62fb54c963b":SJXX-X: st0001})}
 {hline}
 
 {title:Title}
@@ -52,7 +52,7 @@
 
 {p 4 14 2}Conversion functions: {help ig_nbs:documentation}
 
-{p 4 14 2}Classification functions: {help classify_sga:documentation}
+{p 4 14 2}Classification functions: {help classify_sfga:documentation}
 
 {p 4 14 2}Article: {it:Stata Journal}, volume XX, number X: {browse "https://www.overleaf.com/project/641db63564edd62fb54c963b":st0001}
 

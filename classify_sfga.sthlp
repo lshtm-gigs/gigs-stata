@@ -1,15 +1,15 @@
 {smcl}
-{* *! version 0.3.2 23 Nov 2023}{...}
+{* *! version 0.4.0 23 Jan 2023}{...}
 {vieweralsosee "" "--"}{...}
-{vieweralsosee "gigs: Classification functions" "help classify_sga"}{...}
-{viewerjumpto "Syntax" "classify_sga##syntax"}{...}
-{viewerjumpto "Description" "classify_sga##description"}{...}
-{viewerjumpto "Functions" "classify_sga##functions"}{...}
-{viewerjumpto "Options" "classify_sga##options"}{...}
-{viewerjumpto "Remarks" "classify_sga##remarks"}{...}
-{viewerjumpto "Examples" "classify_sga##examples"}{...}
+{vieweralsosee "gigs: Classification functions" "help classify_sfga"}{...}
+{viewerjumpto "Syntax" "classify_sfga##syntax"}{...}
+{viewerjumpto "Description" "classify_sfga##description"}{...}
+{viewerjumpto "Functions" "classify_sfga##functions"}{...}
+{viewerjumpto "Options" "classify_sfga##options"}{...}
+{viewerjumpto "Remarks" "classify_sfga##remarks"}{...}
+{viewerjumpto "Examples" "classify_sfga##examples"}{...}
 
-{hi:help classify_sga, help classify_svn, help classify_stunting, help classify_wasting, help classify_wfa}{right: ({browse "https://www.overleaf.com/project/641db63564edd62fb54c963b":SJXX-X: st0001})}
+{hi:help classify_sfga, help classify_svn, help classify_stunting, help classify_wasting, help classify_wfa}{right: ({browse "https://www.overleaf.com/project/641db63564edd62fb54c963b":SJXX-X: st0001})}
 {hline}
 
 {title:Title}
@@ -21,7 +21,7 @@
 {title:Syntax}
 
 {p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
-{cmd:classify_sga}{cmd:(}{varname}{cmd:)} 
+{cmd:classify_sfga}{cmd:(}{varname}{cmd:)}
 {ifin}{cmd:,} 
 {cmdab:gest:_days}{cmd:(}{varname}{cmd:)} {cmdab:sex}{cmd:(}{varname}{cmd:)}
 {cmdab:sexc:ode}{cmd:(}{cmdab:m:ale=}{it:code}{cmd:,} {cmdab:f:emale=}{it:code}{cmd:)}
@@ -79,7 +79,7 @@
 {marker functions}{...}
 {title:Functions for egen}
 
-{p 4 4 2}{hi:classify_sga(}{varname}{cmd:)} is used to classify size for 
+{p 4 4 2}{hi:classify_sfga(}{varname}{cmd:)} is used to classify size for
  gestational age in newborns according to INTERGROWTH-21st 
  weight-for-gestational age standards. It produces a variable with the
  following values and labels:
@@ -126,7 +126,7 @@
 {col 20}{hline 38}
 {col 21}{cmd: -2}{col 27}Severe stunting{col 45}-5 to -3
 {col 21}{cmd: -1}{col 27}Stunting       {col 45}-3 to -2
-{col 21}{cmd:  0}{col 27}Normal         {col 45}-2 to 5
+{col 21}{cmd:  0}{col 27}Not stunting   {col 45}-2 to 5
 {col 21}{cmd:999}{col 27}Outlier        {col 45}<-5 or >5
  
 {pmore}This function takes one argument:
@@ -146,7 +146,7 @@
 {col 20}{hline 38}
 {col 21}{cmd: -2}{col 27}Severe wasting{col 45}-5 to -3
 {col 21}{cmd: -1}{col 27}Wasting       {col 45}-3 to -2
-{col 21}{cmd:  0}{col 27}Normal        {col 45}-2 to 2
+{col 21}{cmd:  0}{col 27}Not wasting   {col 45}-2 to 2
 {col 21}{cmd:  1}{col 27}Overweight    {col 45}2 to 5
 {col 21}{cmd:999}{col 27}Outlier       {col 45}<-5 or >5
 
@@ -180,7 +180,7 @@
 {dlgtab:Non-specific}
 
 {phang}{opt gest:_days(varname numeric)} specifies gestational age in days for
- newborns. In {cmd:classify_sga()} and {cmd:classify_sga()},any value outside
+ newborns. In {cmd:classify_sfga()} and {cmd:classify_svn()},any value outside
  the range of valid gestational ages as specified in the
  {help ig_nbs##tab1:ig_nbs() documentation} will return a missing value. In the
  other classification functions, this variable is used to compute post-menstrual
@@ -229,11 +229,11 @@
 {marker examples}{...}
 {title:Examples}
 
-{pstd}Classifying SGA, where {cmd:sex} contains the codes {cmd:1} and {cmd:2}:{p_end}
-{phang2}{cmd:. egen sga = classify_sga(weight_kg), gest_days(ga_days) sex(sex) sexcode(male=1, female=2)}
+{pstd}Classifying size-for-GA, where {cmd:sex} contains the codes {cmd:1} and {cmd:2}:{p_end}
+{phang2}{cmd:. egen sfga = classify_sfga(weight_kg), gest_days(ga_days) sex(sex) sexcode(male=1, female=2)}
 
-{pstd}Include severe SGA classifications with the {opt:severe} option:{p_end}
-{phang2}{cmd:. egen sga = classify_sga(weight_kg), gest_days(ga_days) sex(sex) sexcode(male=1, female=2) severe}
+{pstd}Include severe size-for-GA classifications with the {opt:severe} option:{p_end}
+{phang2}{cmd:. egen sfga = classify_sfga(weight_kg), gest_days(ga_days) sex(sex) sexcode(male=1, female=2) severe}
 
 {pstd}Classifying stunting, where {cmd:sex} contains the codes {cmd:M} and {cmd:F}:{p_end}
 {phang2}{cmd:. egen stunting = classify_stunting(weight_kg), gest_days(ga_days) age_days(age) sex(sex) sexcode(male=M, female=F)}
@@ -244,7 +244,7 @@
 {pstd}You can use just the first letters of the {cmd:lenht_cm()}, {cmd:gest_days()}, and {cmd:sexcode()} arguments instead:{p_end}
 {phang2}{cmd:. egen wasting = classify_wasting(weight_kg), lenht(lenht_cm) gest(ga_days) age_days(age) sex(sex) sexc(m=Male, f=Female)}
 
-{pstd}Request that gigs classifies outlier/implasuible values with the {opt:outliers} option:{p_end}
+{pstd}Request that gigs classifies outlier/implasuible values with the {cmd:outliers} option:{p_end}
 {phang2}{cmd:. egen wasting = classify_wasting(weight_kg), lenht(lenht_cm) gest(ga_days) age_days(age) sex(sex) sexc(m=Male, f=Female) outliers}
 
 {marker authors}{...}

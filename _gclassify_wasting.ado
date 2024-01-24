@@ -1,5 +1,5 @@
 capture program drop _gclassify_wasting
-*! version 0.3.2 (SJxx-x: dmxxxx)
+*! version 0.4.0 (SJxx-x: dmxxxx)
 program define _gclassify_wasting
 	version 16
 	preserve
@@ -80,9 +80,9 @@ program define _gclassify_wasting
 			*/ missing(`gest_days') 
 	}	
 	cap la def wasting_labs -2 "severe wasting"  -1 "wasting" ///
-	    0 "normal" 1 "overweight"
+	    0 "not wasting" 1 "overweight"
 	cap la def wasting_labs_out -2 "severe wasting"  -1 "wasting" ///
-	    0 "normal" 1 "overweight" 999 "outlier"
+	    0 "not wasting" 1 "overweight" 999 "outlier"
 	
 	if "`outliers'"=="" {
 		la val `return' wasting_labs

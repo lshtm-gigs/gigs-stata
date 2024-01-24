@@ -1,19 +1,19 @@
 frames reset
 local test_data "tests/inputs"
 
-// Test SGA
-cap frame drop classify_sga
-cap frame create classify_sga
-cap frame change classify_sga
-use "`test_data'/tester_sga.dta", clear
-egen sga = classify_sga(weight), gest_days(gestage) sex(psex) sexcode(m=M, f=F)
-egen sga_sev = classify_sga(weight), gest_days(gestage) ///
+// Test size-for-GA
+cap frame drop classify_sfga
+cap frame create classify_sfga
+cap frame change classify_sfga
+use "`test_data'/tester_sfga.dta", clear
+egen sfga = classify_sfga(weight), gest_days(gestage) sex(psex) sexcode(m=M, f=F)
+egen sfga_sev = classify_sfga(weight), gest_days(gestage) ///
 	sex(psex) sexcode(m=M, f=F) severe
-local SGA = 1
-gen equal = sum(sga == sga_exp)
-if equal[_N] != _N local SVN = 0
-replace equal = sum(sga_sev == sga_sev_exp)
-if equal[_N] != _N local SVN = 0
+local SfGA = 1
+gen equal = sum(sfga == sfga_exp)
+if equal[_N] != _N local SfGA = 0
+replace equal = sum(sfga_sev == sfga_sev_exp)
+if equal[_N] != _N local SfGA = 0
 
 // Test SVN
 cap frame drop classify_svn
@@ -77,8 +77,8 @@ if equal[_N] != _N local WFA = 0
 
 cap frame change default 
 cap frame drop classify_*
-foreach classification in "SGA" "SVN" "Stunting" "Wasting" "WFA" {
-	if "`classification'" == "SGA" local name "_gclassify_sga.ado"
+foreach classification in "SfGA" "SVN" "Stunting" "Wasting" "WFA" {
+	if "`classification'" == "SfGA" local name "_gclassify_sfga.ado"
 	if "`classification'" == "SVN" local name "_gclassify_svn.ado"
 	if "`classification'" == "Stunting" local name "_gclassify_stunting.ado"
 	if "`classification'" == "Wasting" local name "_gclassify_wasting.ado"

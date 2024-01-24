@@ -1,7 +1,7 @@
-capture program drop _gclassify_sga
+capture program drop _gclassify_sfga
 capture program drop SGA_Badsyntax
-*! version 0.3.2 (SJxx-x: dmxxxx)
-program define _gclassify_sga
+*! version 0.4.0 (SJxx-x: dmxxxx)
+program define _gclassify_sfga
 	version 16
 	preserve
 
@@ -22,7 +22,7 @@ program define _gclassify_sga
 		*/ [SEVere by(string)]
 	
 	if `"`by'"' != "" {
-		_egennoby classify_sga() `"`by'"'
+		_egennoby classify_sfga() `"`by'"'
 		/* NOTREACHED */
 	}
 	
@@ -62,19 +62,19 @@ program define _gclassify_sga
 	    replace `return' = 1 if float(`p_temp') > 0.9
 	    replace `return' = . if missing(`p_temp') | `touse' == 0
 	}
-	cap la de sga_labels -1 "SGA" 0 "AGA" 1 "LGA"
-	cap la de sev_sga_labels -2 "severely SGA" -1 "SGA" 0 "AGA" 1 "LGA"
+	cap la de sfga_labels -1 "SGA" 0 "AGA" 1 "LGA"
+	cap la de sev_sfga_labels -2 "severely SGA" -1 "SGA" 0 "AGA" 1 "LGA"
 	if "`severe'"=="" {
-		la val `return' sga_labels
+		la val `return' sfga_labels
 	}
 	else {
 		replace `return' = -2 if float(`p_temp') < 0.03
-	    la val `return' sev_sga_labels
+	    la val `return' sev_sfga_labels
 	}
 	restore, not
 end
 
 program SGA_Badsyntax
-	di as err "sexcode() option invalid: see {help classify_sga}"
+	di as err "sexcode() option invalid: see {help classify_sfga}"
 	exit 198
 end

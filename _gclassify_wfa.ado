@@ -1,5 +1,5 @@
 capture program drop _gclassify_wfa
-*! version 0.3.2 (SJxx-x: dmxxxx)
+*! version 0.4.0 (SJxx-x: dmxxxx)
 program define _gclassify_wfa
 	version 16
 	preserve
@@ -77,9 +77,9 @@ program define _gclassify_wfa
 		replace `return' = . if missing(`z') | `touse' == 0
 	}
 	cap la def wfa_labs -2 "severely underweight" -1 "underweight" ///
-	    0 "normal" 1 "overweight"
+	    0 "normal weight" 1 "overweight"
 	cap la def wfa_labs_out -2 "severely underweight" -1 "underweight" ///
-	    0 "normal" 1 "overweight" 999 "outlier"
+	    0 "normal weight" 1 "overweight" 999 "outlier"
 
 	if "`outliers'"=="" {
 		la val `return' wfa_labs

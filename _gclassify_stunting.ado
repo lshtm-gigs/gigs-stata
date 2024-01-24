@@ -1,5 +1,5 @@
 capture program drop _gclassify_stunting
-*! version 0.3.2 (SJxx-x: dmxxxx)
+*! version 0.4.0 (SJxx-x: dmxxxx)
 program define _gclassify_stunting
 	version 16
 	preserve
@@ -74,9 +74,9 @@ program define _gclassify_stunting
 		replace `return' = 0 if float(`z') > -2
 		replace `return' = . if missing(`z') | `touse' == 0
 	}
-	cap la de stunting_labs -2 "severe stunting" -1 "stunting" 0 "normal"
-	cap la de stunting_labs_out -2 "severe stunting" -1 "stunting" 0 "normal" /*
-	    */ 999 "outlier"
+	cap la de stunting_labs -2 "severe stunting" -1 "stunting" 0 "not stunting"
+	cap la de stunting_labs_out -2 "severe stunting" -1 "stunting" 0 /*
+	    */ "not stunting" 999 "outlier"
 	if "`outliers'"=="" {
 		la val `return' stunting_labs
 	}

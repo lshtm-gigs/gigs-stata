@@ -1,34 +1,33 @@
-use life6mo
-gen agedays = pma - gestage
+use life6mo, clear
+keep id gestage sex visitweek pma age_days weight_g
 local 37weeks 7 * 37
-list in f/10, noobs abbreviate(10) sep(10)
+list in f/9, noobs abbreviate(10) sep(9)
 
-egen double waz_nbs = ig_nbs(meaninfwgt/1000, "wfga", "v2z") ///
-    if agedays == 0, ///
+egen double waz_nbs = ig_nbs(weight_g/1000, "wfga", "v2z") ///
+    if age_days == 0, ///
     gest_days(gestage) sex(sex) sexcode(m=1, f=2)
 
-egen double waz_who = who_gs(meaninfwgt/1000, "wfa", "v2z") ///
-    if agedays > 0 & gestage >= `37weeks', ///
-    xvar(agedays) sex(sex) sexcode(m=1, f=2)
+egen double waz_who = who_gs(weight_g/1000, "wfa", "v2z") ///
+    if age_days > 0 & gestage >= `37weeks', ///
+    xvar(age_days) sex(sex) sexcode(m=1, f=2)
 
 gen pma_weeks = pma / 7
-gen pma_weeks_floored = floor(pma / 7)
-egen double waz_png = ig_png(meaninfwgt/1000, "wfa", "v2z") ///
-    if gestage < `37weeks' & agedays > 0, ///
-    xvar(pma_weeks_floored) sex(sex) sexcode(m=1, f=2)
-drop pma_weeks pma_weeks_floored
+egen double waz_png = ig_png(weight_g/1000, "wfa", "v2z") ///
+    if age_days > 0 & gestage < `37weeks', ///
+    xvar(pma_weeks) sex(sex) sexcode(m=1, f=2)
+drop pma_weeks
 
 gen double waz = waz_who if gestage > `37weeks'
 replace waz = waz_png if gestage < `37weeks'
-replace waz = waz_nbs if agedays == 0
+replace waz = waz_nbs if age_days == 0
 
-list visitweek gestage pma waz_* waz in f/10, noobs sep(10)
+list visitweek gestage pma waz_* waz in f/9, noobs sep(9)
 drop waz_*
 
 gen preterm = gestage < `37weeks'
 collapse waz, by(visitweek preterm)
 line waz visitweek if preterm == 0 || line waz visitweek if preterm == 1 ||, ///
-    title("WAZ in term/preterm infants in the LIFE study") ///
+    title("WAZ in 300 infants from the LIFE data extract") ///
     xtitle("Visit week") ///
     ytitle("Weight-for-age z-score (WAZ)") ///
     xlabel(0 1 2 4 6 10 14 18 26) ///
@@ -37,14 +36,22 @@ line waz visitweek if preterm == 0 || line waz visitweek if preterm == 1 ||, ///
 graph export "gigs_fig1.pdf"
 
 use life6mo, clear
-keep if (gestage - pma) == 0
-egen sga = classify_sga(meaninfwgt/1000), ///
+keep if (age_days) == 0
+egen sfga = classify_sfga(weight_g/1000), ///
     gest_days(gestage) sex(sex) sexcode(m=1, f=2)
-gen term_status = "Preterm" if gestage < `37weeks'
-replace term_status = "Term" if gestage >= `37weeks'
-graph bar, over(sga) by(term_status, ///
-    title("Percentage of each size-for-GA category by term status") ///
-    note("")) ///
+graph bar, over(sfga) ///
+    title("Size-for-GA categorisations in the LIFE data extract") ///
+    note("") ///
     ytitle("Percentage") ///
     scheme(sj)
 graph export "gigs_fig2.pdf"
+
+
+egen svn = classify_svn(weight_g/1000), ///
+    gest_days(gestage) sex(sex) sexcode(m=1, f=2)
+graph bar, over(svn) ///
+    title("SVN categorisations in the LIFE data extract") ///
+    note("") ///
+    ytitle("Percentage") ///
+    scheme(sj)
+graph export "gigs_fig3.pdf"
