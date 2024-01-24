@@ -20,16 +20,16 @@ the latest stable release of `gigs` from GitHub using the
 . github install lshtm-gigs/gigs-stata
 ```
 
-Alternatively, you can download a stable release of your choice from GitHub using the
-`net install` command from Stata. Simply go to the **stable release** of `gigs` that 
-you want to download from the 
-[releases](https://github.com/lshtm-gigs/gigs-stata/releases/) page on GitHub, and 
-download the zipped archive. Unzip this downloaded archive. Within this unzipped 
-folder will be another folder, inside which will be the `.ado`/`.dta` files needed
-for `gigs` to work. Put the path to the folder containing the `.ado`/`.dta` files 
-in the `from()` option of `net install`, and Stata will install the necessary 
-files.
-```
+Alternatively, you can download a stable release of your choice from GitHub 
+using the `net install` command from Stata. Simply go to the **stable release**
+of `gigs` that  you want to download from the 
+[releases](https://github.com/lshtm-gigs/gigs-stata/releases/) page on GitHub, 
+and download the zipped archive. Unzip this downloaded archive. Within this 
+unzipped folder will be another folder, inside which will be the `.ado`/`.dta` 
+files needed for `gigs` to work. Put the path to the folder containing the 
+`.ado`/`.dta` files in the `from()` option of `net install`, and Stata will
+install the necessary files.
+```stata
 . net install gigs, from("directory/of/unzipped/folder/with/ado/files")
 ```
 
@@ -58,39 +58,39 @@ files.
   Component standards
   </summary>
   
-  | Acronym | Description                | Unit | `xvar()` range        |
-  |---------|----------------------------|------|-----------------------|
-  | `wfa`   | weight-for-age             | kg   | 27 to <64 exact weeks |
-  | `lfa`   | length-for-age             | cm   | 27 to <64 exact weeks |
-  | `hcfa`  | head circumference-for-age | cm   | 27 to <64 exact weeks |
-  | `wfl`   | weight-for-length          | kg   | 35 to 65 cm           |
+  | Acronym | Description                | Unit | `xvar()` range      |
+  |---------|----------------------------|------|---------------------|
+  | `wfa`   | weight-for-age             | kg   | 27 to <64 weeks PMA |
+  | `lfa`   | length-for-age             | cm   | 27 to <64 weeks PMA |
+  | `hcfa`  | head circumference-for-age | cm   | 27 to <64 weeks PMA |
+  | `wfl`   | weight-for-length          | kg   | 35 to 65 cm         |
 
   </details>
 * `ig_fet` - INTERGROWTH-21<sup>st</sup> fetal standards
   <details><summary>Component standards</summary>
 
-  | Acronym  | Description                                                               | Unit | `x` range       |
-  |----------|---------------------------------------------------------------------------|------|-----------------|
-  | `hcfga`  | head circumference-for-gestational age                                    | mm   | 98 to 280 days  |
-  | `bpdfga` | biparietal diameter-for-gestational age                                   | mm   | 98 to 280 days  |
-  | `acfga`  | abdominal circumference-for-gestational age                               | mm   | 98 to 280 days  |
-  | `flfga`  | femur length-for-gestational age                                          | mm   | 98 to 280 days  |
-  | `ofdfga` | occipito-frontal diameter for-gestational age                             | mm   | 98 to 280 days  |
-  | `efwfga` | estimated fetal weight-for-gestational age                                | g    | 154 to 280 days |
-  | `sfhfga` | symphisis-fundal height-for-gestational age                               | mm   | 112 to 294 days |
-  | `crlfga` | crown-rump length-for-gestational age                                     | mm   | 58 to 105 days  |
-  | `gafcrl` | gestational age-for-crown-rump length                                     | days | 15 to 95 mm     |
-  | `gwgfga` | gestational weight gain-for-gestational age                               | kg   | 98 to 280 days  |
-  | `pifga`  | pulsatility index-for-gestational age                                     |      | 168 to 280 days |
-  | `rifga`  | resistance index-for-gestational age                                      |      | 168 to 280 days |
-  | `sdrfga` | systolic/diastolic ratio-for-gestational age                              |      | 168 to 280 days |
-  | `tcdfga` | transcerebellar diameter-for-gestational age                              | mm   | 98 to 280 days  |
-  | `tcdfga` | gestational age-for-transcerebellar diameter                              | mm   | 98 to 280 days  |
-  | `poffga` | parietal-occipital fissure-for-gestational age                            | mm   | 105 to 252 days |
-  | `sffga`  | Sylvian fissue-for-gestational age                                        | mm   | 105 to 252 days |
-  | `avfga`  | anterior horn of the lateral ventricle-for-gestational age                | mm   | 105 to 252 days |
-  | `pvfga`  | atrium of the posterior horn of the lateral ventricle-for-gestational age | mm   | 105 to 252 days |
-  | `cmfga`  | cisterna magna-for-gestational age                                        | mm   | 105 to 252 days |
+  | Acronym  | Description                                                               | Unit  | `x` range       |
+  |----------|---------------------------------------------------------------------------|-------|-----------------|
+  | `hcfga`  | head circumference-for-gestational age                                    | mm    | 98 to 280 days  |
+  | `bpdfga` | biparietal diameter-for-gestational age                                   | mm    | 98 to 280 days  |
+  | `acfga`  | abdominal circumference-for-gestational age                               | mm    | 98 to 280 days  |
+  | `flfga`  | femur length-for-gestational age                                          | mm    | 98 to 280 days  |
+  | `ofdfga` | occipito-frontal diameter for-gestational age                             | mm    | 98 to 280 days  |
+  | `efwfga` | estimated fetal weight-for-gestational age                                | grams | 154 to 280 days |
+  | `sfhfga` | symphisis-fundal height-for-gestational age                               | mm    | 112 to 294 days |
+  | `crlfga` | crown-rump length-for-gestational age                                     | mm    | 58 to 105 days  |
+  | `gafcrl` | gestational age-for-crown-rump length                                     | days  | 15 to 95 mm     |
+  | `gwgfga` | gestational weight gain-for-gestational age                               | kg    | 98 to 280 days  |
+  | `pifga`  | pulsatility index-for-gestational age                                     |       | 168 to 280 days |
+  | `rifga`  | resistance index-for-gestational age                                      |       | 168 to 280 days |
+  | `sdrfga` | systolic/diastolic ratio-for-gestational age                              |       | 168 to 280 days |
+  | `tcdfga` | transcerebellar diameter-for-gestational age                              | mm    | 98 to 280 days  |
+  | `gaftcd` | gestational age-for-transcerebellar diameter                              | days  | 12-55 mm        |
+  | `poffga` | parietal-occipital fissure-for-gestational age                            | mm    | 105 to 252 days |
+  | `sffga`  | Sylvian fissue-for-gestational age                                        | mm    | 105 to 252 days |
+  | `avfga`  | anterior horn of the lateral ventricle-for-gestational age                | mm    | 105 to 252 days |
+  | `pvfga`  | atrium of the posterior horn of the lateral ventricle-for-gestational age | mm    | 105 to 252 days |
+  | `cmfga`  | cisterna magna-for-gestational age                                        | mm    | 105 to 252 days |
 
   </details>
 - `who_gs` - WHO Child Growth Standards for term infants
