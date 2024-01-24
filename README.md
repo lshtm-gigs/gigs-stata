@@ -1,4 +1,4 @@
-# gigs: Newborn and infant growth assessment in Stata
+# gigs: Fetal, neonatal and infant growth assessment in Stata
 <!-- badges: start -->
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 <!-- badges: end -->
@@ -229,23 +229,22 @@ contains weight measurements for term and preterm infants from birth
 (`visitweek == 0`) to around six months of age (`visitweek == 26`).
 
 ```stata
-. use life6mo
+. use life6mo, clear
+. keep id gestage sex visitweek pma age_days weight_g
 . local 37weeks 7 * 37
-. list in f/10, noobs abbreviate(10) sep(10)
- ___________________________________________________________
-| infantid     gestage   pma   sex   visitweek   meaninfwgt |
-|-----------------------------------------------------------|
-| 101-1002-1   132       133   2     0           2300       |
-| 101-1002-1   132       139   2     1           2270       |
-| 101-1002-1   132       146   2     2           2465       |
-| 101-1002-1   132       162   2     4           2700       |
-| 101-1002-1   132       174   2     6           3160       |
-| 101-1002-1   132       203   2     10          4004       |
-| 101-1002-1   132       230   2     14          4893.333   |
-| 101-1002-1   132       258   2     18          5690       |
-| 101-1002-1   132       317   2     26          6950       |
-| 101-1003-1   237       238   1     0           1900       |
-|-----------------------------------------------------------|
+. list in f/9, noobs abbreviate(10) sep(9)
+ __________________________________________________________
+|  id  gestage  sex visitweek   pma   age_days   weight_g  |
+|   1      273    1         0   273          0   2300      |
+|   1      273    1         1   280          7   2185      |
+|   1      273    1         2   288         15   2325      |
+|   1      273    1         4   301         28   2575      |
+|   1      273    1         6   316         43   3410      |
+|   1      273    1         10  344         71   4262.3333 |
+|   1      273    1         14  376        103   5050      |
+|   1      273    1         18  399        126   5431.6667 |
+|   1      273    1         26  460        187   5835      |
+ ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 ```
 
 ### Conversion
@@ -256,58 +255,47 @@ INTERGROWTH-21<sup>st</sup> Newborn Size Standards, WHO/INTERGROWTH Postnatal
 standards after birth).
 
 ```stata
-. egen double waz_nbs = ig_nbs(meaninfwgt/1000, "wfga", "v2z") ///
->     if agedays == 0, ///
+. egen double waz_nbs = ig_nbs(weight_g/1000, "wfga", "v2z") ///
+>     if age_days == 0, ///
 >     gest_days(gestage) sex(sex) sexcode(m=1, f=2)
-(8,228 missing values generated)
+(2,432 missing values generated)
 
-. egen double waz_who = who_gs(meaninfwgt/1000, "wfa", "v2z") ///
->     if agedays > 0 & gestage >= `37weeks', ///
->     xvar(agedays) sex(sex) sexcode(m=1, f=2)
-(4,073 missing values generated)
-
+. egen double waz_who = who_gs(weight_g/1000, "wfa", "v2z") ///
+>     if age_days > 0 & gestage >= `37weeks´, ///
+>     xvar(age_days) sex(sex) sexcode(m=1, f=2)
+(1,360 missing values generated)
 
 . gen pma_weeks = pma / 7
-. gen pma_weeks_floored = floor(pma / 7)
-. egen double waz_png = ig_png(meaninfwgt/1000, "wfa", "v2z") ///
->     if gestage < `37weeks' & agedays > 0, ///
->     xvar(pma_weeks_floored) sex(sex) sexcode(m=1, f=2)
-(4,659 missing values generated)
-. drop pma_weeks pma_weeks_floored
-
-. gen age_corrected = pma - `40weeks´
-. egen waz_whocorr = who_gs(meaninfwgt/1000, "wfa", "v2z") ///
->     if gestage < `37weeks´ & visitweek == 26, ///
->     xvar(age_corrected) sex(sex) sexcode(m=1, f=2)
-(7,996 missing values generated)
-. drop age_corrected
+. egen double waz_png = ig_png(weight_g/1000, "wfa", "v2z") ///
+>     if age_days > 0 & gestage < `37weeks´, ///
+>     xvar(pma_weeks) sex(sex) sexcode(m=1, f=2)
+(1,463 missing values generated)
+. drop pma_weeks
 ```
 
 We can then combine these WAZs into one overall `waz` variable:
 
 ```stata
-. gen double waz = waz_who if gestage > `37weeks'
-(4,749 missing values generated)
-. replace waz = waz_png if gestage < `37weeks'
-(3,757 real changes made)
-. replace waz = waz_nbs if agedays == 0
-(188 real changes made)
+. gen double waz = waz_who if gestage > `37weeks´
+(1,508 missing values generated)
+. replace waz = waz_png if gestage < `37weeks´
+(1,026 real changes made)
+. replace waz = waz_nbs if age_days == 0
+(57 real changes made)
 
-. list visitweek gestage pma waz_* waz in f/10, noobs sep(10)
-  +------------------------------------------------------------------------+
-  | visitw~k   gestage   pma   waz_nbs   waz_who      waz_png          waz |
-  |------------------------------------------------------------------------|
-  |        0       132   133         .         .            .            . |
-  |        1       132   139         .         .            .            . |
-  |        2       132   146         .         .            .            . |
-  |        4       132   162         .         .            .            . |
-  |        6       132   174         .         .            .            . |
-  |       10       132   203         .         .    7.8594946    7.8594946 |
-  |       14       132   230         .         .    7.2548282    7.2548282 |
-  |       18       132   258         .         .    6.0985216    6.0985216 |
-  |       26       132   317         .         .    3.8344571    3.8344571 |
-  |        0       237   238         .         .   -.43606208   -.43606208 |
-  +------------------------------------------------------------------------+
+. list visitweek gestage pma waz_* waz in f/9, noobs sep(9)
+ ____________________________________________________________________
+| visitw~k  gestage  pma    waz_nbs      waz_who  waz_png        waz |
+|        0      273  273  -2.298544            .        .  -2.298544 |
+|        1      273  280          .    -3.028356        .  -3.028356 |
+|        2      273  288          .   -3.2685948        . -3.2685948 |
+|        4      273  301          .   -3.6824586        . -3.6824586 |
+|        6      273  316          .   -2.7962372        . -2.7962372 |
+|       10      273  344          .   -2.5495876        . -2.5495876 |
+|       14      273  376          .   -2.3102437        . -2.3102437 |
+|       18      273  399          .   -2.3030732        . -2.3030732 |
+|       26      273  460          .   -2.8157742        . -2.8157742 |
+ ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 ```
 
 This `waz` variable can then be used to determine whether infants are 
@@ -321,17 +309,26 @@ remove any observations which were not made at birth. We then use the
 `classify_sfga()` command to give us our classifications:
 ```stata
 . use life6mo, clear
-. keep if (gestage - pma) == 0
-(7,303 observations deleted)
+. keep if age_days == 0
+(2,432 observations deleted)
 
-. egen sfga = classify_sfga(meaninfwgt/1000), ///
+. egen sfga = classify_sfga(weight_g/1000), ///
 >     gest_days(gestage) sex(sex) sexcode(m=1, f=2)
-(2 missing values generated)
+
+. tab sfga
+
+       sfga |      Freq.     Percent        Cum.
+------------+-----------------------------------
+        SGA |         39       68.42       68.42
+        AGA |         16       28.07       96.49
+        LGA |          2        3.51      100.00
+------------+-----------------------------------
+      Total |         57      100.00
 ```
 
 ## Known issues and bug reporting
-We kindly request that users note any bugs, issues, or feature requests on the 
-GitHub [issues page](https://github.com/lshtm-gigs/gigs-stata/issues).
+We request that users note any bugs, issues, or feature requests on the GitHub 
+[issues page](https://github.com/lshtm-gigs/gigs-stata/issues).
 
 Authors
 ------
