@@ -1,6 +1,6 @@
 capture program drop _gclassify_sfga
 capture program drop SGA_Badsyntax
-*! version 0.4.0 (SJxx-x: dmxxxx)
+*! version 0.4.1 (SJxx-x: dmxxxx)
 program define _gclassify_sfga
 	version 16
 	preserve
@@ -68,7 +68,10 @@ program define _gclassify_sfga
 		la val `return' sfga_labels
 	}
 	else {
-		replace `return' = -2 if float(`p_temp') < 0.03
+		qui {
+			replace `return' = -2 if float(`p_temp') < 0.03
+			replace `return' = . if missing(`p_temp') | `touse' == 0
+		}
 	    la val `return' sev_sfga_labels
 	}
 	restore, not
