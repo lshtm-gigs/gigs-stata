@@ -37,7 +37,7 @@
 {p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
 {cmd:ig_fet}{cmd:(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
 {ifin}{cmd:,} 
-{cmdab:gest:_days}{cmd:(}{varname}{cmd:)}
+{cmdab:x:var}{cmd:(}{varname}{cmd:)}
 
 {p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
 {cmd:who_gs}{cmd:(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}

@@ -60,9 +60,9 @@ install the necessary files.
   
   | Acronym | Description                | Unit | `xvar()` range      |
   |---------|----------------------------|------|---------------------|
-  | `wfa`   | weight-for-age             | kg   | 27 to <64 weeks PMA |
-  | `lfa`   | length-for-age             | cm   | 27 to <64 weeks PMA |
-  | `hcfa`  | head circumference-for-age | cm   | 27 to <64 weeks PMA |
+  | `wfa`   | weight-for-age             | kg   | 27 to ≤64 weeks PMA |
+  | `lfa`   | length-for-age             | cm   | 27 to ≤64 weeks PMA |
+  | `hcfa`  | head circumference-for-age | cm   | 27 to ≤64 weeks PMA |
   | `wfl`   | weight-for-length          | kg   | 35 to 65 cm         |
 
   </details>
