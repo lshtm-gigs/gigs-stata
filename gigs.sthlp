@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.4.0 07 Dec 2023}{...}
+{* *! version 0.4.1 22 April 2024}{...}
 {vieweralsosee "" "--"}{...}
 {vieweralsosee "gigs: Conversion functions" "help ig_nbs"}{...}
 {vieweralsosee "gigs: Classification functions" "help classify_sfga"}{...}
@@ -10,7 +10,7 @@
 {title:Title}
 
 {p2colset 5 17 19 2}{...}
-{p2col :{hi:gigs} {hline 2} Standardising child growth assessment with extensions to egen}
+{p2col :{hi:gigs} {hline 2} Fetal, neonatal, and infant growth assessment using international growth standards}
 {p2colreset}{...}
 
 {marker description}{...}
@@ -31,20 +31,20 @@
 {marker authors}{...}
 {title:Authors}
 
-{pstd}Simon R. Parker{p_end}
+{pstd}Simon R. Parker {bf:(Maintainer, Author)}{p_end}
 {pstd}Maternal, Adolescent, Reproductive, and Child Health (MARCH) Center{p_end}
-{pstd}London School of Hygiene and Tropical Medicine{p_end}
+{pstd}London School of Hygiene & Tropical Medicine{p_end}
 {pstd}London, U.K.{p_end}
 {pstd}simon.parker@lshtm.ac.uk{p_end}
 
-{pstd}Linda Vesel{p_end}
+{pstd}Linda Vesel {bf:(Author, Data Contributor)}{p_end}
 {pstd}Brigham and Women’s Hospital, Boston{p_end}
 {pstd}Massachusetts, U.S.A.{p_end}
-{pstd}simon.parker@lshtm.ac.uk{p_end}
+{pstd}lvesel@ariadnelabs.org{p_end}
 
-{pstd}Eric O. Ohuma{p_end}
+{pstd}Eric O. Ohuma {bf:(Author)}{p_end}
 {pstd}Maternal, Adolescent, Reproductive, and Child Health (MARCH) Center{p_end}
-{pstd}London School of Hygiene and Tropical Medicine{p_end}
+{pstd}London School of Hygiene & Tropical Medicine{p_end}
 {pstd}London, U.K.{p_end}
 {pstd}eric.ohuma@lshtm.ac.uk{p_end}
 
