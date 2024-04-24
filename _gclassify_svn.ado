@@ -1,6 +1,5 @@
-capture program drop _gclassify_svn
-capture program drop SVN_Badsyntax
-*! version 0.4.0 (SJxx-x: dmxxxx)
+capture prog drop _gclassify_svn
+*! version 0.5.0 (SJxx-x: dmxxxx)
 program define _gclassify_svn
 	version 16
 	preserve
@@ -11,7 +10,7 @@ program define _gclassify_svn
 
 	gettoken paren 0 : 0, parse("(), ")
 
-	gettoken input 0 : 0, parse("(), ")
+	gettoken weight_kg 0 : 0, parse("(), ")
 		
 	gettoken paren 0 : 0, parse("(), ")
 	if `"`paren'"' != ")" {
@@ -53,26 +52,16 @@ program define _gclassify_svn
 
     marksample touse
 
- 	tempvar sfga is_term is_sfga
-	qui {
-		egen double `sfga' = classify_sfga(`input'), ///
-			gest_days(`gest_days') sex(`sex') sexcode(m="`male'", f="`female'")
-		gen `is_term' = `gest_days' >= 259 // 259 days = 37 weeks
-	    gen `type' `return' = .
-	    replace `return' = -4 if `is_term' == 0 & `sfga' == -1
-	    replace `return' = -3 if `is_term' == 0 & `sfga' == 0
-        replace `return' = -2 if `is_term' == 0 & `sfga' == 1
-        replace `return' = -1 if `is_term' == 1 & `sfga' == -1
-        replace `return' =  0 if `is_term' == 1 & `sfga' == 0
-        replace `return' =  1 if `is_term' == 1 & `sfga' == 1
-        replace `return' =  . if missing(`sga') | `touse' == 0
-	}
-	cap la de svn_labels -4 "Preterm SGA" -3 "Preterm AGA" -2 "Preterm LGA" ///
-	    -1 "Term SGA" 0 "Term AGA" 1 "Term LGA"
-	la val `return' svn_labels
-	restore, not
+ 	tempvar bweight_centile sfga is_term is_sfga
+	qui egen double `bweight_centile' = ///
+		ig_nbs(`weight_kg', "wfga", "v2c") if `touse', ///
+		gest_days(`gest_days') sex(`sex') sexcode(m="`male'", f="`female'")
+	qui gigs_categorise `return' if `touse', ///
+		analysis(svn) measure(`bweight_centile') ///
+		outvartype(`type') gest_days(`gest_days')
 end
 
+capture prog drop SVN_Badsyntax
 program SVN_Badsyntax
 	di as err "sexcode() option invalid: see {help classify_svn}"
 	exit 198

@@ -1,6 +1,5 @@
-capture program drop _gclassify_sfga
-capture program drop SGA_Badsyntax
-*! version 0.4.1 (SJxx-x: dmxxxx)
+capture prog drop _gclassify_sfga
+*! version 0.5.0 (SJxx-x: dmxxxx)
 program define _gclassify_sfga
 	version 16
 	preserve
@@ -11,7 +10,7 @@ program define _gclassify_sfga
 
 	gettoken paren 0 : 0, parse("(), ")
 
-	gettoken input 0 : 0, parse("(), ")
+	gettoken weight_kg 0 : 0, parse("(), ")
 		
 	gettoken paren 0 : 0, parse("(), ")
 	if `"`paren'"' != ")" {
@@ -35,7 +34,7 @@ program define _gclassify_sfga
 		if "`2'" ~= "=" | "`5'" ~= "=" | /*
 		*/ "`4'" ~= substr("female", 1, length("`4'")) | /*
 		*/ "`7'" ~= "" {
- 			SGA_Badsyntax
+ 			SfGA_Badsyntax
  		}
  		local male "`3'"
   		local female "`6'"
@@ -44,40 +43,36 @@ program define _gclassify_sfga
 	    if "`2'" ~= "=" | "`5'" ~= "=" | /*
  		*/ "`4'" ~= substr("male", 1, length("`4'") | /*
  		*/ "`7'" ~= "" {
- 			SGA_Badsyntax
+ 			SfGA_Badsyntax
  		}
  		local male "`6'"
  		local female "`3'"
  	} 
-	else SGA_Badsyntax	
+	else SfGA_Badsyntax	
 
     marksample touse
-
- 	tempvar p_temp
- 	qui {
-	    egen double `p_temp' = ig_nbs(`input', "wfga", "v2c"), ///
-            gest_days(`gest_days') sex(`sex') sexcode(m="`male'", f="`female'")
-	    generate `type' `return' = 0
-	    replace `return' = -1 if float(`p_temp') < 0.1
-	    replace `return' = 1 if float(`p_temp') > 0.9
-	    replace `return' = . if missing(`p_temp') | `touse' == 0
-	}
-	cap la de sfga_labels -1 "SGA" 0 "AGA" 1 "LGA"
-	cap la de sev_sfga_labels -2 "severely SGA" -1 "SGA" 0 "AGA" 1 "LGA"
-	if "`severe'"=="" {
-		la val `return' sfga_labels
+	
+ 	tempvar bweight_centile
+ 	qui egen double `bweight_centile' = ///
+		ig_nbs(`weight_kg', "wfga", "v2c") if `touse', ///
+		gest_days(`gest_days') sex(`sex') sexcode(m="`male'", f="`female'")
+		
+	if "`severe'" == "" {
+		local severe "0"
 	}
 	else {
-		qui {
-			replace `return' = -2 if float(`p_temp') < 0.03
-			replace `return' = . if missing(`p_temp') | `touse' == 0
-		}
-	    la val `return' sev_sfga_labels
+		local severe "1"
 	}
+	qui gigs_categorise `return' if `touse', ///
+		analysis(sfga) measure(`bweight_centile') ///
+		outvartype(`type') severe(`severe')
+	
 	restore, not
 end
 
-program SGA_Badsyntax
+capture prog drop SfGA_Badsyntax
+program SfGA_Badsyntax
 	di as err "sexcode() option invalid: see {help classify_sfga}"
 	exit 198
 end
+

@@ -1,5 +1,5 @@
 capture program drop _gclassify_wasting
-*! version 0.4.0 (SJxx-x: dmxxxx)
+*! version 0.5.0 (SJxx-x: dmxxxx)
 program define _gclassify_wasting
 	version 16
 	preserve
@@ -51,46 +51,24 @@ program define _gclassify_wasting
 	else WastingSex_Badsyntax
 
 	marksample touse
-
-	tempvar z z_WHO_wfh z_WHO_wfl z_png
-	qui {
-		egen double `z_png' = ig_png(`weight_kg', "wfl", "v2z"), ///
-			xvar(`lenht_cm') sex(`sex') sexcode(m="`male'", f="`female'")
-		egen double `z_WHO_wfl' = who_gs(`weight_kg', "wfl", "v2z"), ///
-			xvar(`lenht_cm') sex(`sex') sexcode(m="`male'", f="`female'")
-		egen double `z_WHO_wfh' = who_gs(`weight_kg', "wfh", "v2z"), ///
-			xvar(`lenht_cm') sex(`sex') sexcode(m="`male'", f="`female'")
-		
-		tempvar pma_weeks use_png use_who
-		gen double `pma_weeks' = (`age_days' + `gest_days') / 7
-		gen byte `use_png' = 1 if `gest_days' < 259 & ///
-			`pma_weeks' >= 27 & `pma_weeks' <= 64
-		
-		gen double `z' = .
-		replace `z' = `z_png' if `use_png' == 1
-		replace `z' = `z_WHO_wfl' if `use_png' != 1 & `age_days' < 731
-		replace `z' = `z_WHO_wfh' if `use_png' != 1 & `age_days' >= 731
-		
-		gen `type' `return' = .
-		replace `return' = -1 if float(`z') <= -2
-		replace `return' = -2 if float(`z') <= -3
-		replace `return' = 0 if abs(float(`z')) < 2
-		replace `return' = 1 if float(`z') >= 2
-		replace `return' = . if missing(`z') | `touse' == 0 | /*
-			*/ missing(`gest_days') 
-	}	
-	cap la def wasting_labs -2 "severe wasting"  -1 "wasting" ///
-	    0 "not wasting" 1 "overweight"
-	cap la def wasting_labs_out -2 "severe wasting"  -1 "wasting" ///
-	    0 "not wasting" 1 "overweight" 999 "outlier"
 	
-	if "`outliers'"=="" {
-		la val `return' wasting_labs
+	tempvar wlz
+	qui gigs_zscore `wlz' if `touse', ///
+		z_type(wlz) yvar(`weight_kg') ///
+		lenht_cm(`lenht_cm') age_days(`age_days') gest_days(`gest_days') ///
+		sex(`sex') sexc(m="`male'", f="`female'") ///
+		outvartype("double")
+		
+	if "`outliers'" == "" {
+		local outliers "0"
 	}
 	else {
-		qui replace `return' = 999 if abs(float(`z')) > 5 & !missing(`return')
-		la val `return' wasting_labs_out
+		local outliers "1"
 	}
+	qui gigs_categorise `return' if `touse', ///
+		analysis(wasting) measure(`wlz') ///
+		outvartype(`type') outliers("`outliers'")
+		
 	restore, not
 end
 
