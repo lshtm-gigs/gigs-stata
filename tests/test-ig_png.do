@@ -120,7 +120,7 @@ foreach acronym in "wfa" "lfa" "hcfa" "wfl" {
 				local colnames P03 P05 P10 P50 P90 P95 P97
 			}
 			cap merge 1:1 `xname' `colnames' using "`path'"
-			if _rc {
+			if _rc == 9 {
 				save "`path'", replace
 				continue
 			}

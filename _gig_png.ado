@@ -1,7 +1,7 @@
 capture program drop _gig_png
 capture program drop Badsexvar_png
 capture program drop Badsyntax_png
-*! version 0.3.1 (SJxx-x: dmxxxx)
+*! version 0.3.2 (SJxx-x: dmxxxx)
 program define _gig_png
  	version 16
 	preserve
@@ -25,14 +25,14 @@ program define _gig_png
 	}
 
 	capture assert inlist("`acronym'", "wfa", "lfa", "hcfa", "wfl")
-	if _rc {
+	if _rc == 9 {
 		di as text "`acronym'" as error " is an invalid acronym. The only " /*
 		*/ as error "valid choices are " as text "wfa, lfa, hcfa " as error /*
 		*/ "or" as text " wfl" as error "."
 		exit 198
 	}
 	capture assert inlist("`conversion'", "v2c", "v2z", "c2v", "z2v")
-	if _rc {
+	if _rc == 9 {
 		di as text "`conversion'" as error " is an invalid conversion code. " /*
 		*/ as error "The only valid choices are " as text "v2c, v2z, c2v," as /*
 		*/ error " or " as text "z2v" as error "."
@@ -89,7 +89,7 @@ program define _gig_png
 	qui generate `type' `return' = .
 	tempvar sex_as_numeric mu sigma 
 	qui {
-		gen `sex_as_numeric' = 1 if `sex' == "`male'"
+		gen byte `sex_as_numeric' = 1 if `sex' == "`male'"
 		replace `sex_as_numeric' = 0 if `sex' == "`female'"
 		gen double `mu' = 2.591277 - 0.01155 * (`xvar' ^ 0.5) - ///
 			2201.705 * (`xvar' ^ -2) + 0.0911639 * `sex_as_numeric' ///
@@ -107,7 +107,7 @@ program define _gig_png
 		    167.906 * (`xvar' / 10) ^ -0.5 ///
 			if "`acronym'" == "wfl" & `sex' == "`female'"
 
-		gen `sigma' = 0.1470258 + 505.92394 / `xvar' ^ 2 - ///
+		gen double `sigma' = 0.1470258 + 505.92394 / `xvar' ^ 2 - ///
 			140.0576 / (`xvar' ^ 2) * log(`xvar') ///
 			if "`acronym'" == "wfa" 
 		replace `sigma' = 0.050489 + (310.44761 * (`xvar' ^ -2)) - ///

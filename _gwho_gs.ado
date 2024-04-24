@@ -1,7 +1,7 @@
 capture program drop _gwho_gs
 capture program drop Badsexvar_who
 capture program drop Badsyntax_who
-*! version 0.3.1 (SJxx-x: dmxxxx)
+*! version 0.3.2 (SJxx-x: dmxxxx)
 program define _gwho_gs
 	version 16
 	preserve
@@ -26,7 +26,7 @@ program define _gwho_gs
 
 	capture assert inlist("`acronym'", "wfa", "bfa", "lhfa", "wfl", "wfh", ///
 	                      "hcfa", "acfa", "ssfa", "tsfa")
-	if _rc {
+	if _rc == 9 {
 		di as text "`acronym'" as error " is an invalid acronym. The only " /*
 		*/ as error "valid choices are " as text "wfa, bfa, lhfa, wfl, wfh, " /*
 		*/ as text "hcfa, acfa, ssfa " as error "or" as text " tsfa" as error /*
@@ -34,7 +34,7 @@ program define _gwho_gs
 		exit 198
 	}
 	capture assert inlist("`conversion'", "v2c", "v2z", "c2v", "z2v")
-	if _rc {
+	if _rc == 9 {
 		di as text "`conversion'" as error " is an invalid conversion code. " /*
 		*/ as error "The only valid choices are " as text "v2c, v2z, c2v," as /*
 		*/ error " or " as text "z2v" as error "."
@@ -96,7 +96,7 @@ program define _gwho_gs
 	// Initialise new variables for merging
 	foreach var in xvar sex L M S {
 		capture confirm new var whoLMS_`var'
-		if _rc {
+		if _rc == 9 {
 			di as error "{bf:whoLMS_`var'} is used by who_gs() - rename "/*
 				*/ "your variable."
 			exit 110
@@ -166,18 +166,18 @@ program define _gwho_gs
 			tempvar _sd3neg _sd2neg _sd2pos _sd3pos
 			gen double `_sd2pos' = `M' * (1 + `L' * `S' * 2) ^ (1/`L')
 			gen double `_sd3pos' = `M' * (1 + `L' * `S' * 3) ^ (1/`L')
-			if `_z' > 3 & ("`acronym'" != "hcfa" & "`acronym'" != "lhfa") {
-				replace `_z' = /*
-				*/ 3 + (`input' - `_sd3pos')/(`_sd3pos' - `_sd2pos') /*
-				*/ if `_z' > 3
+			if !inlist("`acronym'", "hcfa", "lhfa") {
+				replace `_z' = ///
+					3 + (`input' - `_sd3pos')/(`_sd3pos' - `_sd2pos') ///
+					if float(`_z') > +3
 			}
 			
 			gen double `_sd3neg' = `M' * (1 + `L' * `S' * -3) ^ (1 / `L')
 			gen double `_sd2neg' = `M' * (1 + `L' * `S' * -2) ^ (1 / `L')
-			if `_z' < -3 & ("`acronym'" != "hcfa" & "`acronym'" != "lhfa") {
-				replace `_z' = /*
-				*/ -3 + (`input' - `_sd3neg')/(`_sd2neg' - `_sd3neg') /*
-				*/ if `_z' < -3
+			if !inlist("`acronym'", "hcfa", "lhfa") {
+				replace `_z' = ///
+					-3 + (`input' - `_sd3neg')/(`_sd2neg' - `_sd3neg') ///
+					if float(`_z') < -3
 			}
 			replace `return' = `_z'		
 		}

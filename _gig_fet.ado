@@ -1,5 +1,5 @@
 capture program drop _gig_fet
-*! version 0.2.0 (SJxx-x: dmxxxx)
+*! version 0.2.1 (SJxx-x: dmxxxx)
 program define _gig_fet
  	version 16
 	preserve
@@ -28,7 +28,7 @@ program define _gig_fet
 				*/ inlist("`acronym'", "gwgfga", "pifga", "rifga", "sdrfga", /*
 				*/ 		  "tcdfga", "gaftcd", "poffga", "sffga", "avfga") | /*
 	            */ inlist("`acronym'", "pvfga", "cmfga")
-	if _rc {
+	if _rc == 9 {
 		di as text "`acronym'" as error " is an invalid acronym. The only " /*
 		*/ as error "valid choices are " as text "hcfga, bpdfga, acfga," /*
 		*/ as text " flfga, ofdfga, efwfga, sfhfga, crlfga, gafcrl, gwgfga" /*
@@ -38,7 +38,7 @@ program define _gig_fet
 		exit 198
 	}
 	capture assert inlist("`conversion'", "v2c", "v2z", "c2v", "z2v")
-	if _rc {
+	if _rc == 9 {
 		di as text "`conversion'" as error " is an invalid conversion code. " /*
 		*/ as error "The only valid choices are " as text "v2c, v2z, c2v," as /*
 		*/ error " or " as text "z2v" as error "."
