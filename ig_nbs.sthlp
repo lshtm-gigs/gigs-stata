@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.4.0 07 Dec 2023}{...}
+{* *! version 0.4.1 23 April 2024}{...}
 {vieweralsosee "" "--"}{...}
 {vieweralsosee "gigs: Classification functions" "help classify_sfga"}{...}
 {viewerjumpto "Syntax" "ig_nbs##syntax"}{...}
@@ -16,7 +16,7 @@
 {title:Title}
 
 {p2colset 5 17 19 2}{...}
-{p2col :{hi:gigs} {hline 2} Standardising child growth assessment with extensions to egen}
+{p2col :{hi:gigs} {hline 2} Fetal, neonatal, and infant growth assessment using international growth standards}
 {p2colreset}{...}
 
 {marker syntax}{...}
@@ -141,9 +141,9 @@ also {it:fcn} dependent.
 {title:Options}
 {dlgtab:Non-specific}
 
-{phang}{opt sex(varname)} specifies the sex variable. It can be int, byte, or
- string. The codes for {cmd:male} and {cmd:female} must be specified by the 
- {hi:sexcode()} option.
+{phang}{opt sex(varname)} specifies the sex variable. It must be an int, byte,
+ or string variable. The codes for {cmd:male} and {cmd:female} must be specified
+ by the {hi:sexcode()} option.
 
 {phang}{cmd:sexcode(male=}{it:code}{cmd:, female=}{it:code}{cmd:)}
  specifies the codes for {cmd:male} and {cmd:female}. The codes can be specified

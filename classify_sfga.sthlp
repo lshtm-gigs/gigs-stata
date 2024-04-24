@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.4.0 23 Jan 2023}{...}
+{* *! version 0.4.1 17 April 2023}{...}
 {vieweralsosee "" "--"}{...}
 {vieweralsosee "gigs: Classification functions" "help classify_sfga"}{...}
 {viewerjumpto "Syntax" "classify_sfga##syntax"}{...}
@@ -9,13 +9,13 @@
 {viewerjumpto "Remarks" "classify_sfga##remarks"}{...}
 {viewerjumpto "Examples" "classify_sfga##examples"}{...}
 
-{hi:help classify_sfga, help classify_svn, help classify_stunting, help classify_wasting, help classify_wfa}{right: ({browse "https://www.overleaf.com/project/641db63564edd62fb54c963b":SJXX-X: st0001})}
+{hi:help classify_sfga, help classify_svn, help classify_stunting, help classify_wasting, help classify_wfa, help classify_headsize}{right: ({browse "https://www.overleaf.com/project/641db63564edd62fb54c963b":SJXX-X: st0001})}
 {hline}
 
 {title:Title}
 
 {p2colset 5 17 19 2}{...}
-{p2col :{hi:gigs} {hline 2} Standardising child growth assessment with extensions to egen}
+{p2col :{hi:gigs} {hline 2} Fetal, neonatal, and infant growth assessment using international growth standards}
 {p2colreset}{...}
 
 {title:Syntax}
@@ -54,6 +54,12 @@
 {cmdab:gest:_days}{cmd:(}{varname}{cmd:)} {cmd:age_days}{cmd:(}{varname}{cmd:)}
 {cmdab:sexc:ode}{cmd:(}{cmdab:m:ale=}{it:code}{cmd:,} {cmdab:f:emale=}{it:code}{cmd:)}
 [{cmdab:out:liers}]
+
+{p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
+{cmd:classify_headsize}{cmd:(}{varname}{cmd:)} 
+{ifin}{cmd:,} 
+{cmdab:gest:_days}{cmd:(}{varname}{cmd:)} {cmd:age_days}{cmd:(}{varname}{cmd:)}
+{cmdab:sexc:ode}{cmd:(}{cmdab:m:ale=}{it:code}{cmd:,} {cmdab:f:emale=}{it:code}{cmd:)}
 
 {p 4 4 2}{cmd:by} cannot be used with these functions.
 
@@ -174,6 +180,25 @@
 
 {pmore}{varname} is the variable name for weight in kg in your dataset (for
  example, {cmd:weight_kg}, {cmd:mean_wgt}).
+
+{p 4 4 2}{hi:classify_headsize(}{varname}{cmd:)} is used to classify 
+ head circumference-for-age in infants up to five years old using the 
+ INTERGROWTH-21st Newborn Size/Postnatal Growth standards or WHO Child Growth 
+ Standards as appropriate, based on each observation's gestational age and 
+ age in days. It produces a variable with the following values and labels.
+
+{col 20}Value    {col 27}Label               {col 50}{it:Z}-score range
+{col 20}{hline 43}
+{col 21}{cmd: -2}{col 27}Severe microcephaly {col 50}  <=-3
+{col 21}{cmd: -1}{col 27}Microcephaly        {col 50}-3 to -2
+{col 21}{cmd:  0}{col 27}Normal head size    {col 50}-2 to 2
+{col 21}{cmd:  1}{col 27}Macrocephaly        {col 50} 2 to 3
+{col 21}{cmd:  2}{col 27}Severe macrocephaly {col 50}  >= 3
+
+{pmore}This function takes one argument:
+
+{pmore}{varname} is the variable name for weight in kg in your dataset (for
+ example, {cmd:weight_kg}, {cmd:mean_wgt}).
  
 {marker options}{...}
 {title:Options}
@@ -187,9 +212,9 @@
  ages, and therefore determines which growth standard is applied for each
  observation.
 
-{phang}{opt sex(varname)} specifies the sex variable. It can be int, byte, or
- string. The codes for {cmd:male} and {cmd:female} must be specified by the 
- {hi:sexcode()} option.
+{phang}{opt sex(varname)} specifies the sex variable. It must be an int, byte,
+ or string variable. The codes for {cmd:male} and {cmd:female} must be specified
+ by the {hi:sexcode()} option.
 
 {phang}{cmdab:sexc:ode}{cmd:(}{cmdab:m:ale=}{it:code}{cmd:,} {cmdab:f:emale=}{it:code}{cmd:)}
  specifies the codes for {cmd:male} and {cmd:female}. The codes can be specified
