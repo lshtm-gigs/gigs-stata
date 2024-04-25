@@ -22,6 +22,7 @@ gen double waz = waz_who if gestage > `37weeks'
 replace waz = waz_png if gestage < `37weeks'
 replace waz = waz_nbs if age_days == 0
 
+/* Show data from first visits for the first 9 IDs*/
 list id visitweek gestage pma waz_* waz in f/80 if visitweek == 0, noobs sep(9)
 drop waz_*
 
@@ -37,7 +38,7 @@ line waz visitweek if preterm == 0 || line waz visitweek if preterm == 1 ||, ///
 graph export "gigs_fig1.pdf"
 
 use life6mo, clear
-keep if (age_days) == 0
+keep if age_days == 0
 egen sfga = classify_sfga(weight_g/1000), ///
     gest_days(gestage) sex(sex) sexcode(m=1, f=2)
 graph bar, over(sfga) ///

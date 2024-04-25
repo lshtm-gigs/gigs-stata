@@ -3,8 +3,9 @@
 {vieweralsosee "" "--"}{...}
 {vieweralsosee "gigs: Conversion functions" "help ig_nbs"}{...}
 {vieweralsosee "gigs: Classification functions" "help classify_sfga"}{...}
+{vieweralsosee "gigs: Growth classification command" "help gigs_classify_growth"}{...}
 
-{hi: help ig_nbs, help classify_sfga}{right: ({browse "https://www.overleaf.com/project/641db63564edd62fb54c963b":SJXX-X: st0001})}
+{hi: help gigs}{right: ({browse "https://www.overleaf.com/project/641db63564edd62fb54c963b":SJXX-X: st0001})}
 {hline}
 
 {title:Title}
@@ -16,17 +17,23 @@
 {marker description}{...}
 {title:Description}
 
-{pstd} Amongst other aims, the Guidance for International Growth Standards 
- (GIGS) project is intended to make child growth assessment more accessible 
- and repeatable in code. As part of GIGS, we have implemented the growth 
- standards from the World Health Organisation and INTERGROWTH-21st project in 
- Stata.
+{pstd} The Guidance for International Growth Standards (GIGS) project is
+ intended to make child growth assessment more accessible and repeatable,
+ through statistical software and published guidance on which standards to use,
+ where to use them, and when. As part of GIGS, we have implemented international
+ growth standards from the World Health Organisation and INTERGROWTH-21st
+ project in Stata. Our approach is based on knowing the gestational age of a
+ child such that the best available international standards are used to assess
+ its size.
  
 {p 4 4 2}We have developed multiple functions for {cmd:egen}, which are 
  described in the documentation pages linked to from the 'Also see' section on 
  this page. These functions either convert between anthropometric measures and 
  z-scores/centiles, or classify growth according to literature-based
- cut-offs, including from the DHS.
+ cut-offs. We have also written the {cmd:gigs_classify_growth} command, which
+ takes multiple anthropometric indices and applies the most suitable growth
+ standards at each time point to classify common growth indicators such as
+ size-for-gestational age, stunting, and wasting.
 
 {marker authors}{...}
 {title:Authors}
@@ -50,9 +57,11 @@
 
 {title:Also see}
 
-{p 4 14 2}Conversion functions: {help ig_nbs:documentation}
+{p 4 14 2}GIGS conversion functions: {help ig_nbs:documentation}
 
-{p 4 14 2}Classification functions: {help classify_sfga:documentation}
+{p 4 14 2}GIGS classification functions: {help classify_sfga:documentation}
+
+{p 4 14 2}GIGS growth classification command: {help gigs_classify_growth:documentation}
 
 {p 4 14 2}Article: {it:Stata Journal}, volume XX, number X: {browse "https://www.overleaf.com/project/641db63564edd62fb54c963b":st0001}
 
