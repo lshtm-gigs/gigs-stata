@@ -21,29 +21,30 @@ program gigs_categorise
 		exit 499
 	}
 	if "`analysis'" == "sfga" {
-		SfGA_categorise `newvar' if `touse' == 1, ///
+		SfGA_categorise `newvar' if `touse', ///
 			bweight_centile(`measure') outvartype("`outvartype'") ///
 			severe("`severe'")
 	}
 	else if "`analysis'" == "svn" {
-		SVN_categorise `newvar' if `touse' == 1, ///
+		SVN_categorise `newvar' if `touse', ///
 			bweight_centile(`measure') gest_days(`gest_days') ///
 			outvartype("`outvartype'")
+			noi li `newvar'
 	}
 	else if "`analysis'" == "stunting" {
-		Stunting_categorise `newvar' if `touse' == 1, ///
+		Stunting_categorise `newvar' if `touse', ///
 			lhaz(`measure') outvartype("`outvartype'") outliers("`outliers'")
 	}
 	else if "`analysis'" == "wasting" {
-		Wasting_categorise `newvar' if `touse' == 1, ///
+		Wasting_categorise `newvar' if `touse', ///
 			wlz(`measure') outvartype("`outvartype'") outliers("`outliers'")
 	}
 	else if "`analysis'" == "wfa" {
-		WFA_categorise `newvar' if `touse' == 1, ///
+		WFA_categorise `newvar' if `touse', ///
 			waz(`measure') outvartype("`outvartype'") outliers("`outliers'")
 	}
 	else if "`analysis'" == "headsize" {
-		Headsize_categorise `newvar' if `touse' == 1, ///
+		Headsize_categorise `newvar' if `touse', ///
 			hcaz(`measure') outvartype("`outvartype'")
 	}
 	restore, not
@@ -95,7 +96,7 @@ program SVN_categorise
 	marksample touse, novarlist
 	
 	tempvar sfga is_term
-	SfGA_categorise `sfga' if `touse' == 1, ///
+	SfGA_categorise `sfga' if `touse', ///
 		bweight_centile(`bweight_centile') outvartype(int) ///
 		severe("0")
 	gen byte `is_term' = `gest_days' >= 259 & /// 259 days = 37 weeks
