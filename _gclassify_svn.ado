@@ -59,6 +59,7 @@ program define _gclassify_svn
 	qui gigs_categorise `return' if `touse', ///
 		analysis(svn) measure(`bweight_centile') ///
 		outvartype(`type') gest_days(`gest_days')
+	restore, not
 end
 
 capture prog drop SVN_Badsyntax
