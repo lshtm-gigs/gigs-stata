@@ -230,6 +230,36 @@ compare_interpolation <- function(standard, acronym, sex) {
   consistent_lgl
 }
 
+compare_gigs_z_lgls <- function() {
+  dta_path <- file.path("tests", "outputs", "gigs_zscoring", "gigs_z.dta")
+  stata <- if (file.exists(dta_path)) haven::read_dta(file = dta_path) else {
+      cat("\t")
+      cli::cli_alert_danger(text = "File not found: {.file {dta_path}}")
+      return(FALSE)
+  }
+
+  stata <- stata |>
+    dplyr::mutate(ig_nbs = as.logical(ig_nbs),
+                  ig_png = as.logical(ig_png),
+                  who_gs = as.logical(who_gs),
+                  .keep = "unused")
+  r <- as.data.frame(gigs:::gigs_zscoring_lgls(age_days = stata$age_days,
+                                               gest_days = stata$gest_days))
+
+  consistent_lgl <- tryCatch(expr = {
+    testthat::expect_equivalent(r, stata[, c("ig_nbs", "ig_png", "who_gs")])
+    TRUE
+  }, error = function(e) {
+    FALSE
+  })
+  cli_fn <- if (consistent_lgl) cli::cli_alert_success else cli::cli_alert_danger
+  consistent_str <- if (consistent_lgl) "consistent" else "inconsistent"
+  consistent_fn <- if (consistent_lgl) cli::col_green else cli::col_red
+  cat("\t")
+  cli_fn("GIGS zscoring logicals are {consistent_fn(consistent_str)}.")
+  consistent_lgl
+}
+
 wait_time_secs <- 1
 cli::cli_h1(text = "INTERGROWTH-21st Fetal Growth Standards")
 acronyms <- rep.int(names(gigs::ig_fet), times = rep(2, length(names(gigs::ig_fet))))
@@ -268,6 +298,10 @@ acronyms <- c(rep.int(names(gigs::who_gs_coeffs),
                       times = rep(2, length(ig_nbs_with_coeffs))))
 sexes <- rep_len(c("M", "F"), length.out = length(acronyms))
 interpolation <- mapply(FUN = compare_interpolation, standards, acronyms, sexes)
+if (!interactive()) Sys.sleep(wait_time_secs)
+
+cli::cli_h1(text = "GIGS z-scoring logicals")
+interpolation <- compare_gigs_z_lgls()
 if (!interactive()) Sys.sleep(wait_time_secs)
 
 cli::cli_h1(text = "Overall")

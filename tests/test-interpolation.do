@@ -1,6 +1,4 @@
-// /* 
 //  Test whether interpolated coeffs give out same values as in R package
-// */
 
 local test_interp_outputs = "tests/outputs/interpolation"
 cap mkdir "`interp_outputs'"

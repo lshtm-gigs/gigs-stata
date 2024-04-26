@@ -14,10 +14,10 @@ net install gigs, from(`gigs_stata_dir')
 //  1. Generate .dta files with standards using "z2v/c2v" conversions
 local outputs "tests/outputs"
 cap mkdir "`outputs'"
-foreach standard in "who_gs" "ig_nbs" "ig_png" "ig_fet" "interpolation" {
-	cap mkdir "`outputs'/`standard'"
-	noi di "Running .dta file generation for `standard'"
-	run "tests/test-`standard'.do"
+foreach aspect in "who_gs" "ig_nbs" "ig_png" "ig_fet" "interpolation" "z_lgls" {
+	cap mkdir "`outputs'/`aspect'"
+	noi di "Running .dta file generation for `aspect'"
+	run "tests/test-`aspect'.do"
 }
 
 //  2. Compare to standards in gigs R package
