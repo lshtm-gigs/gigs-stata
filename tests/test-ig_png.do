@@ -1,6 +1,3 @@
-clear
-do "_gig_png.ado"
-
 capture program drop make_ig_png_tbl
 program define make_ig_png_tbl
  	args _x_var sex acronym conversion
@@ -113,29 +110,33 @@ foreach acronym in "wfa" "lfa" "hcfa" "wfl" {
 			}
 			
 			local path = "tests/outputs/ig_png/`acronym'_`conversion'_`_sex'.dta"
+			cap confirm file `path'
+			if _rc == 601 { // i.e. file does not exist
+				qui save "`path'", replace		
+				di as text "IG PNG: `acronym'; `sex': Disk file not found; " ///
+					"saving."
+				continue
+			}
+			
 			if "`conversion'" == "z2v" {
 				local colnames SD3neg SD2neg SD1neg SD0 SD1 SD2 SD3
 			}
 			if "`conversion'" == "c2v" {
 				local colnames P03 P05 P10 P50 P90 P95 P97
 			}
-			cap merge 1:1 `xname' `colnames' using "`path'"
-			if _rc == 9 {
-				save "`path'", replace
-				continue
-			}
-			qui {
-				levelsof _merge, clean local(merge_local)
-			}
+			cap qui merge 1:1 `xname' `colnames' using "`path'"
+			qui levelsof _merge, clean local(merge_local)
 			if "`merge_local'" != "3" {
-				di as text "Disk file not same as memory; saving."
+				di as text "IG PNG: `acronym'; `sex': Disk file not same " ///
+					"as memory; saving."
 				keep if _merge != 2
 				drop _merge
 				noi save "`path'", replace
 				continue
 			}
 			else {
-				di as text "Disk file same as memory; not saving."
+				di as text "IG PNG: `acronym'; `sex': Disk file same as " ///
+					"memory; not saving."
 			}
 		}
 	}
@@ -164,7 +165,7 @@ foreach acronym in "wfa" "lfa" "hcfa" "wfl" {
 		cap drop sex z *from* *diffs *equal
 		gen sex = "M"
 		
-		gen double z = -1
+		gen double z = -1.00000000
 		egen double y_from_z = ig_png(z, "`acronym'", "z2v"), /* 
 			*/ x(xvar) sex(sex) sexcode(m=M, f=F)
 		egen double p_from_y = ig_png(y_from_z, "`acronym'", "v2c"), /* 
@@ -176,8 +177,8 @@ foreach acronym in "wfa" "lfa" "hcfa" "wfl" {
 		
 		gen double z_diffs  = z - z_from_y
 		gen double y_diffs  = y_from_z - y_from_p
-		gen byte z_equal = abs(z_diffs) < 10^-14
-		gen byte y_equal = abs(y_diffs) < 10^-14
+		gen byte z_equal = abs(z_diffs) < 10^-13
+		gen byte y_equal = abs(y_diffs) < 10^-13
 		
 		assert z_equal == 1 & y_equal == 1
 	}

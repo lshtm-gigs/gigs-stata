@@ -2,7 +2,6 @@
 //  Test whether interpolated coeffs give out same values as in R package
 // */
 
-do "_gwho_gs.ado"
 local test_interp_outputs = "tests/outputs/interpolation"
 cap mkdir "`interp_outputs'"
 
@@ -67,5 +66,3 @@ foreach acronym in "wfga" "lfga" "hcfga" {
 		save `path', replace
 	}
 }
-
-clear

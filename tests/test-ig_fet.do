@@ -1,6 +1,3 @@
-clear
-do "_gig_fet.ado"
-
 capture program drop make_ig_fet_tbl
 program define make_ig_fet_tbl
  	args _xvar acronym conversion
@@ -190,16 +187,16 @@ foreach acronym in "hcfga" "bpdfga" "acfga" "flfga" "ofdfga" "efwfga" /*
 		range xvar 58 105
 	}
 	else if "`acronym'" == "gafcrl" {			
-		qui set obs 81
+		qui set obs 81 // 15 to 95 mm
 		capture drop xvar
 		range xvar 15 95
 	}
 	else if "`acronym'" == "gwgfga" {			
-		qui set obs 27
+		qui set obs 27 // 14 to 40 weeks
 		range xvar 98 280
 	}
 	else if "`acronym'" == "gaftcd" {
-		qui set obs 44
+		qui set obs 44 // 12 to 55 mm TCD
 		range xvar 12 55
 	}
 	

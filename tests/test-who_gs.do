@@ -1,6 +1,3 @@
-clear
-do "_gwho_gs.ado"
-
 capture program drop make_who_gs_tbl
 program define make_who_gs_tbl
  	args _xvar sex acronym conversion
@@ -111,7 +108,7 @@ foreach acronym in "wfa" "bfa" "lhfa" "hcfa" "wfh" "wfl" "acfa" "ssfa" "tsfa" {
 			cap frame drop `_frame'
 			cap frame create `_frame'
 			cap frame change `_frame'
-			capture clear
+ 			capture drop _all
 			local _sex = "`sex'"
 			if ("`acronym'" == "wfa" | "`acronym'" == "bfa" | ///
 			    "`acronym'" == "lhfa" | "`acronym'" == "hcfa") {
@@ -146,32 +143,38 @@ foreach acronym in "wfa" "bfa" "lhfa" "hcfa" "wfh" "wfl" "acfa" "ssfa" "tsfa" {
 				qui make_who_gs_tbl age_days "`sex'" "`acronym'" "`conversion'"
 			}
 			
-			local path = "tests/outputs/who_gs/`acronym'_`conversion'_`_sex'.dta"
+			local path = ///
+				"tests/outputs/who_gs/`acronym'_`conversion'_`_sex'.dta"
+			cap confirm file `path'
+			if _rc == 601 { // i.e. file does not exist
+				qui save "`path'", replace
+				di as text "WHO GS: `acronym'; `sex': Disk file not found; " ///
+					"saving."
+				continue
+			}
+			
+			// Set up colnames
 			if "`conversion'" == "z2v" {
-				ds SD*, not
+				qui ds SD*, not
 				local colnames `r(varlist)' SD3neg SD2neg SD1neg SD0 SD1 SD2 SD3
 			}
 			if "`conversion'" == "c2v" {
-				ds P*, not
-				local colnames `r(varlist)' P03 P05 P10 P50 P90 P95 P97
+				qui ds P*, not
+				local colnames `r(varlist)' P3 P5 P10 P50 P90 P95 P97
 			}
-			cap merge 1:1 `colnames' using "`path'"
-			if _rc == 9 {
-				save "`path'", replace
-				continue
-			}
-			qui {
-				levelsof _merge, clean local(merge_local)
-			}
+			cap qui merge 1:1 `colnames' using "`path'"
+			qui levelsof _merge, clean local(merge_local)
 			if "`merge_local'" != "3" {
-				di as text "Disk file not same as memory; saving."
+				di as text "WHO GS: `acronym'; `sex': Disk file not same " ///
+					"as memory; saving."
 				keep if _merge != 2
 				drop _merge
 				noi save "`path'", replace
 				continue
 			}
 			else {
-				di as text "Disk file same as memory; not saving."
+				di as text "WHO GS: `acronym'; `sex': Disk file same as " ///
+					"memory; not saving."
 			}
 		}
 	}
