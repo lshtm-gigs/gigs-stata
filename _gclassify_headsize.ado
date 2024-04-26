@@ -56,7 +56,7 @@ program define _gclassify_headsize
 		z_type(hcaz) yvar(`headcirc_cm') ///
 		age_days(`age_days') gest_days(`gest_days') ///
 		sex(`sex') sexc(m="`male'", f="`female'") ///
-		outvartype("double")	
+		outvartype("double")
 	qui gigs_categorise `return' if `touse', ///
 		analysis(headsize) measure(`hcaz') ///
 		outvartype(`type')

@@ -75,15 +75,28 @@ if equal[_N] != _N local WFA = 0
 replace equal = sum(wfa_out == wfa_out_exp)
 if equal[_N] != _N local WFA = 0
 
+// Test head size
+capture frame drop classify_headsize
+frame create classify_headsize
+frame change classify_headsize
+use "`test_data'/tester_headsize.dta", clear
+egen headsize = classify_headsize(hcirc_cm), ///
+	gest_days(ga_at_birth) age_days(days_old) ///
+	sex(psex) sexc(m=M, f=F)
+local Head-size = 1
+gen equal = sum(headsize == headsize_exp)
+if equal[_N] != _N local Head-size = 0
+
 cap frame change default 
 cap frame drop classify_*
-foreach classification in "SfGA" "SVN" "Stunting" "Wasting" "WFA" {
+foreach classification in "SfGA" "SVN" "Stunting" "Wasting" "WFA" "Head-size" {
 	if "`classification'" == "SfGA" local name "_gclassify_sfga.ado"
 	if "`classification'" == "SVN" local name "_gclassify_svn.ado"
 	if "`classification'" == "Stunting" local name "_gclassify_stunting.ado"
 	if "`classification'" == "Wasting" local name "_gclassify_wasting.ado"
 	if "`classification'" == "WFA" local name "_gclassify_wfa.ado"
-	if ``classification'' != 1 {
+	if "`classification'" == "Head-size" local name "_gclassify_headsize.ado"
+	if "``classification''" != "1" {
 		noi di as err "{bf: `classification' failed.} Refactor `name'".
 	}
 	else {
