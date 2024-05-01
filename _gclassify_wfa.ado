@@ -1,5 +1,5 @@
 capture program drop _gclassify_wfa
-*! version 0.5.0 (SJxx-x: dmxxxx)
+*! version 0.5.1 (SJxx-x: dmxxxx)
 program define _gclassify_wfa
 	version 16
 	preserve
@@ -20,6 +20,9 @@ program define _gclassify_wfa
 	syntax [if] [in], GEST_days(varname numeric) age_days(varname numeric) /*
 		*/ sex(varname) SEXCode(string) [OUTliers BY(string)]
 	
+	if !inlist("`type'", "", "int") {
+		WFA_BadVarType "`return'" "`type'"
+	}
 	if `"`by'"' != "" {
 		_egennoby classify_wfa() `"`by'"'
 		/* NOTREACHED */
@@ -65,8 +68,7 @@ program define _gclassify_wfa
 		local outliers "1"
 	}
 	qui gigs_categorise `return' if `touse', ///
-		analysis(wfa) measure(`waz') ///
-		outvartype(`type') outliers("`outliers'")
+		outcome(wfa) measure(`waz') outliers("`outliers'")
 	restore, not
 end
 
@@ -74,4 +76,14 @@ capture prog drop WFASex_Badsyntax
 program WFASex_Badsyntax
 	di as err "sexcode() option invalid: see {help classify_wfa}"
 	exit 198
+end
+
+capture prog drop WFA_BadVarType
+program WFA_BadVarType
+	args newvar vartype 
+	di as text "Warning in {bf:classify_wfa()}:"
+	di as text "	You requested a {helpb datatypes:`vartype'} variable, " ///
+		"but {bf:classify_wfa()} only generates {helpb datatypes:int} " ///
+		"variables. Your new variable '{bf:`newvar'}' will be an " ///
+		"{helpb datatypes:int}."
 end

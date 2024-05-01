@@ -5,8 +5,8 @@ cap frame drop classify_sfga
 cap frame create classify_sfga
 cap frame change classify_sfga
 use "`test_data'/tester_sfga.dta", clear
-egen sfga = classify_sfga(weight), gest_days(gestage) sex(psex) sexcode(m=M, f=F)
-egen sfga_sev = classify_sfga(weight), gest_days(gestage) ///
+egen int sfga = classify_sfga(weight), gest_days(gestage) sex(psex) sexcode(m=M, f=F)
+egen int sfga_sev = classify_sfga(weight), gest_days(gestage) ///
 	sex(psex) sexcode(m=M, f=F) severe
 local SfGA = 1
 gen equal = sum(sfga == sfga_exp)
@@ -19,7 +19,7 @@ cap frame drop classify_svn
 cap frame create classify_svn
 cap frame change classify_svn
 use "`test_data'/tester_svn.dta", clear
-egen svn = classify_svn(weight_kg), gest_days(gest_age) sex(sex) ///
+egen int svn = classify_svn(weight_kg), gest_days(gest_age) sex(sex) ///
     sexcode(m=M, f=F)
 local SVN = 1
 gen equal = sum(svn == svn_exp)
@@ -30,10 +30,10 @@ capture frame drop classify_stunting
 frame create classify_stunting
 frame change classify_stunting
 use "`test_data'/tester_stunting.dta", clear
-egen stunting = classify_stunting(lenht), ///
+egen int stunting = classify_stunting(lenht), ///
     gest_days(ga_at_birth) age_days(age_days) ///
 	sex(psex) sexc(m=M, f=F)
-egen stunting_out = classify_stunting(lenht), ///
+egen int stunting_out = classify_stunting(lenht), ///
     gest_days(ga_at_birth) age_days(age_days) ///
 	sex(psex) sexc(m=M, f=F) outliers
 local Stunting = 1
@@ -47,9 +47,9 @@ capture frame drop classify_wasting
 frame create classify_wasting
 frame change classify_wasting
 use "`test_data'/tester_wasting.dta", clear
-egen wasting = classify_wasting(wght_kg), lenht(lenht) gest(ga_days) ///
+egen int wasting = classify_wasting(wght_kg), lenht(lenht) gest(ga_days) ///
 	age_days(chron_age) sex(psex) sexc(m=M, f=F)
-egen wasting_out = classify_wasting(wght_kg), lenht(lenht) gest(ga_days) ///
+egen int wasting_out = classify_wasting(wght_kg), lenht(lenht) gest(ga_days) ///
 	age_days(chron_age) sex(psex) sexc(m=M, f=F) outliers
 local Wasting = 1
 gen equal = sum(wasting == wasting_exp)
@@ -62,10 +62,10 @@ capture frame drop classify_wfa
 frame create classify_wfa
 frame change classify_wfa
 use "`test_data'/tester_wfa.dta", clear
-egen wfa = classify_wfa(wght_kg), ///
+egen int wfa = classify_wfa(wght_kg), ///
 	gest_days(ga_at_birth) age_days(days_old) ///
 	sex(psex) sexc(m=M, f=F)
-egen wfa_out = classify_wfa(wght_kg), ///
+egen int wfa_out = classify_wfa(wght_kg), ///
 	gest_days(ga_at_birth) age_days(days_old) ///
 	sex(psex) sexc(m=M, f=F) outliers
 local WFA = 1
@@ -79,7 +79,7 @@ capture frame drop classify_headsize
 frame create classify_headsize
 frame change classify_headsize
 use "`test_data'/tester_headsize.dta", clear
-egen headsize = classify_headsize(hcirc_cm), ///
+egen int headsize = classify_headsize(hcirc_cm), ///
 	gest_days(ga_at_birth) age_days(days_old) ///
 	sex(psex) sexc(m=M, f=F)
 local Headsize = 1

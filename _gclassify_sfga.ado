@@ -1,5 +1,5 @@
 capture prog drop _gclassify_sfga
-*! version 0.5.0 (SJxx-x: dmxxxx)
+*! version 0.5.1 (SJxx-x: dmxxxx)
 program define _gclassify_sfga
 	version 16
 	preserve
@@ -19,6 +19,10 @@ program define _gclassify_sfga
 	
 	syntax [if] [in], GEST_days(varname numeric) sex(varname) SEXCode(string) /*
 		*/ [SEVere by(string)]
+	
+	if !inlist("`type'", "", "int") {
+		SfGA_BadVarType "`return'" "`type'"
+	}
 	
 	if `"`by'"' != "" {
 		_egennoby classify_sfga() `"`by'"'
@@ -64,8 +68,7 @@ program define _gclassify_sfga
 		local severe "1"
 	}
 	qui gigs_categorise `return' if `touse', ///
-		analysis(sfga) measure(`bweight_centile') ///
-		outvartype(`type') severe(`severe')
+		outcome(sfga) measure(`bweight_centile') severe(`severe')
 	
 	restore, not
 end
@@ -76,3 +79,12 @@ program SfGA_Badsyntax
 	exit 198
 end
 
+capture prog drop SfGA_BadVarType
+program SfGA_BadVarType
+	args newvar vartype 
+	di as text "Warning in {bf:classify_sfga()}:"
+	di as text "	You requested a {helpb datatypes:`vartype'} variable, " ///
+		"but {bf:classify_sfga()} only generates {helpb datatypes:int} " ///
+		"variables. Your new variable '{bf:`newvar'}' will be an " ///
+		"{helpb datatypes:int}."
+end

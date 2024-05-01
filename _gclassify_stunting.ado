@@ -1,5 +1,5 @@
 capture program drop _gclassify_stunting
-*! version 0.5.0 (SJxx-x: dmxxxx)
+*! version 0.5.1 (SJxx-x: dmxxxx)
 program define _gclassify_stunting
 	version 16
 	preserve
@@ -19,7 +19,10 @@ program define _gclassify_stunting
 
 	syntax [if] [in], GEST_days(varname numeric) age_days(varname numeric) /*
 		*/ sex(varname) SEXCode(string) [OUTliers BY(string)]
-
+	
+	if !inlist("`type'", "", "int") {
+		Stunting_BadVarType "`type'"
+	}
 	if `"`by'"' != "" {
 		_egennoby classify_stunting() `"`by'"'
 		/* NOTREACHED */
@@ -65,8 +68,7 @@ program define _gclassify_stunting
 		local outliers "1"
 	}
 	qui gigs_categorise `return' if `touse', ///
-		analysis(stunting) measure(`lhaz') ///
-		outvartype(`type') outliers("`outliers'")
+		outcome(stunting) measure(`lhaz') outliers("`outliers'")
 	
 	restore, not
 end
@@ -75,4 +77,14 @@ capture prog drop StuntingSex_Badsyntax
 program StuntingSex_Badsyntax
 	di as err "sexcode() option invalid: see {help classify_stunting}"
 	exit 198
+end
+
+capture prog drop Stunting_BadVarType
+program Stunting_BadVarType
+	args newvar vartype 
+	di as text "Warning in {bf:classify_sfga()}:"
+	di as text "	You requested a {helpb datatypes:`vartype'} variable, " ///
+		"but {bf:classify_sfga()} only generates {helpb datatypes:int} " ///
+		"variables. Your new variable '{bf:`newvar'}' will be an " ///
+		"{helpb datatypes:int}."
 end

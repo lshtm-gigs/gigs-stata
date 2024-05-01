@@ -1,5 +1,5 @@
 capture program drop _gclassify_headsize
-*! version 0.1.0 (SJxx-x: dmxxxx)
+*! version 0.1.2 (SJxx-x: dmxxxx)
 program define _gclassify_headsize
 	version 16
 	preserve
@@ -20,6 +20,9 @@ program define _gclassify_headsize
 	syntax [if] [in], GEST_days(varname numeric) age_days(varname numeric) /*
 		*/ sex(varname) SEXCode(string) [OUTliers BY(string)]
 	
+	if !inlist("`type'", "", "int") {
+		Headsize_BadVarType "`type'"
+	}
 	if `"`by'"' != "" {
 		_egennoby classify_headsize() `"`by'"'
 		/* NOTREACHED */
@@ -57,9 +60,7 @@ program define _gclassify_headsize
 		age_days(`age_days') gest_days(`gest_days') ///
 		sex(`sex') sexc(m="`male'", f="`female'") ///
 		outvartype("double")
-	qui gigs_categorise `return' if `touse', ///
-		analysis(headsize) measure(`hcaz') ///
-		outvartype(`type')
+	qui gigs_categorise `return' if `touse', outcome(headsize) measure(`hcaz')
 	
 	restore, not
 end
@@ -68,4 +69,14 @@ capture prog drop HeadSizeSex_BadSyntax
 program HeadSizeSex_BadSyntax
 	di as err "sexcode() option invalid: see {help classify_headsize}"
 	exit 198
+end
+
+capture prog drop Headsize_BadVarType
+program Headsize_BadVarType
+	args newvar vartype 
+	di as text "Warning in {bf:classify_sfga()}:"
+	di as text "	You requested a {helpb datatypes:`vartype'} variable, " ///
+		"but {bf:classify_sfga()} only generates {helpb datatypes:int} " ///
+		"variables. Your new variable '{bf:`newvar'}' will be an " ///
+		"{helpb datatypes:int}."
 end

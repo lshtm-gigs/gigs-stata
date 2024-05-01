@@ -1,51 +1,47 @@
 capture prog drop gigs_categorise
-*! version 0.1.0 (SJxx-x: dmxxxx)
+*! version 0.1.1 (SJxx-x: dmxxxx)
 program gigs_categorise
 	version 16
 	preserve
 	syntax newvarname(numeric) [if] [in] , /// 
-		analysis(string) measure(varname numeric) outvartype(string) ///
+		outcome(string) measure(varname numeric) ///
 		[gest_days(varname numeric) outliers(string) severe(string)]
 	marksample touse, novarlist
 	
 	local newvar "`varlist'"
 	
-	cap assert inlist("`analysis'", "sfga", "svn", "stunting", "wasting", ///
+	cap assert inlist("`outcome'", "sfga", "svn", "stunting", "wasting", ///
 		"wfa", "headsize")
 	if _rc == 9 {
 		di as error "INTERNAL ERROR in gigs_categorise: " /*
-			*/ "{bf:analysis} arg must be a valid growth analysis string. " /*
+			*/ "{bf:outcome} arg must be a valid growth outcome string. " /*
 			*/ "This is an internal error, so please contact the " /*
 			*/ "maintainers of this package if you are an end-user. You can " /*
-			*/ "find our details at {help gigs}."
+			*/ "find our details at the {help gigs:gigs help page}."
 		exit 499
 	}
-	if "`analysis'" == "sfga" {
+	if "`outcome'" == "sfga" {
 		SfGA_categorise `newvar' if `touse', ///
-			bweight_centile(`measure') outvartype("`outvartype'") ///
-			severe("`severe'")
+			bweight_centile(`measure') severe("`severe'")
 	}
-	else if "`analysis'" == "svn" {
+	else if "`outcome'" == "svn" {
 		SVN_categorise `newvar' if `touse', ///
-			bweight_centile(`measure') gest_days(`gest_days') ///
-			outvartype("`outvartype'")
-			noi li `newvar'
+			bweight_centile(`measure') gest_days(`gest_days')
 	}
-	else if "`analysis'" == "stunting" {
+	else if "`outcome'" == "stunting" {
 		Stunting_categorise `newvar' if `touse', ///
-			lhaz(`measure') outvartype("`outvartype'") outliers("`outliers'")
+			lhaz(`measure') outliers("`outliers'")
 	}
-	else if "`analysis'" == "wasting" {
+	else if "`outcome'" == "wasting" {
 		Wasting_categorise `newvar' if `touse', ///
-			wlz(`measure') outvartype("`outvartype'") outliers("`outliers'")
+			wlz(`measure') outliers("`outliers'")
 	}
-	else if "`analysis'" == "wfa" {
+	else if "`outcome'" == "wfa" {
 		WFA_categorise `newvar' if `touse', ///
-			waz(`measure') outvartype("`outvartype'") outliers("`outliers'")
+			waz(`measure') outliers("`outliers'")
 	}
-	else if "`analysis'" == "headsize" {
-		Headsize_categorise `newvar' if `touse', ///
-			hcaz(`measure') outvartype("`outvartype'")
+	else if "`outcome'" == "headsize" {
+		Headsize_categorise `newvar' if `touse', hcaz(`measure')
 	}
 	restore, not
 end
@@ -55,11 +51,11 @@ program SfGA_categorise
 	version 16
 	preserve
 	syntax newvarname(numeric) [if] [in] , /// 
-		bweight_centile(varname numeric) outvartype(string) severe(string)
+		bweight_centile(varname numeric) severe(string)
 	marksample touse, novarlist
 	
 	local sfga "`varlist'"
-	qui gen `outvartype' `sfga' = 0
+	qui gen int `sfga' = 0
 	replace `sfga' = -1 if float(`bweight_centile') < 0.1
 	replace `sfga' =  1 if float(`bweight_centile') > 0.9
 	replace `sfga' =  . if missing(`bweight_centile') | `touse' == 0
@@ -80,7 +76,7 @@ program SfGA_categorise
 			*/ "option must be either 0 (don't flag outliers) or 1 (flag " /*
 			*/ "outliers). This is an internal error, so please contact the " /*
 			*/ "maintainers of this package if you are an end-user. You can " /*
-			*/ "find our details at {help gigs}."
+			*/ "find our details at the {help gigs:gigs help page}."
 		exit 498
 	}
 	restore, not
@@ -91,19 +87,17 @@ program SVN_categorise
 	version 16
 	preserve
 	syntax newvarname(numeric) [if] [in] , /// 
-		bweight_centile(varname numeric) gest_days(varname numeric) ///
-		outvartype(string)
+		bweight_centile(varname numeric) gest_days(varname numeric)
 	marksample touse, novarlist
 	
 	tempvar sfga is_term
 	SfGA_categorise `sfga' if `touse', ///
-		bweight_centile(`bweight_centile') outvartype(int) ///
-		severe("0")
+		bweight_centile(`bweight_centile') severe("0")
 	gen byte `is_term' = `gest_days' >= 259 & /// 259 days = 37 weeks
 		 !missing(`gest_days')
 	
 	local svn "`varlist'"
-	gen `outvartype' `svn' = .
+	gen int `svn' = .
 	replace `svn' = -4 if `is_term' == 0 & `sfga' == -1
 	replace `svn' = -3 if `is_term' == 0 & `sfga' == 0
     replace `svn' = -2 if `is_term' == 0 & `sfga' == 1
@@ -123,11 +117,11 @@ program Stunting_categorise
 	version 16
 	preserve
 	syntax newvarname(numeric) [if] [in] , /// 
-		lhaz(varname numeric) outvartype(string) outliers(string)
+		lhaz(varname numeric) outliers(string)
 	marksample touse, novarlist
 	
 	local stunting "`varlist'"
-	qui gen `outvartype' `stunting' = .
+	qui gen int `stunting' = .
 	replace `stunting' = -1 if float(`lhaz') <= -2
 	replace `stunting' = -2 if float(`lhaz') <= -3
 	replace `stunting' = 0 if float(`lhaz') > -2
@@ -151,7 +145,7 @@ program Stunting_categorise
 			*/ "option must be either 0 (don't flag outliers) or 1 (flag " /*
 			*/ "outliers). This is an internal error, so please contact the " /*
 			*/ "maintainers of this package if you are an end-user. You can " /*
-			*/ "find our details at {help gigs}."
+			*/ "find our details at the {help gigs:gigs help page}."
 		exit 498
 	}
 	restore, not
@@ -161,12 +155,11 @@ capture prog drop Wasting_categorise
 program Wasting_categorise
 	version 16
 	preserve
-	syntax newvarname(numeric) [if] [in] , /// 
-		wlz(varname numeric) outvartype(string) outliers(string)
+	syntax newvarname(numeric) [if] [in] , wlz(varname numeric) outliers(string)
 	marksample touse, novarlist
 	
 	local wasting "`varlist'"
-	qui gen `outvartype' `wasting' = .
+	qui gen int `wasting' = .
 	replace `wasting' = -1 if float(`wlz') <= -2
 	replace `wasting' = -2 if float(`wlz') <= -3
 	replace `wasting' = 0 if abs(float(`wlz')) < 2
@@ -191,7 +184,7 @@ program Wasting_categorise
 			*/ "option must be either 0 (don't flag outliers) or 1 (flag " /*
 			*/ "outliers). This is an internal error, so please contact the " /*
 			*/ "maintainers of this package if you are an end-user. You can " /*
-			*/ "find our details at {help gigs}."
+			*/ "find our details at the {help gigs:gigs help page}."
 		exit 498
 	}
 	restore, not
@@ -201,12 +194,11 @@ capture prog drop WFA_categorise
 program WFA_categorise
 	version 16
 	preserve
-	syntax newvarname(numeric) [if] [in] , /// 
-		waz(varname numeric) outvartype(string) outliers(string)
+	syntax newvarname(numeric) [if] [in] , waz(varname numeric) outliers(string)
 	marksample touse, novarlist
 	
 	local wfa "`varlist'"
-	qui gen `outvartype' `wfa' = .
+	qui gen int `wfa' = .
 	replace `wfa' = -1 if float(`waz') <= -2
 	replace `wfa' = -2 if float(`waz') <= -3
 	replace `wfa' = 0 if float(abs(`waz')) < 2
@@ -231,7 +223,7 @@ program WFA_categorise
 			*/ "option must be either 0 (don't flag outliers) or 1 (flag " /*
 			*/ "outliers). This is an internal error, so please contact the " /*
 			*/ "maintainers of this package if you are an end-user. You can " /*
-			*/ "find our details at {help gigs}."
+			*/ "find our details at the {help gigs:gigs help page}."
 		exit 498
 	}
 	restore, not
@@ -241,12 +233,11 @@ capture prog drop Headsize_categorise
 program Headsize_categorise
 	version 16
 	preserve
-	syntax newvarname(numeric) [if] [in] , /// 
-		hcaz(varname numeric) outvartype(string)
+	syntax newvarname(numeric) [if] [in] , hcaz(varname numeric)
 	marksample touse, novarlist
 	
 	local headsize "`varlist'"
-	qui gen `outvartype' `headsize' = .
+	qui gen int `headsize' = .
 	replace `headsize' = -1 if float(`hcaz') <= -2
 	replace `headsize' = -2 if float(`hcaz') <= -3
 	replace `headsize' = 0 if float(abs(`hcaz')) < 2

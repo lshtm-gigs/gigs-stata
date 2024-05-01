@@ -1,5 +1,5 @@
 capture prog drop _gclassify_svn
-*! version 0.5.0 (SJxx-x: dmxxxx)
+*! version 0.5.1 (SJxx-x: dmxxxx)
 program define _gclassify_svn
 	version 16
 	preserve
@@ -20,6 +20,9 @@ program define _gclassify_svn
 	syntax [if] [in], GEST_days(varname numeric) sex(varname) SEXCode(string) /*
 		*/ [by(string)]
 	
+	if !inlist("`type'", "", "int") {
+		SVN_BadVarType "`type'"
+	}
 	if `"`by'"' != "" {
 		_egennoby classify_svn() `"`by'"'
 		/* NOTREACHED */
@@ -57,8 +60,7 @@ program define _gclassify_svn
 		ig_nbs(`weight_kg', "wfga", "v2c") if `touse', ///
 		gest_days(`gest_days') sex(`sex') sexcode(m="`male'", f="`female'")
 	qui gigs_categorise `return' if `touse', ///
-		analysis(svn) measure(`bweight_centile') ///
-		outvartype(`type') gest_days(`gest_days')
+		outcome(svn) measure(`bweight_centile') gest_days(`gest_days')
 	restore, not
 end
 
@@ -66,4 +68,14 @@ capture prog drop SVN_Badsyntax
 program SVN_Badsyntax
 	di as err "sexcode() option invalid: see {help classify_svn}"
 	exit 198
+end
+
+capture prog drop SVN_BadVarType
+program SVN_BadVarType
+	args newvar vartype 
+	di as text "Warning in {bf:classify_sfga()}:"
+	di as text "	You requested a {helpb datatypes:`vartype'} variable, " ///
+		"but {bf:classify_sfga()} only generates {helpb datatypes:int} " ///
+		"variables. Your new variable '{bf:`newvar'}' will be an " ///
+		"{helpb datatypes:int}."
 end

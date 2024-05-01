@@ -1,5 +1,5 @@
 capture program drop _gclassify_wasting
-*! version 0.5.0 (SJxx-x: dmxxxx)
+*! version 0.5.1 (SJxx-x: dmxxxx)
 program define _gclassify_wasting
 	version 16
 	preserve
@@ -20,7 +20,10 @@ program define _gclassify_wasting
 	syntax [if] [in], LENHT_cm(varname numeric) /*
 		*/ GEST_days(varname numeric) age_days(varname numeric) /*
 		*/ sex(varname) SEXCode(string) [OUTliers BY(string)]
-
+	
+	if !inlist("`type'", "", "int") {
+		Stunting_BadVarType "`type'"
+	}
 	if `"`by'"' != "" {
 		_egennoby classify_wasting() `"`by'"'
 		/* NOTREACHED */
@@ -66,8 +69,7 @@ program define _gclassify_wasting
 		local outliers "1"
 	}
 	qui gigs_categorise `return' if `touse', ///
-		analysis(wasting) measure(`wlz') ///
-		outvartype(`type') outliers("`outliers'")
+		outcome(wasting) measure(`wlz') outliers("`outliers'")
 		
 	restore, not
 end
@@ -78,8 +80,12 @@ program WastingSex_Badsyntax
 	exit 198
 end
 
-capture prog drop WastingLenht_Badsyntax
-program WastingLenht_Badsyntax
-	di as err "lenhtcode() option invalid: see {help classify_wasting}"
-	exit 198
+capture prog drop Wasting_BadVarType
+program Wasting_BadVarType
+	args newvar vartype 
+	di as text "Warning in {bf:classify_sfga()}:"
+	di as text "	You requested a {helpb datatypes:`vartype'} variable, " ///
+		"but {bf:classify_sfga()} only generates {helpb datatypes:int} " ///
+		"variables. Your new variable '{bf:`newvar'}' will be an " ///
+		"{helpb datatypes:int}."
 end

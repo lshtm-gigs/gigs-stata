@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.4.1 17 April 2023}{...}
+{* *! version 0.4.2 01 May 2023}{...}
 {vieweralsosee "" "--"}{...}
 {vieweralsosee "gigs: Classification functions" "help classify_sfga"}{...}
 {viewerjumpto "Syntax" "classify_sfga##syntax"}{...}
@@ -20,27 +20,27 @@
 
 {title:Syntax}
 
-{p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
+{p 8 17 2}{cmd:egen} {newvar} {cmd:=}
 {cmd:classify_sfga}{cmd:(}{varname}{cmd:)}
 {ifin}{cmd:,} 
 {cmdab:gest:_days}{cmd:(}{varname}{cmd:)} {cmdab:sex}{cmd:(}{varname}{cmd:)}
 {cmdab:sexc:ode}{cmd:(}{cmdab:m:ale=}{it:code}{cmd:,} {cmdab:f:emale=}{it:code}{cmd:)}
 [{cmdab:sev:ere}]
 
-{p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
+{p 8 17 2}{cmd:egen} {newvar} {cmd:=}
 {cmd:classify_svn}{cmd:(}{varname}{cmd:)} 
 {ifin}{cmd:,} 
 {cmdab:gest:_days}{cmd:(}{varname}{cmd:)} {cmdab:sex}{cmd:(}{varname}{cmd:)}
 {cmdab:sexc:ode}{cmd:(}{cmdab:m:ale=}{it:code}{cmd:,} {cmdab:f:emale=}{it:code}{cmd:)}
 
-{p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
+{p 8 17 2}{cmd:egen} {newvar} {cmd:=}
 {cmd:classify_stunting}{cmd:(}{varname}{cmd:)} 
 {ifin}{cmd:,} 
 {cmdab:gest:_days}{cmd:(}{varname}{cmd:)} {cmdab:age_days}{cmd:(}{varname}{cmd:)}
 {cmdab:sex}{cmd:(}{varname}{cmd:)} {cmdab:sexc:ode}{cmd:(}{cmdab:m:ale=}{it:code}{cmd:,} {cmdab:f:emale=}{it:code}{cmd:)}
 [{cmdab:out:liers}]
 
-{p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
+{p 8 17 2}{cmd:egen} {newvar} {cmd:=}
 {cmd:classify_wasting}{cmd:(}{varname}{cmd:)} 
 {ifin}{cmd:,} 
 {cmdab:lenht:_cm}{cmd:(}{varname}{cmd:)}
@@ -48,20 +48,23 @@
 {cmdab:sexc:ode}{cmd:(}{cmdab:m:ale=}{it:code}{cmd:,} {cmdab:f:emale=}{it:code}{cmd:)}
 [{cmdab:out:liers}]
 
-{p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
+{p 8 17 2}{cmd:egen} {newvar} {cmd:=}
 {cmd:classify_wfa}{cmd:(}{varname}{cmd:)} 
 {ifin}{cmd:,} 
 {cmdab:gest:_days}{cmd:(}{varname}{cmd:)} {cmd:age_days}{cmd:(}{varname}{cmd:)}
 {cmdab:sexc:ode}{cmd:(}{cmdab:m:ale=}{it:code}{cmd:,} {cmdab:f:emale=}{it:code}{cmd:)}
 [{cmdab:out:liers}]
 
-{p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
+{p 8 17 2}{cmd:egen} {newvar} {cmd:=}
 {cmd:classify_headsize}{cmd:(}{varname}{cmd:)} 
 {ifin}{cmd:,} 
 {cmdab:gest:_days}{cmd:(}{varname}{cmd:)} {cmd:age_days}{cmd:(}{varname}{cmd:)}
 {cmdab:sexc:ode}{cmd:(}{cmdab:m:ale=}{it:code}{cmd:,} {cmdab:f:emale=}{it:code}{cmd:)}
 
-{p 4 4 2}{cmd:by} cannot be used with these functions.
+{p 4 4 2}{cmd:by} cannot be used with these functions.{p_end} 
+{p 4 4 2}These functions produce {helpb datatype:int} variables with specific 
+ {helpb label:labels}. Attempting to generate non-integer variables with these 
+ egen functions will trigger errors.
 
 {marker description}{...}
 {title:Description}
@@ -78,9 +81,10 @@
 
 {p 4 4 2}We have developed multiple functions for {cmd:egen}, as part of the
  Guidance for International Growth Standards (GIGS) project. Each of the
- functions described in this help file are used to classify growth indicators
+ functions described in this help file are used to classify growth outcomes
  from anthropometric data, namely size-for-gestational age, small vulnerable
- newborn (SVN) types, stunting, wasting, and underweight/weight-for-age.
+ newborn (SVN) types, stunting, wasting, underweight/weight-for-age, and head 
+ size.
 
 {marker functions}{...}
 {title:Functions for egen}
@@ -94,8 +98,8 @@
 {col 9}{hline 68}
 {col 10}{cmd:-2}{col 17}Severely small for gestational age  {col 56}<3rd centile
 {col 10}{cmd:-1}{col 17}Small for gestational age (SGA)     {col 56}<10th centile
-{col 11}{cmd:0}{col 17}Appropriate for gestational age (SGA){col 56}10th to 90th centile
-{col 11}{cmd:1}{col 17}Large for gestational age (SGA)      {col 56}>90th centile
+{col 11}{cmd:0}{col 17}Appropriate for gestational age (AGA){col 56}10th to 90th centile
+{col 11}{cmd:1}{col 17}Large for gestational age (LGA)      {col 56}>90th centile
  
 {pmore}This function takes one argument:
 
@@ -107,14 +111,14 @@
  size-for-gestational age in the INTERGROWTH-21st weight-for-gestational age
  standards. It produces a variable with the following values and labels:
  
-{col 9}Value{col 17}Label{col 38}Term status{col 56}Centile range
-{col 9}{hline 68}
-{col 10}{cmd:-4}{col 17}Preterm SGA{col 38}Preterm{col 56}<10th centile
-{col 10}{cmd:-3}{col 17}Preterm AGA{col 38}Preterm{col 56}10th to 90th centile
-{col 10}{cmd:-2}{col 17}Preterm LGA{col 38}Preterm{col 56}>90th centile
-{col 10}{cmd:-1}{col 17}Term SGA{col 38}Term{col 56}<10th centile
-{col 10}{cmd: 0}{col 17}Term AGA{col 38}Term{col 56}10th to 90th centile
-{col 10}{cmd: 1}{col 17}Term LGA{col 38}Term{col 56}>=10th centile
+{col 9}Value{col 17}Label{col 32}Term status{col 47}Centile range
+{col 9}{hline 59}
+{col 10}{cmd:-4}{col 17}Preterm SGA{col 32}Preterm{col 47}<10th centile
+{col 10}{cmd:-3}{col 17}Preterm AGA{col 32}Preterm{col 47}10th to 90th centile
+{col 10}{cmd:-2}{col 17}Preterm LGA{col 32}Preterm{col 47}>90th centile
+{col 10}{cmd:-1}{col 17}Term SGA{col 32}Term{col 47}<10th centile
+{col 10}{cmd: 0}{col 17}Term AGA{col 32}Term{col 47}10th to 90th centile
+{col 10}{cmd: 1}{col 17}Term LGA{col 32}Term{col 47}>90th centile
  
 {pmore}This function takes one argument:
 
@@ -128,12 +132,12 @@
  values and labels, where 'outlier' classifications are only applied if the
  {cmd:outliers} option is specified by the user.
 
-{col 20}Value{col 27}Label{col 45}{it:Z}-score range
-{col 20}{hline 38}
-{col 21}{cmd: -2}{col 27}Severe stunting{col 45}-5 to -3
-{col 21}{cmd: -1}{col 27}Stunting       {col 45}-3 to -2
-{col 21}{cmd:  0}{col 27}Not stunting   {col 45}-2 to 5
-{col 21}{cmd:999}{col 27}Outlier        {col 45}<-5 or >5
+{col 9}Value{col 17}Label{col 36}{it:Z}-score range
+{col 9}{hline 41}
+{col 10}{cmd: -2}{col 17}Severe stunting{col 37} -5 to -3
+{col 10}{cmd: -1}{col 17}Stunting       {col 37} -3 to -2
+{col 10}{cmd:  0}{col 17}Not stunting   {col 37} -2 to  5
+{col 10}{cmd:999}{col 17}Outlier        {col 37}<-5 or >5
  
 {pmore}This function takes one argument:
 
@@ -148,13 +152,13 @@
  classifications are only applied if the {cmd:outliers} option is specified by
  the user.
 
-{col 20}Value{col 27}Label{col 45}{it:Z}-score range
-{col 20}{hline 38}
-{col 21}{cmd: -2}{col 27}Severe wasting{col 45}-5 to -3
-{col 21}{cmd: -1}{col 27}Wasting       {col 45}-3 to -2
-{col 21}{cmd:  0}{col 27}Not wasting   {col 45}-2 to 2
-{col 21}{cmd:  1}{col 27}Overweight    {col 45}2 to 5
-{col 21}{cmd:999}{col 27}Outlier       {col 45}<-5 or >5
+{col 9}Value{col 17}Label{col 36}{it:Z}-score range
+{col 9}{hline 41}
+{col 10}{cmd: -2}{col 17}Severe wasting{col 37} -5 to -3
+{col 10}{cmd: -1}{col 17}Wasting       {col 37} -3 to -2
+{col 10}{cmd:  0}{col 17}Not wasting   {col 37} -2 to  2
+{col 10}{cmd:  1}{col 17}Overweight    {col 37}  2 to  5
+{col 10}{cmd:999}{col 17}Outlier       {col 37}<-5 or >5
 
 {pmore}This function takes one argument:
 
@@ -168,13 +172,13 @@
  variable with the following values and labels, where 'outlier' classifications
  are only applied if the {cmd:outliers} option is specified by the user.
 
-{col 20}Value    {col 27}Label               {col 50}{it:Z}-score range
-{col 20}{hline 43}
-{col 21}{cmd: -2}{col 27}Severely underweight{col 50}-6 to -3
-{col 21}{cmd: -1}{col 27}Underweight         {col 50}-3 to -2
-{col 21}{cmd:  0}{col 27}Normal weight       {col 50}-2 to 2
-{col 21}{cmd:  1}{col 27}Overweight          {col 50} 2 to 5
-{col 21}{cmd:999}{col 27}Outlier             {col 50}<-6 or >5
+{col 9}Value{col 17}Label{col 41}{it:Z}-score range
+{col 9}{hline 45}
+{col 10}{cmd: -2}{col 17}Severely underweight{col 42} -6 to -3
+{col 10}{cmd: -1}{col 17}Underweight         {col 42} -3 to -2
+{col 10}{cmd:  0}{col 17}Normal weight       {col 42} -2 to  2
+{col 10}{cmd:  1}{col 17}Overweight          {col 42}  2 to  5
+{col 10}{cmd:999}{col 17}Outlier             {col 42}<-6 or >5
 
 {pmore}This function takes one argument:
 
@@ -187,13 +191,13 @@
  Standards as appropriate, based on each observation's gestational age and 
  age in days. It produces a variable with the following values and labels.
 
-{col 20}Value    {col 27}Label               {col 50}{it:Z}-score range
-{col 20}{hline 43}
-{col 21}{cmd: -2}{col 27}Severe microcephaly {col 50}  <=-3
-{col 21}{cmd: -1}{col 27}Microcephaly        {col 50}-3 to -2
-{col 21}{cmd:  0}{col 27}Normal head size    {col 50}-2 to 2
-{col 21}{cmd:  1}{col 27}Macrocephaly        {col 50} 2 to 3
-{col 21}{cmd:  2}{col 27}Severe macrocephaly {col 50}  >= 3
+{col 9}Value{col 17}Label{col 41}{it:Z}-score range
+{col 9}{hline 45}
+{col 10}{cmd: -2}{col 17}Severe microcephaly {col 42} {it:z} <= -3
+{col 10}{cmd: -1}{col 17}Microcephaly        {col 42}-3 to -2
+{col 10}{cmd:  0}{col 17}Normal head size    {col 42}-2 to  2
+{col 10}{cmd:  1}{col 17}Macrocephaly        {col 42} 2 to  3
+{col 10}{cmd:  2}{col 17}Severe macrocephaly {col 42} {it:z} >=  3
 
 {pmore}This function takes one argument:
 
