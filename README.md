@@ -69,29 +69,30 @@ install the necessary files.
 * `ig_fet` - INTERGROWTH-21<sup>st</sup> fetal standards
   <details><summary>Component standards</summary>
 
-  | Acronym  | Description                                                               | Unit  | `x` range       |
-  |----------|---------------------------------------------------------------------------|-------|-----------------|
-  | `hcfga`  | head circumference-for-gestational age                                    | mm    | 98 to 280 days  |
-  | `bpdfga` | biparietal diameter-for-gestational age                                   | mm    | 98 to 280 days  |
-  | `acfga`  | abdominal circumference-for-gestational age                               | mm    | 98 to 280 days  |
-  | `flfga`  | femur length-for-gestational age                                          | mm    | 98 to 280 days  |
-  | `ofdfga` | occipito-frontal diameter for-gestational age                             | mm    | 98 to 280 days  |
-  | `efwfga` | estimated fetal weight-for-gestational age                                | grams | 154 to 280 days |
-  | `sfhfga` | symphisis-fundal height-for-gestational age                               | mm    | 112 to 294 days |
-  | `crlfga` | crown-rump length-for-gestational age                                     | mm    | 58 to 105 days  |
-  | `gafcrl` | gestational age-for-crown-rump length                                     | days  | 15 to 95 mm     |
-  | `gwgfga` | gestational weight gain-for-gestational age                               | kg    | 98 to 280 days  |
-  | `pifga`  | pulsatility index-for-gestational age                                     |       | 168 to 280 days |
-  | `rifga`  | resistance index-for-gestational age                                      |       | 168 to 280 days |
-  | `sdrfga` | systolic/diastolic ratio-for-gestational age                              |       | 168 to 280 days |
-  | `tcdfga` | transcerebellar diameter-for-gestational age                              | mm    | 98 to 280 days  |
-  | `gaftcd` | gestational age-for-transcerebellar diameter                              | days  | 12-55 mm        |
-  | `poffga` | parietal-occipital fissure-for-gestational age                            | mm    | 105 to 252 days |
-  | `sffga`  | Sylvian fissue-for-gestational age                                        | mm    | 105 to 252 days |
-  | `avfga`  | anterior horn of the lateral ventricle-for-gestational age                | mm    | 105 to 252 days |
-  | `pvfga`  | atrium of the posterior horn of the lateral ventricle-for-gestational age | mm    | 105 to 252 days |
-  | `cmfga`  | cisterna magna-for-gestational age                                        | mm    | 105 to 252 days |
-
+  | Acronym   | Description                                                  | Unit  | `x` range       |
+  |-----------|--------------------------------------------------------------|-------|-----------------|
+  | `hcfga`   | head circumference-for-GA                                    | mm    | 98 to 280 days  |
+  | `bpdfga`  | biparietal diameter-for-GA                                   | mm    | 98 to 280 days  |
+  | `acfga`   | abdominal circumference-for-GA                               | mm    | 98 to 280 days  |
+  | `flfga`   | femur length-for-GA                                          | mm    | 98 to 280 days  |
+  | `ofdfga`  | occipito-frontal diameter for-GA                             | mm    | 98 to 280 days  |
+  | `efwfga`  | estimated fetal weight-for-GA                                | grams | 154 to 280 days |
+  | `sfhfga`  | symphisis-fundal height-for-GA                               | mm    | 112 to 294 days |
+  | `crlfga`  | crown-rump length-for-GA                                     | mm    | 58 to 105 days  |
+  | `gafcrl`  | GA-for-crown-rump length                                     | days  | 15 to 95 mm     |
+  | `gwgfga`  | gestational weight gain-for-GA                               | kg    | 98 to 280 days  |
+  | `pifga`   | pulsatility index-for-GA                                     |       | 168 to 280 days |
+  | `rifga`   | resistance index-for-GA                                      |       | 168 to 280 days |
+  | `sdrfga`  | systolic/diastolic ratio-for-GA                              |       | 168 to 280 days |
+  | `tcdfga`  | transcerebellar diameter-for-GA                              | mm    | 98 to 280 days  |
+  | `gaftcd`  | GA-for-transcerebellar diameter                              | days  | 12-55 mm        |
+  | `poffga`  | parietal-occipital fissure-for-GA                            | mm    | 105 to 252 days |
+  | `sffga`   | Sylvian fissue-for-GA                                        | mm    | 105 to 252 days |
+  | `avfga`   | anterior horn of the lateral ventricle-for-GA                | mm    | 105 to 252 days |
+  | `pvfga`   | atrium of the posterior horn of the lateral ventricle-for-GA | mm    | 105 to 252 days |
+  | `cmfga`   | cisterna magna-for-GA                                        | mm    | 105 to 252 days |
+  | `hefwfga` | Hadlock estimated fetal weight-for-GA                        | g     | 126 to 287 days |
+  
   </details>
 - `who_gs` - WHO Child Growth Standards for term infants
   <details>
