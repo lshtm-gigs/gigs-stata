@@ -1,4 +1,4 @@
-v 0.5.0
+v 0.5.1
 d Materials by S. R. Parker
 d London School of Hygiene & Tropical Medicine
 d simon.parker@lshtm.ac.uk
