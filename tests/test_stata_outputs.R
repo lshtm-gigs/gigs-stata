@@ -17,7 +17,7 @@ compare_ig_fet <- function(acronym, z_or_c) {
                                  "sffga", "avfga", "pvfga", "cmfga", "gaftcd",
                                  "gwgfga"),
                     yes = 2,
-                    no = ifelse(acronym %in% c("efwfga", "gafcrl"),
+                    no = ifelse(acronym %in% c("efwfga", "hefwfga", "gafcrl"),
                                 yes = 0, no = 1))
 
   # R implementation is already validated against z-score/centile tables
