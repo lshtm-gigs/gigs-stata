@@ -1,9 +1,9 @@
 capture program drop gigs_classify_growth
-*! version 0.1.0 (SJxx-x: dmxxxx)
+*! version 0.1.1 (SJxx-x: dmxxxx)
 program define gigs_classify_growth
 	version 16
 	preserve
-	syntax anything(name=analyses id="analyses") [if] [in] , /*
+	syntax anything(name=outcomes id="outcomes") [if] [in] , /*
 		*/ GEST_days(varname numeric) AGE_days(varname numeric) /*
  		*/ sex(varname) SEXCode(string) /*
  		*/ [WEIGHT_kg(varname numeric) LENHT_cm(varname numeric) /*
@@ -52,29 +52,29 @@ program define gigs_classify_growth
 	
 	marksample touse
 	
-	// 1. Check each word in `analyses'
+	// 1. Check each word in `outcomes'
 	
-	di "Requested analyses:"
-	if "`analyses'" == "all" {
-		local analyses sfga svn stunting wasting wfa headsize
+	di "Requested outcomes:"
+	if "`outcomes'" == "all" {
+		local outcomes sfga svn stunting wasting wfa headsize
 	}
-	foreach analysis in `analyses' {
-		cap assert inlist("`analysis'", "sfga", "svn", "stunting", /*
+	foreach outcome in `outcomes' {
+		cap assert inlist("`outcome'", "sfga", "svn", "stunting", /*
 			*/ "wasting", "wfa", "headsize")
 		if _rc == 9 {	
-			di as text "`analysis'" as error " is an invalid analysis. " /*
-			*/ "The only valid analyses are " as text "sfga, svn, " /*
+			di as text "`outcome'" as error " is an invalid outcome. " /*
+			*/ "The only valid outcomes are " as text "sfga, svn, " /*
 			*/ as text "stunting, wasting, wfa " as error "or" /*
 			*/ as text " headsize" as error "."
 			exit 198
 		}
-		if "`analysis'" == "sfga" local analysis_str "Size-for-gestational age"
-		if "`analysis'" == "svn" local analysis_str "Small vulnerable newborn"
-		if "`analysis'" == "stunting" local analysis_str "Stunting"
-		if "`analysis'" == "wasting" local analysis_str "Wasting"
-		if "`analysis'" == "wfa" local analysis_str "Weight-for-age"
-		if "`analysis'" == "headsize" local analysis_str "Head size"
-		di "	`analysis_str' (`analysis')"
+		if "`outcome'" == "sfga" local outcome_str "Size-for-gestational age"
+		if "`outcome'" == "svn" local outcome_str "Small vulnerable newborn"
+		if "`outcome'" == "stunting" local outcome_str "Stunting"
+		if "`outcome'" == "wasting" local outcome_str "Wasting"
+		if "`outcome'" == "wfa" local outcome_str "Weight-for-age"
+		if "`outcome'" == "headsize" local outcome_str "Head size"
+		di "	`outcome_str' (`outcome')"
 	}
 	
 	// 2. Get vars for later + gigs logicals 
@@ -116,12 +116,12 @@ program define gigs_classify_growth
 		local missing_headcirc 0
 	}	
 	
-	// 4. Run analyses in `analyses'
+	// 4. Run analses for `outcomes'
 	local bw_centile_done "0"
-	foreach analysis in `analyses' {
-		if inlist("`analysis'", "sfga", "svn") {
+	foreach outcome in `outcomes' {
+		if inlist("`outcome'", "sfga", "svn") {
 			if "`missing_weight'" == "1" {
-				MissingRequiredData_growth "`analysis'" weight_kg
+				MissingRequiredData_growth "`outcome'" weight_kg
 			}
 			capture confirm new var birthweight_centile
 			if !_rc {
@@ -151,14 +151,14 @@ program define gigs_classify_growth
 				}
 			}
 
-			if "`analysis'" == "sfga" {
+			if "`outcome'" == "sfga" {
 				tempvar sfga_temp sfga_severe_temp
 				qui gigs_categorise `sfga_temp' if `touse', ///
-					analysis("`analysis'") measure(birthweight_centile) ///
-					outvartype("int") severe("0")
+					outcome("`outcome'") measure(birthweight_centile) ///
+					severe("0")
 				qui gigs_categorise `sfga_severe_temp' if `touse', ///
-					analysis("`analysis'") measure(birthweight_centile) ///
-					outvartype("int") severe("1")
+					outcome("`outcome'") measure(birthweight_centile) ///
+					severe("1")
 				
 				// Check if sfga cols already exist
 				capture confirm new var sfga
@@ -192,11 +192,11 @@ program define gigs_classify_growth
 				la val sfga_severe gigs_labs_sfga_sev		
 			}
 				
-			if "`analysis'" == "svn" {
+			if "`outcome'" == "svn" {
 				tempvar svn_temp
 				qui gigs_categorise `svn_temp' if `touse', ///
-					analysis("`analysis'") measure(birthweight_centile) ///
-					gest_days(`gest_days') outvartype("int")
+					outcome("`outcome'") measure(birthweight_centile) ///
+					gest_days(`gest_days')
 				capture confirm new var svn
 				if !_rc {
 					qui gen int svn = `svn_temp'
@@ -214,9 +214,9 @@ program define gigs_classify_growth
 			}
 		}
 			
-		if "`analysis'" == "stunting" {
+		if "`outcome'" == "stunting" {
 			if "`missing_lenht'" == "1" {
-				MissingRequiredData_growth "`analysis'" lenht_cm
+				MissingRequiredData_growth "`outcome'" lenht_cm
 			}
 			
 			tempvar lhaz_temp 
@@ -243,8 +243,7 @@ program define gigs_classify_growth
 			
 			tempvar stunting_temp
 			qui gigs_categorise `stunting_temp' if `touse', ///
-				analysis("`analysis'") measure(lhaz) ///
-				outvartype("int") outliers("0")
+				outcome("`outcome'") measure(lhaz) outliers("0")
 			capture confirm new var stunting
 			if !_rc {
 				qui gen int stunting = `stunting_temp'
@@ -262,8 +261,7 @@ program define gigs_classify_growth
 			
 			tempvar stunting_out_temp
 			qui gigs_categorise `stunting_out_temp' if `touse', ///
-				analysis("`analysis'") measure(lhaz) ///
-				outvartype("int") outliers("1")
+				outcome("`outcome'") measure(lhaz) outliers("1")
 			capture confirm new var stunting_outliers
 			if !_rc {
 				qui gen int stunting_outliers = `stunting_out_temp'
@@ -280,12 +278,12 @@ program define gigs_classify_growth
 			la val stunting_outliers gigs_labs_stunting_out
 		}
 
-		if "`analysis'" == "wasting" {
+		if "`outcome'" == "wasting" {
 			if "`missing_weight'" == "1" {
-				MissingRequiredData_growth "`analysis'" weight_kg
+				MissingRequiredData_growth "`outcome'" weight_kg
 			}
 			if "`missing_lenht'" == "1" {
-				MissingRequiredData_growth "`analysis'" lenht_cm
+				MissingRequiredData_growth "`outcome'" lenht_cm
 			}
 			
 			tempvar wlz_temp
@@ -293,7 +291,6 @@ program define gigs_classify_growth
 				z_type(wlz) yvar(`weight_kg') ///
 				age_days(`age_days') gest_days(`gest_days') ///
 				sex(`sex') sexc(m="`male'", f="`female'") ///
-				outvartype("double") ///
 				lenht_cm(`lenht_cm') ///
 				gigs_lgls(`use_ig_nbs' `use_ig_png' `use_who_gs')
 			
@@ -313,8 +310,8 @@ program define gigs_classify_growth
 			
 			tempvar wasting_temp
 			qui gigs_categorise `wasting_temp' if `touse', ///
-				analysis("`analysis'") measure(wlz) ///
-				outvartype("int") outliers("0")
+				outcome("`outcome'") measure(wlz) ///
+				outliers("0")
 			capture confirm new var wasting
 			if !_rc {
 				qui gen int wasting = `wasting_temp'
@@ -332,8 +329,8 @@ program define gigs_classify_growth
 			
 			tempvar wasting_out_temp
 			qui gigs_categorise `wasting_out_temp' if `touse', ///
-				analysis("`analysis'") measure(wlz) ///
-				outvartype("int") outliers("1")
+				outcome("`outcome'") measure(wlz) ///
+				outliers("1")
 			capture confirm new var wasting_outliers
 			if !_rc {
 				qui gen int wasting_outliers = `wasting_out_temp'
@@ -350,9 +347,9 @@ program define gigs_classify_growth
 			la val wasting_outliers gigs_labs_wasting_out
 		}
 		
-		if "`analysis'" == "wfa" {
+		if "`outcome'" == "wfa" {
 			if "`missing_weight'" == "1" {
-				MissingRequiredData_growth "`analysis'" weight_kg
+				MissingRequiredData_growth "`outcome'" weight_kg
 			}
 			
 			tempvar waz_temp 
@@ -379,8 +376,8 @@ program define gigs_classify_growth
 			
 			tempvar wfa_temp
 			qui gigs_categorise `wfa_temp' if `touse', ///
-				analysis("`analysis'") measure(waz) ///
-				outvartype("int") outliers("0")
+				outcome("`outcome'") measure(waz) ///
+				outliers("0")
 			capture confirm new var wfa
 			if !_rc {
 				qui gen int wfa = `wfa_temp'
@@ -398,8 +395,8 @@ program define gigs_classify_growth
 			
 			tempvar wfa_out_temp
 			qui gigs_categorise `wfa_out_temp' if `touse', ///
-				analysis("`analysis'") measure(waz) ///
-				outvartype("int") outliers("1")
+				outcome("`outcome'") measure(waz) ///
+				outliers("1")
 			capture confirm new var wfa_outliers
 			if !_rc {
 				qui gen int wfa_outliers = `wfa_out_temp'
@@ -416,9 +413,9 @@ program define gigs_classify_growth
 			la val wfa_outliers gigs_labs_wfa_out
 		}
 		
-		if "`analysis'" == "headsize" {
+		if "`outcome'" == "headsize" {
 			if "`missing_headcirc'" == "1" {
-				MissingRequiredData_growth "`analysis'" headcirc_cm
+				MissingRequiredData_growth "`outcome'" headcirc_cm
 			}
 			
 			tempvar hcaz_temp
@@ -445,8 +442,7 @@ program define gigs_classify_growth
 			
 			tempvar headsize_temp
 			qui gigs_categorise `headsize_temp' if `touse', ///
-				analysis("`analysis'") measure(hcaz) ///
-				outvartype("int")
+				outcome("`outcome'") measure(hcaz)
 			capture confirm new var headsize
 			if !_rc {
 				qui gen int headsize = `headsize_temp'
@@ -497,26 +493,26 @@ end
 
 capture prog drop MissingRequiredData_growth
 program MissingRequiredData_growth
-	args analysis missing_data
+	args outcome missing_data
 	
-	cap assert inlist("`analysis'", "sfga", "svn", "stunting", "wasting", ///
+	cap assert inlist("`outcome'", "sfga", "svn", "stunting", "wasting", ///
 		"wfa", "headsize")
 	if _rc == 9 {
 		di as error "INTERNAL ERROR in MissingRequiredData_growth: " /*
-			*/ "{bf:analysis} arg must be a valid growth analysis string. " /*
+			*/ "{bf:outcome} arg must be a valid growth outcome string. " /*
 			*/ "This is an internal error, so please contact the " /*
 			*/ "maintainers of this package if you are an end-user. You can " /*
 			*/ "find our details at {help gigs}."
 		exit 499
 	}
-	if "`analysis'" == "sfga" local analysis_str "Size-for-gestational age"
-	if "`analysis'" == "svn" local analysis_str "Small vulnerable newborn"
-	if "`analysis'" == "wasting" local analysis_str "Wasting"
-	if "`analysis'" == "stunting" local analysis_str "Stunting"
-	if "`analysis'" == "wfa" local analysis_str "Weight-for-age"
-	if "`analysis'" == "headsize" local analysis_str "Head size"
+	if "`outcome'" == "sfga" local outcome_str "Size-for-gestational age"
+	if "`outcome'" == "svn" local outcome_str "Small vulnerable newborn"
+	if "`outcome'" == "wasting" local outcome_str "Wasting"
+	if "`outcome'" == "stunting" local outcome_str "Stunting"
+	if "`outcome'" == "wfa" local outcome_str "Weight-for-age"
+	if "`outcome'" == "headsize" local outcome_str "Head size"
 	
-	di as error "`analysis_str' analysis requires {bf:`missing_data'}, " /* 
+	di as error "`outcome_str' outcome requires {bf:`missing_data'}, " /* 
 		*/ "which you have not provided."
 	exit 498
 end

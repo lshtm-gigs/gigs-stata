@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.1.0 23 April 2023}{...}
+{* *! version 0.1.1 01 May 2023}{...}
 {vieweralsosee "" "--"}{...}
 {vieweralsosee "gigs: Conversion functions" "help ig_nbs"}{...}
 {vieweralsosee "gigs: Classification functions" "help classify_sfga"}{...}
@@ -21,7 +21,7 @@
 {marker syntax}{...}
 {title:Syntax}
 
-{p 8 17 2}{cmd:gigs_classify_growth} {it:analyses} {ifin}{cmd:,}
+{p 8 17 2}{cmd:gigs_classify_growth} {it:outcomes} {ifin}{cmd:,}
  {cmdab:gest:_days}{cmd:(}{varname}{cmd:)} {cmdab:age:_days}{cmd:(}{varname}{cmd:)} {cmdab:sex}{cmd:(}{varname}{cmd:)}
  {cmdab:sexc:ode}{cmd:(}{cmdab:m:ale=}{it:code}{cmd:,} 
  {cmdab:f:emale=}{it:code}{cmd:)} [{cmdab:weight:_kg}{cmd:(}{varname}{cmd:)}
@@ -40,18 +40,18 @@
  size. It also generates variables with centiles/z-scores, pertinent to each 
  categorisation it performs.
 
-{p 4 4 2}{it:analyses} is used to specify the analyses you want to perform. This
- should be a space-separated list of the abbreviations in the table below. Each
- analysis will generate new variables, or replace existing variables if the
- {cmd:replace} option is specified and the variables in the below table already
- exist.
+{p 4 4 2}{it:outcomes} is used to specify which growth outcomes you want to 
+ assess. This should be a space-separated list of the abbreviations in the table
+ below. Each requested outcome will generate new variables, or replace existing 
+ variables if the {cmd:replace} option is specified and the variables in the 
+ below table already exist.
  
 {marker tab1}{...}
-{col 5}{ul:Acceptable tokens for {it:analyses}}
+{col 5}{ul:Acceptable tokens for {it:outcomes}}
 
-{col 5}{it:analysis}{col 20}Description{col 49}New continuous variable{col 76}New categorical variable(s)
+{col 5}{it:outcome}{col 20}Description{col 49}New continuous variable{col 76}New categorical variable(s)
 {col 5}{hline 100}
-{col 6}{bf:all}{col 20}All analyses{col 49}
+{col 6}{bf:all}{col 20}All outcomes{col 49}
 {col 6}{bf:sfga}{col 20}Size-for-gestational age{col 49}{bf:birthweight_centile}{col 76}{bf:sfga} {bf:sfga_severe}
 {col 6}{bf:svn}{col 20}Small vulnerable newborns{col 49}{bf:birthweight_centile}{col 76}{bf:svn}
 {col 6}{bf:stunting}{col 20}Stunting{col 49}{bf:lhaz}{col 76}{bf:stunting} {bf:stunting_outliers}
@@ -60,7 +60,7 @@
 {col 6}{bf:headsize}{col 20}Head size{col 49}{bf:hcaz}{col 76}{bf:headsize}
 {col 5}{hline 100}
  
-{p 4 4 2}You can list several different {it:analyses} at once, to specify which
+{p 4 4 2}You can list several different {it:outcomes} at once, to specify which
  you'd like to perform. So for example, you could supply the command with
  '{bf:stunting wasting}' to run only stunting and wasting analyses; or 
  '{bf:headsize}' to only do a head size analysis. The continuous variables 
@@ -120,9 +120,9 @@
  {cmd:age_days} < 0.5 are analysed with the {help ig_nbs:{bf:ig_nbs()}} egen 
  function. Preterm infants with a post-menstrual age of 27 to 64 weeks 
  (inclusive) are analysed with the {help ig_nbs:{bf:ig_png()}} egen function. 
- Term infants and preterm infants over 64 weeks' PMA are analysed with 
- the {help ig_nbs:{bf:who_gs()}} egen function. Check out the source code on 
- GitHub to see exactly when/where each growth standard is applied.
+ Term infants and preterm infants over 64 weeks' post-menstrual age are analysed
+ with the {help ig_nbs:{bf:who_gs()}} egen function. Check out the source code 
+ on GitHub to see exactly when/where each growth standard is applied.
 
 {pstd}These functions will return missing values where values are outside the
  ranges specified for the {help ig_nbs##tab1:gigs conversion functions},
@@ -133,14 +133,20 @@
 {marker examples}{...}
 {title:Examples}
 
-{pstd}Running all available classifications, where {cmd:sex} contains the codes {cmd:1} and {cmd:2}:{p_end}
-{phang2}{cmd:. gigs_classify_growth sfga svn, age_days(age_days) gest_days(gest_days) sex(sex) sexcode(male=1, female=2) weight_kg(weight_kg) lenht_cm(lenht_cm) headcirc_cm(headcirc_cm)}
+{pstd}These examples assume you have loaded the {bf:life6mo} dataset into Stata.
+ You can access this data by running:{p_end}
+{phang2}{cmd:. net get gigs, from("https://raw.githubusercontent.com/lshtm-gigs/gigs-stata/master")}{p_end}
+{phang2}{cmd:. use life6mo}{p_end}
+{phang2}{cmd:. gen double wt_kg = weight_g / 1000}{p_end}
 
-{pstd}Running all available classifications in {cmd:replace} mode, and {cmd:sex} contains the codes {cmd:M} and {cmd:F}, only for observations where infants weigh < 2kg :{p_end}
-{phang2}{cmd:. gigs_classify_growth sfga svn if weight_kg < 2, age_days(age_days) gest_days(gest_days) sex(sex) sexcode(male=M, female=F) weight_kg(weight_kg) lenht_cm(lenht_cm) headcirc_cm(headcirc_cm) replace}
+{pstd}Running all available classifications, where {cmd:sex} contains the codes {cmd:1} and {cmd:2}:{p_end}
+{phang2}{cmd:. gigs_classify_growth all, age_days(age_days) gest_days(gestage) sex(sex) sexcode(male=1, female=2) weight_kg(wt_kg) lenht_cm(len_cm) headcirc_cm(headcirc_cm)}
+
+{pstd}Running all available classifications in {cmd:replace} mode, only for observations where infants weigh < 2kg :{p_end}
+{phang2}{cmd:. gigs_classify_growth sfga svn if weight_kg < 2, age_days(age_days) gest_days(gestage) sex(sex) sexcode(male=1, female=2) weight_kg(wt_kg) replace}
 
 {pstd}You can use also use shorter versions of certain options (see the {help gigs_classify_growth##syntax:syntax diagram} for more information):{p_end}
-{phang2}{cmd:. gigs_classify_growth sfga svn, age(age_days) gest(gest_days) sex(sex) sexc(male=1, female=2) weight(weight_kg) lenht(lenht_cm) headcirc(headcirc_cm) replace}
+{phang2}{cmd:. gigs_classify_growth stunting, age(age_days) gest(gestage) sex(sex) sexc(male=1, female=2) weight(wt_kg) lenht(len_cm) replace}
 
 {marker authors}{...}
 {title:Authors}
