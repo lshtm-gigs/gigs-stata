@@ -153,17 +153,17 @@ also {it:fcn} dependent.
 {phang}{opt x:var(varname numeric)} specifies the variable used with supplied
  sex values to standardise the measure of interest. In the INTERGROWTH-21st
  Postnatal Growth standards ({cmd:ig_png()}) this is usually post-menstrual age
- in whole weeks, but may also be length in cm if using the {cmd:wfl} standard.
- In the INTERGROWTH-21st Fetal standards ({cmd:ig_fet()}), this is usually
- gestational age in days but can also be crown-rump length in mm or
- transcerebellar diameter in mm, if using either the {cmd:gafcrl} or
- {cmd:gaftcd} standards, respectively. In the WHO Child Growth standards,
- {cmd:xvar()} is usually age in days, but may also be length or height (in cm)
- if using either the {cmd:wfl} or {cmd:wfh} standards. See Tables
- {help ig_nbs##tab2:2}, {help ig_nbs##tab3:3}, or {help ig_nbs##tab4:4} for
- appropriate {cmd:{it:x}} values and units for each valid acronym. Any
- {cmd:{it:x}} variable values outside the ranges described below will return a
- missing value.
+ in weeks, but may also be length in cm if using the {cmd:wfl} standard. In the
+ INTERGROWTH-21st Fetal standards ({cmd:ig_fet()}), this is usually gestational 
+ age in days but can also be crown-rump length in mm or transcerebellar diameter
+ in mm, if using either the {cmd:gafcrl} or {cmd:gaftcd} standards, 
+ respectively. In the WHO Child Growth standards, {cmd:xvar()} is usually age in
+ days, but may also be length or height (in cm) if using either the {cmd:wfl} or
+ {cmd:wfh} standards. See Tables {help ig_nbs##tab2:2}, {help ig_nbs##tab3:3}, 
+ or {help ig_nbs##tab4:4} for appropriate {cmd:{it:x}} values and units for each
+ valid acronym. Any observations with {cmd:{it:x}} variable values outside the 
+ ranges described in these tables will have a missing value in the generated 
+ variable.
 
 {dlgtab:INTERGROWTH-21st Newborn Size standards}
 
@@ -228,6 +228,7 @@ also {it:fcn} dependent.
 {col 6}{cmd:avfga}{col 14}anterior horn of the lateral ventricle-for-GA{col 76}mm{col 82}105-252 days
 {col 6}{cmd:pvfga}{col 14}atrium of the posterior horn of the lateral ventricle-for-GA{col 76}mm{col 82}105-252 days
 {col 6}{cmd:cmfga}{col 14}cisterna magna-for-GA{col 76}mm{col 82}105-252 days
+{col 6}{cmd:hefwfga}{col 14}Hadlock estimated fetal weight-for-GA{col 76}g{col 82}126-187 days
 {col 5}{hline 90}
 
 {marker tab4}{...}
@@ -251,12 +252,12 @@ also {it:fcn} dependent.
 {title:Remarks}
 
 {pstd}These functions will return missing values where values are outside the
- ranges given above, but otherwise will not automatically detect data
- errors. Ensure you check your data before using these functions or you may
- receive incorrect results. Additionally, when providing centiles to the
- function with {cmd: "c2v"}, ensure your inputs are between 0 and 1, or the
- function will return missing values (e.g. for 25th centile, use 0.25; for 95th
- centile, use 0.95).
+ ranges given in the above tables, but otherwise will not automatically detect 
+ data errors. Ensure you check your data before using these functions or you may
+ receive incorrect results, especially to make sure you have the correct units. 
+ Additionally, when providing centiles to these functions with {cmd: "c2v"}, 
+ ensure your inputs are between 0 and 1, or the function will return missing 
+ values (e.g. for 25th centile, use 0.25; for 95th centile, use 0.95).
 
 {marker examples}{...}
 {title:Examples}
@@ -264,33 +265,30 @@ also {it:fcn} dependent.
 {pstd}Getting centiles from values ({cmd: "v2c"}) in the INTERGROWTH-21st
  Newborn Size Standard for weight-for-gestational age ({cmd:"wfga"}), where 
  {cmd:sex} contains the codes {cmd:1} and {cmd:2}:{p_end}
-{phang2}{cmd:. egen z_wfga = ig_nbs(weight,"wfga","v2c"), gest_days(ga_weeks * 7) sex(sex) sexcode(male=1, female=2)}
+{phang2}{cmd:. egen z_wfga = ig_nbs(weight, "wfga", "v2c"), gest_days(ga_weeks * 7) sex(sex) sexcode(male=1, female=2)}
 
 {pstd}Getting z-scores from values ({cmd: "v2z"}) in the INTERGROWTH-21st
  Newborn Size Standard for weight-for-gestational age ({cmd:"wfga"}), where 
  {cmd:sex} contains the codes {cmd:M} and {cmd:F}:{p_end}
-{phang2}{cmd:. egen z_lfa = ig_png(len_cm,"lfa","v2z"), xvar(pma) sex(sex) sexcode(male=M, female=F)}
+{phang2}{cmd:. egen z_lfa = ig_png(len_cm, "lfa" , "v2z"), xvar(pma) sex(sex) sexcode(male=M, female=F)}
 
 {pstd}Getting values for specific centiles ({cmd: "v2c"}) in the
  INTERGROWTH-21st Fetal Standard for abdominal circumference-for-gestational age
  ({cmd:"acfga"}):{p_end}
-{phang2}{cmd:. egen abdocirc_mm = ig_fet(centile,"acfga","v2c"), xvar(ga_days)}
+{phang2}{cmd:. egen abdocirc_mm = ig_fet(centile, "acfga", "v2c"), xvar(ga_days)}
 
 {pstd}Getting values for z-scores ({cmd: "v2c"}) in the WHO Child Growth
  Standard for arm circumference-for-age ({cmd:"acfa"}), where 
  {cmd:sex} contains the codes {cmd:Male} and {cmd:Female}:{p_end}
-{phang2}{cmd:. egen z_acfa = who_gs(zscores,"acfa","z2v"), xvar(age_days) sex(sex) sexcode(male=Male, female=Female)}
+{phang2}{cmd:. egen z_acfa = who_gs(zscores, "acfa", "z2v"), xvar(age_days) sex(sex) sexcode(male=Male, female=Female)}
 
 {pstd}You can use just the first letter of the {cmd:sexcode()} arguments{p_end}
-{phang2}{cmd:. egen z_acfa = who_gs(zscores,"acfa","z2v"), xvar(age_days) sex(sex) sexcode(m=Male, f=Female)}
+{phang2}{cmd:. egen z_acfa = who_gs(zscores, "acfa", "z2v"), xvar(age_days) sex(sex) sexcode(m=Male, f=Female)}
 
 {pstd}Codes given to {cmd: sexcode()} cannot be abbreviated. They must be 
  typed exactly as they appear in your dataset. You can, however, swap the order
  and/or omit the comma in the {hi:sexcode()} option:{p_end}
-{phang2}{cmd:. egen z_acfa = who_gs(zscores,"acfa","z2v"), xvar(age_days) sex(sex) sexcode(f=Female, m=Male)}
-
-{phang2}{cmd:. egen z_acfa = who_gs(zscores,"acfa","z2v"), xvar(age_days) sex(sex) sexcode(f=Female m=Male)}{p_end}
-
+{phang2}{cmd:. egen z_acfa = who_gs(zscores, "acfa", "z2v"), xvar(age_days) sex(sex) sexcode(f=Female m=Male)}{p_end}
 
 {marker authors}{...}
 {title:Authors}
@@ -306,7 +304,6 @@ also {it:fcn} dependent.
 {pstd}London School of Hygiene and Tropical Medicine{p_end}
 {pstd}London, U.K.{p_end}
 {pstd}eric.ohuma@lshtm.ac.uk{p_end}
-
 
 {title:Also see}
 
