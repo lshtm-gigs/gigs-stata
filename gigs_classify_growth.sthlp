@@ -137,7 +137,6 @@
  You can access this data by running:{p_end}
 {phang2}{cmd:. net get gigs, from("https://raw.githubusercontent.com/lshtm-gigs/gigs-stata/master")}{p_end}
 {phang2}{cmd:. use life6mo}{p_end}
-{phang2}{cmd:. gen double wt_kg = weight_g / 1000}{p_end}
 
 {pstd}Running all available classifications, where {cmd:sex} contains the codes {cmd:1} and {cmd:2}:{p_end}
 {phang2}{cmd:. gigs_classify_growth all, age_days(age_days) gest_days(gestage) sex(sex) sexcode(male=1, female=2) weight_kg(wt_kg) lenht_cm(len_cm) headcirc_cm(headcirc_cm)}

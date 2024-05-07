@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.2.0 17 April 2024}{...}
+{* *! version 0.3.0 07 May 2024}{...}
 {vieweralsosee "" "--"}{...}
 {vieweralsosee "gigs package" "help gigs"}{...}
 
@@ -19,14 +19,14 @@ observations.
 {col 6}{cmd:sex}{col 20}Sex of the infant as an integer (1 = Male; 2 = Female).
 {col 6}{cmd:gestage}{col 20}Best obstetric estimate of gestational age in days (181--291).
 {col 6}{cmd:age_days}{col 20}Chronological age in days at each visit (0--242).
-{col 6}{cmd:pma}{col 20}Post-menstrual age in days (182--528)
-{col 6}{cmd:weight_g}{col 20}Mean weight in g (1240.00--9406.67).
-{col 6}{cmd:len_cm}{col 20}Mean length in cm (37.37--72.93).
-{col 6}{cmd:headcirc_cm}{col 20}Mean head circumference in cm (23.20--44.87).
-{col 6}{cmd:muac_cm}{col 20}Mean mid-upper arm circumference in cm (6.30--16.83).
+{col 6}{cmd:pma}{col 20}Post-menstrual age in days at each visit (182--528)
+{col 6}{cmd:wt_kg}{col 20}Mean weight at each visit in kg (1.24--9.40667).
+{col 6}{cmd:len_cm}{col 20}Mean length at each visit in cm (37.37--72.93).
+{col 6}{cmd:headcirc_cm}{col 20}Mean head circumference at each visit in cm (23.20--44.87).
+{col 6}{cmd:muac_cm}{col 20}Mean mid-upper arm circumference at each visit in cm (6.30--16.83).
 {col 5}{hline 88} 
 
-							  
+  
 {title:Reference}
 Vesel L, Bellad RM, Manji K, Saidi F, Velasquez E, Sudfeld C, {it:et al}. {bf:Feeding}
  {bf:practices and growth patterns of moderately low birthweight infants in resource-}
