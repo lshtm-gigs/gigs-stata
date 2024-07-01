@@ -335,7 +335,11 @@ Authors
   **S. R. Parker**  
   Maternal, Adolescent, Reproductive, and Child Health Centre  
   London School of Hygiene and Tropical Medicine
-  
-  **Dr E. O. Ohuma**  
+
+  **Dr L. Vesel**  
+  Ariadne Labs, Brigham and Women’s Hospital  
+  Harvard T.H. Chan School of Public Health
+
+  **Professor E. O. Ohuma**  
   Maternal, Adolescent, Reproductive, and Child Health Centre  
   London School of Hygiene and Tropical Medicine
