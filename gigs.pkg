@@ -1,9 +1,9 @@
-v 0.5.1
+v 1.0.0
 d 'GIGS': Fetal, neonatal, and infant growth assessment using international growth standards
 d 
-d gigs provides a single, simple interface for working with outputs from the INTERGROWTH-21st project and the WHO Child Growth standards. You will find functions for converting between anthropometric measures (e.g. weight or length) to z-scores and centiles, and the inverse. Also included are functions for classifying newborn and infant growth according to published cut-offs.
+d gigs provides a single, simple interface for working with outputs from the INTERGROWTH-21st project and the WHO Child Growth standards. You will find functions for converting between anthropometric measures (e.g. weight or length) to z-scores and centiles, and the inverse. Also included is a command for classifying newborn and infant growth according to published z-score/centile cut-offs.
 d 
-d Distribution-Date: 20240501
+d Distribution-Date: 20241031
 d License: GNU General Public License v3.0
 d 
 F _gig_fet.ado
