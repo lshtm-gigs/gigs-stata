@@ -1,8 +1,7 @@
 {smcl}
-{* *! version 0.4.2 01 May 2024}{...}
+{* *! version 0.5.0 31 Oct 2024}{...}
 {vieweralsosee "" "--"}{...}
 {vieweralsosee "gigs: Conversion functions" "help ig_nbs"}{...}
-{vieweralsosee "gigs: Classification functions" "help classify_sfga"}{...}
 {vieweralsosee "gigs: Growth classification command" "help gigs_classify_growth"}{...}
 
 {hi: help gigs}{right: ({browse "https://www.overleaf.com/project/641db63564edd62fb54c963b":SJXX-X: st0001})}
@@ -32,7 +31,7 @@
  z-scores/centiles, or classify growth according to literature-based
  cut-offs. We have also written the {helpb gigs_classify_growth} command, which
  takes multiple anthropometric indices and applies the most suitable growth
- standards at each time point to classify common growth indicators such as
+ standards at each time point to classify common growth outcomes including
  size-for-gestational age, stunting, and wasting.
 
 {marker authors}{...}
@@ -58,8 +57,6 @@
 {title:Also see}
 
 {p 4 14 2}GIGS conversion functions: {help ig_nbs:documentation}
-
-{p 4 14 2}GIGS classification functions: {help classify_sfga:documentation}
 
 {p 4 14 2}GIGS growth classification command: {help gigs_classify_growth:documentation}
 

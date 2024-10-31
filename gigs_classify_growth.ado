@@ -1,5 +1,5 @@
 capture program drop gigs_classify_growth
-*! version 0.1.1 (SJxx-x: dmxxxx)
+*! version 0.2.0 (SJxx-x: dmxxxx)
 program define gigs_classify_growth
 	version 16
 	preserve
@@ -7,7 +7,7 @@ program define gigs_classify_growth
 		*/ GEST_days(varname numeric) AGE_days(varname numeric) /*
  		*/ sex(varname) SEXCode(string) /*
  		*/ [WEIGHT_kg(varname numeric) LENHT_cm(varname numeric) /*
- 		*/  HEADCIRC_cm(varname numeric) replace]
+ 		*/  HEADCIRC_cm(varname numeric) id(varname) replace]
 	
 	if `"`by'"' != "" {
 		_egennoby gigs_classify_growth `"`by'"'
@@ -50,11 +50,23 @@ program define gigs_classify_growth
 		}
 	}
 	
+	local id_type = "`:type `id''"
+	if !regexm("`id_type'", "byte|str|int") {
+		Badidvar_growth
+	}
+	else {
+		local id_was_str = .
+		if regexm("`id_type'", "byte|int") {
+			local id_was_str = 0
+			qui tostring(`id'), replace
+		}
+	}
+	
 	marksample touse
 	
 	// 1. Check each word in `outcomes'
 	
-	di "Requested outcomes:"
+	di as result "Requested outcomes:"
 	if "`outcomes'" == "all" {
 		local outcomes sfga svn stunting wasting wfa headsize
 	}
@@ -74,7 +86,7 @@ program define gigs_classify_growth
 		if "`outcome'" == "wasting" local outcome_str "Wasting"
 		if "`outcome'" == "wfa" local outcome_str "Weight-for-age"
 		if "`outcome'" == "headsize" local outcome_str "Head size"
-		di "	`outcome_str' (`outcome')"
+		di as text "	`outcome_str' ({bf:`outcome'})"
 	}
 	
 	// 2. Get vars for later + gigs logicals 
@@ -84,7 +96,7 @@ program define gigs_classify_growth
 	
 	tempvar use_ig_nbs use_ig_png use_who_gs
 	gigs_zscoring_lgls `use_ig_nbs' `use_ig_png' `use_who_gs' if `touse', ///
-		gest_days(`gest_days') age_days(`age_days')
+		gest_days(`gest_days') age_days(`age_days') id(`id')
 
 	// 3. Check if data provided, print if so
 	if `"`weight_kg'"' == "" & `"`lenht_cm'"' == "" & `"`headcirc_cm'"' == "" {
@@ -93,7 +105,7 @@ program define gigs_classify_growth
 			*/ "options."
 		exit 498
 	}
-	di "Supplied data:"
+	di as text "{bf:Supplied data:}"
 	if `"`weight_kg'"' == "" {
 		local missing_weight 1
 	}
@@ -117,14 +129,17 @@ program define gigs_classify_growth
 	}	
 	
 	// 4. Run analses for `outcomes'
+	di as result "Running analyses. New/replaced variables:"
 	local bw_centile_done "0"
 	foreach outcome in `outcomes' {
 		if inlist("`outcome'", "sfga", "svn") {
 			if "`missing_weight'" == "1" {
 				MissingRequiredData_growth "`outcome'" weight_kg
+				continue
 			}
 			capture confirm new var birthweight_centile
 			if !_rc {
+				GenNewVar_growth birthweight_centile
 				qui egen double birthweight_centile = ///
 					ig_nbs(`weight_kg', "wfga", "v2c") ///
 					if `use_ig_nbs' & `touse', ///
@@ -163,6 +178,7 @@ program define gigs_classify_growth
 				// Check if sfga cols already exist
 				capture confirm new var sfga
 				if !_rc {
+					GenNewVar_growth sfga
 					qui gen int sfga = `sfga_temp'
 				}
 				else {
@@ -178,6 +194,7 @@ program define gigs_classify_growth
 				
 				capture confirm new var sfga_severe
 				if !_rc {
+					GenNewVar_growth sfga_severe
 					qui gen int sfga_severe = `sfga_severe_temp'
 				}
 				else {
@@ -199,6 +216,7 @@ program define gigs_classify_growth
 					gest_days(`gest_days')
 				capture confirm new var svn
 				if !_rc {
+					GenNewVar_growth svn
 					qui gen int svn = `svn_temp'
 				}				
 				else {
@@ -217,6 +235,7 @@ program define gigs_classify_growth
 		if "`outcome'" == "stunting" {
 			if "`missing_lenht'" == "1" {
 				MissingRequiredData_growth "`outcome'" lenht_cm
+				continue
 			}
 			
 			tempvar lhaz_temp 
@@ -225,10 +244,12 @@ program define gigs_classify_growth
 				age_days(`age_days') gest_days(`gest_days') ///
 				sex(`sex') sexc(m="`male'", f="`female'") ///
 				outvartype("double") ///
-				gigs_lgls(`use_ig_nbs' `use_ig_png' `use_who_gs')
+				gigs_lgls(`use_ig_nbs' `use_ig_png' `use_who_gs') ///
+				id(`id')
 			
 			capture confirm new var lhaz
 			if !_rc {
+				GenNewVar_growth lhaz
 				qui gen double lhaz = `lhaz_temp'
 			}				
 			else {
@@ -246,6 +267,7 @@ program define gigs_classify_growth
 				outcome("`outcome'") measure(lhaz) outliers("0")
 			capture confirm new var stunting
 			if !_rc {
+				GenNewVar_growth stunting
 				qui gen int stunting = `stunting_temp'
 			}				
 			else {
@@ -264,6 +286,7 @@ program define gigs_classify_growth
 				outcome("`outcome'") measure(lhaz) outliers("1")
 			capture confirm new var stunting_outliers
 			if !_rc {
+				GenNewVar_growth stunting_outliers
 				qui gen int stunting_outliers = `stunting_out_temp'
 			}				
 			else {
@@ -279,11 +302,14 @@ program define gigs_classify_growth
 		}
 
 		if "`outcome'" == "wasting" {
-			if "`missing_weight'" == "1" {
-				MissingRequiredData_growth "`outcome'" weight_kg
-			}
-			if "`missing_lenht'" == "1" {
-				MissingRequiredData_growth "`outcome'" lenht_cm
+			if ("`missing_weight'" == "1" | "`missing_lenht'" == "1") {
+				if "`missing_weight'" == "1" {
+					MissingRequiredData_growth "`outcome'" weight_kg
+				}
+				if "`missing_lenht'" == "1" {
+					MissingRequiredData_growth "`outcome'" lenht_cm
+				}
+				continue
 			}
 			
 			tempvar wlz_temp
@@ -291,11 +317,14 @@ program define gigs_classify_growth
 				z_type(wlz) yvar(`weight_kg') ///
 				age_days(`age_days') gest_days(`gest_days') ///
 				sex(`sex') sexc(m="`male'", f="`female'") ///
+				outvartype("double") ///
 				lenht_cm(`lenht_cm') ///
-				gigs_lgls(`use_ig_nbs' `use_ig_png' `use_who_gs')
+				gigs_lgls(`use_ig_nbs' `use_ig_png' `use_who_gs') ///
+				id(`id')
 			
 			capture confirm new var wlz
 			if !_rc {
+				GenNewVar_growth wlz
 				qui gen double wlz = `wlz_temp'
 			}				
 			else {
@@ -314,6 +343,7 @@ program define gigs_classify_growth
 				outliers("0")
 			capture confirm new var wasting
 			if !_rc {
+				GenNewVar_growth wasting
 				qui gen int wasting = `wasting_temp'
 			}				
 			else {
@@ -333,6 +363,7 @@ program define gigs_classify_growth
 				outliers("1")
 			capture confirm new var wasting_outliers
 			if !_rc {
+				GenNewVar_growth wasting_outliers
 				qui gen int wasting_outliers = `wasting_out_temp'
 			}				
 			else {
@@ -350,6 +381,7 @@ program define gigs_classify_growth
 		if "`outcome'" == "wfa" {
 			if "`missing_weight'" == "1" {
 				MissingRequiredData_growth "`outcome'" weight_kg
+				continue
 			}
 			
 			tempvar waz_temp 
@@ -358,10 +390,12 @@ program define gigs_classify_growth
 				age_days(`age_days') gest_days(`gest_days') ///
 				sex(`sex') sexc(m="`male'", f="`female'") ///
 				outvartype("double") ///
-				gigs_lgls(`use_ig_nbs' `use_ig_png' `use_who_gs')
+				gigs_lgls(`use_ig_nbs' `use_ig_png' `use_who_gs') ///
+				id(`id')
 						
 			capture confirm new var waz
 			if !_rc {
+				GenNewVar_growth waz
 				qui gen double waz = `waz_temp'
 			}				
 			else {
@@ -380,6 +414,7 @@ program define gigs_classify_growth
 				outliers("0")
 			capture confirm new var wfa
 			if !_rc {
+				GenNewVar_growth wfa
 				qui gen int wfa = `wfa_temp'
 			}				
 			else {
@@ -399,6 +434,7 @@ program define gigs_classify_growth
 				outliers("1")
 			capture confirm new var wfa_outliers
 			if !_rc {
+				GenNewVar_growth wfa_outliers
 				qui gen int wfa_outliers = `wfa_out_temp'
 			}				
 			else {
@@ -416,6 +452,7 @@ program define gigs_classify_growth
 		if "`outcome'" == "headsize" {
 			if "`missing_headcirc'" == "1" {
 				MissingRequiredData_growth "`outcome'" headcirc_cm
+				continue
 			}
 			
 			tempvar hcaz_temp
@@ -424,10 +461,12 @@ program define gigs_classify_growth
 				age_days(`age_days') gest_days(`gest_days') ///
 				sex(`sex') sexc(m="`male'", f="`female'") ///
 				outvartype("double") ///
-				gigs_lgls(`use_ig_nbs' `use_ig_png' `use_who_gs')
+				gigs_lgls(`use_ig_nbs' `use_ig_png' `use_who_gs') ///
+				id(`id')
 			
 			capture confirm new var hcaz
 			if !_rc {
+				GenNewVar_growth hcaz
 				qui gen double hcaz = `hcaz_temp'
 			}				
 			else {
@@ -445,6 +484,7 @@ program define gigs_classify_growth
 				outcome("`outcome'") measure(hcaz)
 			capture confirm new var headsize
 			if !_rc {
+				GenNewVar_growth headsize
 				qui gen int headsize = `headsize_temp'
 			}				
 			else {
@@ -460,6 +500,7 @@ program define gigs_classify_growth
 		}
 	}	
 	qui if "`sex_was_str'" == "0" destring(`sex'), replace
+	qui if "`id_was_str'" == "0" destring(`id'), replace
 	restore, not
 end
 
@@ -476,6 +517,13 @@ program Badsexvar_growth
 	exit 109
 end
 
+capture prog drop Badidvar_growth
+program Badidvar_growth
+	di as err "id() option should be a byte, int or str variable: see " /*
+	       */ "{help gigs_classify_growth}"
+	exit 109
+end
+
 capture prog drop BadExistingVar_growth
 program BadExistingVar_growth
 	args var
@@ -485,10 +533,18 @@ program BadExistingVar_growth
 	exit 110
 end
 
+capture prog drop GenNewVar_growth
+program GenNewVar_growth
+	args var
+	di as text "    Generated new variable {bf:`var'}."
+end
+
+
+
 capture prog drop ReplaceExistingVar_growth
 program ReplaceExistingVar_growth
 	args var
-	di as text "Variable {bf:`var'} already exists. Replacing..."
+	di as text "    Replaced variable {bf:`var'}."
 end
 
 capture prog drop MissingRequiredData_growth
@@ -505,14 +561,13 @@ program MissingRequiredData_growth
 			*/ "find our details at {help gigs}."
 		exit 499
 	}
-	if "`outcome'" == "sfga" local outcome_str "Size-for-gestational age"
-	if "`outcome'" == "svn" local outcome_str "Small vulnerable newborn"
-	if "`outcome'" == "wasting" local outcome_str "Wasting"
-	if "`outcome'" == "stunting" local outcome_str "Stunting"
-	if "`outcome'" == "wfa" local outcome_str "Weight-for-age"
-	if "`outcome'" == "headsize" local outcome_str "Head size"
+	if "`outcome'" == "sfga" local outcome_str "size-for-gestational age"
+	if "`outcome'" == "svn" local outcome_str "small vulnerable newborn"
+	if "`outcome'" == "wasting" local outcome_str "wasting"
+	if "`outcome'" == "stunting" local outcome_str "stunting"
+	if "`outcome'" == "wfa" local outcome_str "weight-for-age"
+	if "`outcome'" == "headsize" local outcome_str "head size"
 	
-	di as error "`outcome_str' outcome requires {bf:`missing_data'}, " /* 
-		*/ "which you have not provided."
-	exit 498
+	di as error "    Classifying `outcome_str' ({bf:`outcome'}) requires " /*
+	    */ "{bf:`missing_data'}, which you have not provided."
 end

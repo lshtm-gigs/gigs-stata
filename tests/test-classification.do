@@ -1,104 +1,15 @@
-local test_data "tests/inputs"
+local test_gigs_classification = "tests/outputs/gigs_classification"
+cap mkdir "`test_gigs_classification'"
 
-// Test size-for-GA
-cap frame drop classify_sfga
-cap frame create classify_sfga
-cap frame change classify_sfga
-use "`test_data'/tester_sfga.dta", clear
-egen int sfga = classify_sfga(weight), gest_days(gestage) sex(psex) sexcode(m=M, f=F)
-egen int sfga_sev = classify_sfga(weight), gest_days(gestage) ///
-	sex(psex) sexcode(m=M, f=F) severe
-local SfGA = 1
-gen equal = sum(sfga == sfga_exp)
-if equal[_N] != _N local SfGA = 0
-replace equal = sum(sfga_sev == sfga_sev_exp)
-if equal[_N] != _N local SfGA = 0
+// Test gigs_classify_growth
+cap frame drop classify_growth
+cap frame create classify_growth
+cap frame change classify_growth
+use "life6mo", clear
+tostring id, replace
+gigs_classify_growth all, ///
+	gest_days(gestage) age_days(age_days) sex(sex) sexc(m=1, f=2) ///
+	weight_kg(wt_kg) lenht_cm(len_cm) headcirc_cm(headcirc_cm) id(id)
 
-// Test SVN
-cap frame drop classify_svn
-cap frame create classify_svn
-cap frame change classify_svn
-use "`test_data'/tester_svn.dta", clear
-egen int svn = classify_svn(weight_kg), gest_days(gest_age) sex(sex) ///
-    sexcode(m=M, f=F)
-local SVN = 1
-gen equal = sum(svn == svn_exp)
-if equal[_N] != _N local SVN = 0
-
-// Test stunting
-capture frame drop classify_stunting
-frame create classify_stunting
-frame change classify_stunting
-use "`test_data'/tester_stunting.dta", clear
-egen int stunting = classify_stunting(lenht), ///
-    gest_days(ga_at_birth) age_days(age_days) ///
-	sex(psex) sexc(m=M, f=F)
-egen int stunting_out = classify_stunting(lenht), ///
-    gest_days(ga_at_birth) age_days(age_days) ///
-	sex(psex) sexc(m=M, f=F) outliers
-local Stunting = 1
-gen equal = sum(stunting == stunting_exp)
-if equal[_N] != _N local Stunting = 0
-replace equal = sum(stunting_out == stunting_out_exp)
-if equal[_N] != _N local Stunting = 0
-
-// Test wasting
-capture frame drop classify_wasting
-frame create classify_wasting
-frame change classify_wasting
-use "`test_data'/tester_wasting.dta", clear
-egen int wasting = classify_wasting(wght_kg), lenht(lenht) gest(ga_days) ///
-	age_days(chron_age) sex(psex) sexc(m=M, f=F)
-egen int wasting_out = classify_wasting(wght_kg), lenht(lenht) gest(ga_days) ///
-	age_days(chron_age) sex(psex) sexc(m=M, f=F) outliers
-local Wasting = 1
-gen equal = sum(wasting == wasting_exp)
-if equal[_N] != _N local Wasting = 0
-replace equal = sum(wasting_out == wasting_out_exp)
-if equal[_N] != _N local Wasting = 0
-
-// Test weight-for-age
-capture frame drop classify_wfa
-frame create classify_wfa
-frame change classify_wfa
-use "`test_data'/tester_wfa.dta", clear
-egen int wfa = classify_wfa(wght_kg), ///
-	gest_days(ga_at_birth) age_days(days_old) ///
-	sex(psex) sexc(m=M, f=F)
-egen int wfa_out = classify_wfa(wght_kg), ///
-	gest_days(ga_at_birth) age_days(days_old) ///
-	sex(psex) sexc(m=M, f=F) outliers
-local WFA = 1
-gen equal = sum(wfa == wfa_exp)
-if equal[_N] != _N local WFA = 0
-replace equal = sum(wfa_out == wfa_out_exp)
-if equal[_N] != _N local WFA = 0
-
-// Test head size
-capture frame drop classify_headsize
-frame create classify_headsize
-frame change classify_headsize
-use "`test_data'/tester_headsize.dta", clear
-egen int headsize = classify_headsize(hcirc_cm), ///
-	gest_days(ga_at_birth) age_days(days_old) ///
-	sex(psex) sexc(m=M, f=F)
-local Headsize = 1
-gen equal = sum(headsize == headsize_exp)
-if equal[_N] != _N local Headsize = 0
-
-cap frame change default 
-cap frame drop classify_*
-foreach classification in "SfGA" "SVN" "Stunting" "Wasting" "WFA" "Headsize" {
-	if "`classification'" == "SfGA" local name "_gclassify_sfga.ado"
-	if "`classification'" == "SVN" local name "_gclassify_svn.ado"
-	if "`classification'" == "Stunting" local name "_gclassify_stunting.ado"
-	if "`classification'" == "Wasting" local name "_gclassify_wasting.ado"
-	if "`classification'" == "WFA" local name "_gclassify_wfa.ado"
-	if "`classification'" == "Headsize" local name "_gclassify_headsize.ado"
-	if "``classification''" != "1" {
-		noi di as err "{bf: `classification' failed.} Refactor `name'".
-	}
-	else {
-		noi di as text "{bf: `classification' passed.}"
-	}
-}
+local outpath = "`test_gigs_classification'/gigs_classification.dta"
+save `outpath', replace	

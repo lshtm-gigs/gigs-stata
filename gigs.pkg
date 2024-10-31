@@ -6,12 +6,6 @@ d
 d Distribution-Date: 20240501
 d License: GNU General Public License v3.0
 d 
-F _gclassify_sfga.ado
-F _gclassify_stunting.ado
-F _gclassify_svn.ado
-F _gclassify_wasting.ado
-F _gclassify_wfa.ado
-F _gclassify_headsize.ado
 F _gig_fet.ado
 F _gig_nbs.ado
 F _gig_png.ado
@@ -21,12 +15,6 @@ F gigs_zscore.ado
 F gigs_zscoring_lgls.ado
 F gigs_categorise.ado
 F gigs_ipolate_coeffs.mo
-F classify_sfga.sthlp
-F classify_stunting.sthlp
-F classify_svn.sthlp
-F classify_wasting.sthlp
-F classify_wfa.sthlp
-F classify_headsize.sthlp
 F gigs_classify_growth.sthlp
 F gigs.sthlp
 F ig_fet.sthlp

@@ -260,6 +260,74 @@ compare_gigs_z_lgls <- function() {
   consistent_lgl
 }
 
+compare_growth_classify_output <- function() {
+  dta_path <- file.path("tests", "outputs", "gigs_classification",
+                        "gigs_classification.dta")
+  df_stata <- if (file.exists(dta_path)) haven::read_dta(file = dta_path) else {
+      cat("\t")
+      cli::cli_alert_danger(text = "File not found: {.file {dta_path}}")
+      return(FALSE)
+  }
+
+  df_stata <- df_stata |>
+     haven::as_factor() |>
+     dplyr::mutate(id = as.factor(id),
+                   sex = ifelse(sex == 1, "M", "F"),
+                   .keep = "unused")
+
+  df_r <- df_stata |>
+    dplyr::select(id, sex, gestage, age_days, wt_kg, len_cm, headcirc_cm) |>
+    gigs::classify_growth(
+      gest_days = gestage,
+      age_days = age_days,
+      sex = as.character(sex),
+      weight_kg = wt_kg,
+      lenht_cm = len_cm,
+      headcirc_cm = headcirc_cm,
+      id = as.factor(id),
+      .verbose = FALSE
+    ) |>
+    dplyr::select(
+      tidyselect::ends_with(c("centile", "z")),
+      tidyselect::starts_with(c("sfga", "svn", "stunting", "wasting", "wfa",
+                                "headsize"))
+    )
+
+  stata2r_factorlevels <- function(df_stata, df_r) {
+    for (name in c("sfga", "sfga_severe", "svn", "stunting",
+                   "stunting_outliers", "wasting", "wasting_outliers", "wfa",
+                   "wfa_outliers", "headsize")) {
+      if (name %in% names(df_stata) & name %in% names(df_r)) {
+        levels(df_stata[[name]]) <- levels(df_r[[name]])
+      }
+    }
+    df_stata
+  }
+
+  df_stata <- df_stata |>
+    dplyr::select(
+      tidyselect::ends_with(c("centile", "z")),
+      tidyselect::starts_with(c("sfga", "svn", "stunting", "wasting", "wfa",
+                                "headsize"))
+    ) |>
+    stata2r_factorlevels(df_r)
+
+  consistent_lgl <- tryCatch(expr = {
+    testthat::expect_equivalent(
+      df_r, df_stata
+    )
+    TRUE
+  }, error = function(e) {
+    FALSE
+  })
+  cli_fn <- if (consistent_lgl) cli::cli_alert_success else cli::cli_alert_danger
+  consistent_str <- if (consistent_lgl) "consistent" else "inconsistent"
+  consistent_fn <- if (consistent_lgl) cli::col_green else cli::col_red
+  cat("\t")
+  cli_fn("GIGS classification is {consistent_fn(consistent_str)}.")
+  consistent_lgl
+}
+
 wait_time_secs <- 1
 cli::cli_h1(text = "INTERGROWTH-21st Fetal Growth Standards")
 acronyms <- rep.int(names(gigs::ig_fet), times = rep(2, length(names(gigs::ig_fet))))
@@ -302,10 +370,16 @@ if (!interactive()) Sys.sleep(wait_time_secs)
 
 cli::cli_h1(text = "GIGS z-scoring logicals")
 interpolation <- compare_gigs_z_lgls()
+gigs_zscoring <- compare_gigs_z_lgls()
+if (!interactive()) Sys.sleep(wait_time_secs)
+
+cli::cli_h1(text = "GIGS classification")
+gigs_classification <- compare_growth_classify_output()
 if (!interactive()) Sys.sleep(wait_time_secs)
 
 cli::cli_h1(text = "Overall")
-overall <- unlist(c(ig_nbs, ig_png, ig_fet, who_gs, interpolation))
+overall <- unlist(c(ig_nbs, ig_png, ig_fet, who_gs, interpolation, 
+                    gigs_zscoring, gigs_classification))
 if (all(overall)) {
   cli::cli_alert_success(text = "All tests passed!")
 } else {

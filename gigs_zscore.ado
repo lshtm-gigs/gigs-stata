@@ -1,5 +1,5 @@
 capture prog drop gigs_zscore
-*! version 0.1.0 (SJxx-x: dmxxxx)
+*! version 0.2.0 (SJxx-x: dmxxxx)
 program gigs_zscore
 	version 16
 	preserve
@@ -8,8 +8,8 @@ program gigs_zscore
 		age_days(varname numeric) gest_days(varname numeric) ///
 		sex(varname) SEXCode(string) ///
 		outvartype(string) ///
-		[lenht_cm(varname numeric) gigs_lgls(varlist numeric min=3 max=3)]
-	
+		[lenht_cm(varname numeric) id(varname string) ///
+		gigs_lgls(varlist numeric min=3 max=3)]
 	
 	// 0a. Sanity checks --> is z-score type a permitted variable?
 	cap assert inlist("`z_type'", "waz", "wlz", "lhaz", "hcaz")
@@ -66,7 +66,7 @@ program gigs_zscore
 	if "`gigs_lgls'" == "" {
 		tempvar use_ig_nbs use_ig_png use_who_gs
 		gigs_zscoring_lgls `use_ig_nbs' `use_ig_png' `use_who_gs' ///
-			if `touse', age_days(`age_days') gest_days(`gest_days')
+			if `touse', age_days(`age_days') gest_days(`gest_days') id(`id')
 		noi di "`use_ig_nbs' `use_ig_png' `use_who_gs'"
 	}
 	else {	
@@ -185,5 +185,11 @@ capture prog drop Badsexvar_gigsz
 program Badsexvar_gigsz
 	di as err "sex() option should be a byte, int or str variable in " ///
 		"gigs_zscore"
+	exit 109
+end
+
+capture prog drop Badidvar_gigsz
+program Badidvar_gigsz
+	di as err "id() option should be a str variable in gigs_zscore"
 	exit 109
 end
