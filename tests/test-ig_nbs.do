@@ -1,6 +1,3 @@
-clear
-do "_gig_nbs.ado"
-
 capture program drop make_ig_nbs_tbl
 program define make_ig_nbs_tbl
  	args _ga_days sex acronym conversion
@@ -120,6 +117,17 @@ foreach acronym in "wfga" "lfga" "hcfga" "wlrfga" "bfpfga" "ffmfga" "fmfga" {
 			local _sex = "`sex'"
 			qui make_ig_nbs_tbl gest_age "`sex'" "`acronym'" "`conversion'"
 			
+			local path = ///
+				"tests/outputs/ig_nbs/`acronym'_`conversion'_`_sex'.dta"
+			cap confirm file `path'
+			if _rc == 601 { // i.e. file does not exist
+				qui save "`path'", replace
+				di as text "IG NBS: `acronym'; `sex': Disk file not found; " ///
+					"saving."
+				continue
+			}
+			
+			// Set up colnames
 			if "`conversion'" == "z2v" {
 				local colnames SD3neg SD2neg SD1neg SD0 SD1 SD2 SD3
 			}
@@ -129,24 +137,20 @@ foreach acronym in "wfga" "lfga" "hcfga" "wlrfga" "bfpfga" "ffmfga" "fmfga" {
 					local colnames P03 P10 P50 P90 P97
 				}
 			}
-			local path = "tests/outputs/ig_nbs/`acronym'_`conversion'_`_sex'.dta"
-			cap merge 1:1 gest_age `colnames' using "`path'"
-			if _rc {
-				save "`path'", replace
-				continue
-			}
-			qui {
-				levelsof _merge, clean local(merge_local)
-			}
+			
+			cap qui merge 1:1 gest_age `colnames' using "`path'"
+			qui levelsof _merge, clean local(merge_local)
 			if "`merge_local'" != "3" {
-				di as text "Disk file not same as memory; saving."
+				di as text "IG NBS: `acronym'; `sex': Disk file not same " ///
+					"as memory; saving."
 				keep if _merge != 2
 				drop _merge
 				noi save "`path'", replace
 				continue
 			}
 			else {
-				di as text "Disk file same as memory; not saving."
+				di as text "IG NBS: `acronym'; `sex': Disk file same as " ///
+					"memory; not saving."
 			}
 		}
 	}

@@ -1,1 +1,1 @@
-github install benjann/moremata
+net install moremata, replace from(https://raw.githubusercontent.com/benjann/moremata/master/)

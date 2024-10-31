@@ -1,8 +1,5 @@
-// /* 
 //  Test whether interpolated coeffs give out same values as in R package
-// */
 
-do "_gwho_gs.ado"
 local test_interp_outputs = "tests/outputs/interpolation"
 cap mkdir "`interp_outputs'"
 
@@ -43,6 +40,7 @@ foreach acronym in "wfa"  "bfa"  "lhfa" "wfl"  "wfh"  "hcfa" "acfa" "ssfa" "tsfa
 		qui gen double z = 1
 		qui egen double stata_col = who_gs(z, "`acronym'", "z2v"), ///
 			xvar(xvar) sex(sex) sexcode(m=M, f=F)
+		qui drop if missing(stata_col) // Remove OOBs
 		// Save for testing against R outputs
 		local path = "`test_interp_outputs'/who_gs_`acronym'_`sex'_interped.dta"
 		save `path', replace
@@ -67,5 +65,3 @@ foreach acronym in "wfga" "lfga" "hcfga" {
 		save `path', replace
 	}
 }
-
-clear

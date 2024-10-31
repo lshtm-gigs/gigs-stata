@@ -1,7 +1,7 @@
 capture program drop _gig_nbs
 capture program drop Badsexvar_nbs
 capture program drop Badsyntax_nbs
-*! version 0.3.1 (SJxx-x: dmxxxx)
+*! version 0.3.2 (SJxx-x: dmxxxx)
 program define _gig_nbs
  	version 16
 	preserve
@@ -25,7 +25,7 @@ program define _gig_nbs
 	}
 	capture assert inlist("`acronym'", "wfga", "lfga", "wlrfga", "hcfga", /*
 	*/                    "ffmfga", "bfpfga", "fmfga")
-	if _rc {
+	if _rc == 9 {
 		di as text "`acronym'" as error " is an invalid acronym. The only " /*
 		*/ as error "valid choices are " as text "wfga, lfga, hcfga, wlrfga," /*
 		*/ as text " ffmfga, bfpfga, " as error "or" as text " fmfga" /*
@@ -33,7 +33,7 @@ program define _gig_nbs
 		exit 198
 	}
 	capture assert inlist("`conversion'", "v2c", "v2z", "c2v", "z2v")
-	if _rc {
+	if _rc == 9 {
 		di as text "`conversion'" as error " is an invalid conversion code. " /*
 		*/ as error "The only valid choices are " as text "v2c, v2z, c2v," as /*
 		*/ error " or " as text "z2v" as error "."
@@ -100,7 +100,7 @@ program define _gig_nbs
 		// Initialise new variables for merging
 		foreach var in gest_age sex mu sigma nu tau {
 			capture confirm new var nbsMSNT_`var'
-			if _rc {
+			if _rc == 9 {
 				di as error "{bf:nbsMSNT_`var'} is used by ig_nbs() - rename" /* 
 				*/ as error " your variable."
 				exit 110
@@ -137,9 +137,9 @@ program define _gig_nbs
 		
 		tempvar sex_as_numeric median gest_age_weeks vpns_median vpns_stddev
 		qui {
-			generate `sex_as_numeric' = 1 if `sex' == "`male'"
+			generate byte `sex_as_numeric' = 1 if `sex' == "`male'"
 			replace `sex_as_numeric' = 0 if `sex' == "`female'"
-			generate `gest_age_weeks' = .
+			generate double `gest_age_weeks' = .
 			replace `gest_age_weeks' = `gest_days' / 7  if `gest_days' >= 168
 				
 			gen double `vpns_median' = .
@@ -282,7 +282,7 @@ program define _gig_nbs
 		// Initialise new variables for merging
 		foreach var in sexacronym intercept x x2 x3 sigma {
 			capture confirm new var nbsBC_`var'
-			if _rc {
+			if _rc == 9 {
 				di as error "{bf:nbsMSNT_`var'} is used by ig_nbs() - rename" /* 
 				*/ as error " your variable."
 				exit 110

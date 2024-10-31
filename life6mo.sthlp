@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.1.1 24 Jan 2024}{...}
+{* *! version 0.3.0 07 May 2024}{...}
 {vieweralsosee "" "--"}{...}
 {vieweralsosee "gigs package" "help gigs"}{...}
 
@@ -8,26 +8,25 @@
 
 {title:Data extract from the Low birthweight Infant Feeding Exploration (LIFE) study}
 
-     
 Anthropometric data from a subset of 300 singleton infants enrolled in the Low 
-birthweight Infant Feeding Exploration (LIFE) study. Has 10 variables and 2,511
+birthweight Infant Feeding Exploration (LIFE) study. Has 10 variables and 2,191
 observations.
 
 {col 6}Variable{col 20}Description{col 43}
 {col 5}{hline 88}
 {col 6}{cmd:id}{col 20}Unique ID for each infant in the dataset (1--300).
-{col 6}{cmd:gestage}{col 20}Best obstetric estimate of gestational age in days (201--311).
-{col 6}{cmd:sex}{col 20}Sex of the infant as an integer (1 = Male; 2 = Female).
 {col 6}{cmd:visitweek}{col 20}Chronological age in weeks (+/-1 week) when study visit occurred.
-{col 6}{cmd:pma}{col 20}Post-menstrual age in days (202--545)
-{col 6}{cmd:age_days}{col 20}Chronological age in days at each visit (0--245).
-{col 6}{cmd:weight_g}{col 20}Mean weight in g (1271.67--9050.00).
-{col 6}{cmd:len_cm}{col 20}Mean length in cm (35.03--72.93).
-{col 6}{cmd:headcirc_cm}{col 20}Mean head circumference in cm (23.20--45.17).
-{col 6}{cmd:muac_cm}{col 20}Mean mid-upper arm circumference in cm (6.13--17.03).
+{col 6}{cmd:sex}{col 20}Sex of the infant as an integer (1 = Male; 2 = Female).
+{col 6}{cmd:gestage}{col 20}Best obstetric estimate of gestational age in days (181--291).
+{col 6}{cmd:age_days}{col 20}Chronological age in days at each visit (0--242).
+{col 6}{cmd:pma}{col 20}Post-menstrual age in days at each visit (182--528)
+{col 6}{cmd:wt_kg}{col 20}Mean weight at each visit in kg (1.24--9.40667).
+{col 6}{cmd:len_cm}{col 20}Mean length at each visit in cm (37.37--72.93).
+{col 6}{cmd:headcirc_cm}{col 20}Mean head circumference at each visit in cm (23.20--44.87).
+{col 6}{cmd:muac_cm}{col 20}Mean mid-upper arm circumference at each visit in cm (6.30--16.83).
 {col 5}{hline 88} 
 
-							  
+  
 {title:Reference}
 Vesel L, Bellad RM, Manji K, Saidi F, Velasquez E, Sudfeld C, {it:et al}. {bf:Feeding}
  {bf:practices and growth patterns of moderately low birthweight infants in resource-}
