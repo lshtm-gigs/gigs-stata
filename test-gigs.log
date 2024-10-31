@@ -1,0 +1,338 @@
+-----------------------------------------------------------------------------------------------------------------------------------------------
+      name:  GIGS Testing
+       log:  D:\Users\tadeo\Documents\gigs-stata\test-gigs.log
+  log type:  text
+ opened on:  31 Oct 2024, 13:55:14
+
+. 
+. //  1. Generate .dta files with standards using "z2v/c2v" conversions,
+. //     and with .dta files to be tested against R dataframes
+. local outputs "tests/outputs"
+
+. cap mkdir "`outputs'"
+
+. foreach aspect in "who_gs" "ig_nbs" "ig_png" "ig_fet" "interpolation" ///
+>     "z_lgls" "classification" {
+  2.         cap mkdir "`outputs'/`aspect'"
+  3.         noi di "Running .dta file generation for `aspect'"
+  4.         frames reset
+  5.         run "tests/test-`aspect'.do"
+  6. }
+Running .dta file generation for who_gs
+Running .dta file generation for ig_nbs
+Running .dta file generation for ig_png
+Running .dta file generation for ig_fet
+Running .dta file generation for interpolation
+Running .dta file generation for z_lgls
+Running .dta file generation for classification
+
+. 
+. //  2. Compare to standards in gigs R package
+. //              a. n.b. Install rsource (R from Stata) if not already installed:
+. //                 . cap ssc install rsource, replace
+. local test_rscript "tests/test_stata_outputs.R"
+
+. if "`c(os)'"=="MacOSX" | "`c(os)'"=="UNIX" {
+.     noi rsource using "`test_rscript'", ///
+>                 noloutput ///
+>                 rpath("/usr/local/bin/R") ///
+>                 roptions(`"--vanilla"')
+. }
+
+. else if "`c(os)'"=="Windows" { 
+.         // Windows
+.         // n.b. Set `rversion' to that of own system - n.b. gigs needs R >=4.1.0
+.         local rversion "4.3.3" 
+.         noi rsource using "`test_rscript'", ///
+>                 noloutput ///
+>                 rpath("C:\Program Files\R\R-`rversion'\bin\x64\Rterm.exe") ///
+>                 roptions("--vanilla")
+Assumed R program path: "C:\Program Files\R\R-4.3.3\bin\x64\Rterm.exe"
+
+── INTERGROWTH-21st Fetal Growth Standards ─────────────────────────────────────
+✔ Centiles in hcfga: succeeded
+✔ Z-scores in hcfga: succeeded
+✔ Centiles in bpdfga: succeeded
+✔ Z-scores in bpdfga: succeeded
+✔ Centiles in acfga: succeeded
+✔ Z-scores in acfga: succeeded
+✔ Centiles in flfga: succeeded
+✔ Z-scores in flfga: succeeded
+✔ Centiles in ofdfga: succeeded
+✔ Z-scores in ofdfga: succeeded
+✔ Centiles in efwfga: succeeded
+✔ Z-scores in efwfga: succeeded
+✔ Centiles in sfhfga: succeeded
+✔ Z-scores in sfhfga: succeeded
+✔ Centiles in crlfga: succeeded
+✔ Z-scores in crlfga: succeeded
+✔ Centiles in gafcrl: succeeded
+✔ Z-scores in gafcrl: succeeded
+✔ Centiles in gwgfga: succeeded
+✔ Z-scores in gwgfga: succeeded
+✔ Centiles in pifga: succeeded
+✔ Z-scores in pifga: succeeded
+✔ Centiles in rifga: succeeded
+✔ Z-scores in rifga: succeeded
+✔ Centiles in sdrfga: succeeded
+✔ Z-scores in sdrfga: succeeded
+✔ Centiles in tcdfga: succeeded
+✔ Z-scores in tcdfga: succeeded
+✔ Centiles in gaftcd: succeeded
+✔ Z-scores in gaftcd: succeeded
+✔ Centiles in poffga: succeeded
+✔ Z-scores in poffga: succeeded
+✔ Centiles in sffga: succeeded
+✔ Z-scores in sffga: succeeded
+✔ Centiles in avfga: succeeded
+✔ Z-scores in avfga: succeeded
+✔ Centiles in pvfga: succeeded
+✔ Z-scores in pvfga: succeeded
+✔ Centiles in cmfga: succeeded
+✔ Z-scores in cmfga: succeeded
+✔ Centiles in hefwfga: succeeded
+✔ Z-scores in hefwfga: succeeded
+
+── INTERGROWTH-21st Newborn Size Standards ─────────────────────────────────────
+✔ Male centiles in wfga: succeeded
+✔ Female centiles in wfga: succeeded
+✔ Male centiles in lfga: succeeded
+✔ Female centiles in lfga: succeeded
+✔ Male centiles in hcfga: succeeded
+✔ Female centiles in hcfga: succeeded
+✔ Male centiles in wlrfga: succeeded
+✔ Female centiles in wlrfga: succeeded
+ℹ File not found: 'tests/outputs/ig_nbs/ffmfga_z2v_male.dta'
+✔ Male centiles in ffmfga: succeeded
+ℹ File not found: 'tests/outputs/ig_nbs/ffmfga_z2v_female.dta'
+✔ Female centiles in ffmfga: succeeded
+ℹ File not found: 'tests/outputs/ig_nbs/bfpfga_z2v_male.dta'
+✔ Male centiles in bfpfga: succeeded
+ℹ File not found: 'tests/outputs/ig_nbs/bfpfga_z2v_female.dta'
+✔ Female centiles in bfpfga: succeeded
+ℹ File not found: 'tests/outputs/ig_nbs/fmfga_z2v_male.dta'
+✔ Male centiles in fmfga: succeeded
+ℹ File not found: 'tests/outputs/ig_nbs/fmfga_z2v_female.dta'
+✔ Female centiles in fmfga: succeeded
+
+── INTERGROWTH-21st Postnatal Growth Standards ─────────────────────────────────
+✔ Male centiles in wfa: succeeded
+✔ Female centiles in wfa: succeeded
+✔ Male centiles in lfa: succeeded
+✔ Female centiles in lfa: succeeded
+✔ Male centiles in hcfa: succeeded
+✔ Female centiles in hcfa: succeeded
+✔ Male centiles in wfl: succeeded
+✔ Female centiles in wfl: succeeded
+
+── WHO Child Growth Standards ──────────────────────────────────────────────────
+✔ Male centiles in wfa: succeeded
+✔ Female centiles in wfa: succeeded
+✔ Male centiles in bfa: succeeded
+✔ Female centiles in bfa: succeeded
+✔ Male centiles in lhfa: succeeded
+✔ Female centiles in lhfa: succeeded
+✔ Male centiles in wfl: succeeded
+✔ Female centiles in wfl: succeeded
+✔ Male centiles in wfh: succeeded
+✔ Female centiles in wfh: succeeded
+✔ Male centiles in hcfa: succeeded
+✔ Female centiles in hcfa: succeeded
+✔ Male centiles in acfa: succeeded
+✔ Female centiles in acfa: succeeded
+✔ Male centiles in ssfa: succeeded
+✔ Female centiles in ssfa: succeeded
+✔ Male centiles in tsfa: succeeded
+✔ Female centiles in tsfa: succeeded
+
+── Interpolation of coefficients ───────────────────────────────────────────────
+✔ Interpolation is consistent for males in WHO GS `wfa`.
+✔ Interpolation is consistent for females in WHO GS `wfa`.
+✔ Interpolation is consistent for males in WHO GS `bfa`.
+✔ Interpolation is consistent for females in WHO GS `bfa`.
+✔ Interpolation is consistent for males in WHO GS `lhfa`.
+✔ Interpolation is consistent for females in WHO GS `lhfa`.
+✔ Interpolation is consistent for males in WHO GS `wfl`.
+✔ Interpolation is consistent for females in WHO GS `wfl`.
+✔ Interpolation is consistent for males in WHO GS `wfh`.
+✔ Interpolation is consistent for females in WHO GS `wfh`.
+✔ Interpolation is consistent for males in WHO GS `hcfa`.
+✔ Interpolation is consistent for females in WHO GS `hcfa`.
+✔ Interpolation is consistent for males in WHO GS `acfa`.
+✔ Interpolation is consistent for females in WHO GS `acfa`.
+✔ Interpolation is consistent for males in WHO GS `ssfa`.
+✔ Interpolation is consistent for females in WHO GS `ssfa`.
+✔ Interpolation is consistent for males in WHO GS `tsfa`.
+✔ Interpolation is consistent for females in WHO GS `tsfa`.
+✔ Interpolation is consistent for males in IG NBS `wfga`.
+✔ Interpolation is consistent for females in IG NBS `wfga`.
+✔ Interpolation is consistent for males in IG NBS `lfga`.
+✔ Interpolation is consistent for females in IG NBS `lfga`.
+✔ Interpolation is consistent for males in IG NBS `hcfga`.
+✔ Interpolation is consistent for females in IG NBS `hcfga`.
+
+── GIGS z-scoring logicals ─────────────────────────────────────────────────────
+✔ GIGS zscoring logicals are consistent.
+
+── GIGS classification ─────────────────────────────────────────────────────────
+✔ GIGS classification is consistent.
+
+── Overall ─────────────────────────────────────────────────────────────────────
+✔ All tests passed!
+. }
+
+. 
+. // Stop logging
+. log close
+no log file open
+r(606);
+
+end of do-file
+
+r(606);
+
+. net uninstall gigs, force
+option force not allowed
+r(198);
+
+. net uninstall gigs
+criterion matches more than one package
+r(111);
+
+. net install gigs
+checking gigs consistency and verifying not already installed...
+all files already exist and are up to date.
+
+. net install gigs, force
+checking gigs consistency and verifying not already installed...
+
+the following files will be replaced:
+    C:\Users\tadeo\ado\plus\_\_gig_fet.ado
+    C:\Users\tadeo\ado\plus\_\_gig_nbs.ado
+    C:\Users\tadeo\ado\plus\_\_gig_png.ado
+    C:\Users\tadeo\ado\plus\_\_gwho_gs.ado
+    C:\Users\tadeo\ado\plus\g\gigs_classify_growth.ado
+    C:\Users\tadeo\ado\plus\g\gigs_zscore.ado
+    C:\Users\tadeo\ado\plus\g\gigs_zscoring_lgls.ado
+    C:\Users\tadeo\ado\plus\g\gigs_categorise.ado
+    C:\Users\tadeo\ado\plus\g\gigs_ipolate_coeffs.mo
+    C:\Users\tadeo\ado\plus\g\gigs_classify_growth.sthlp
+    C:\Users\tadeo\ado\plus\g\gigs.sthlp
+    C:\Users\tadeo\ado\plus\i\ig_fet.sthlp
+    C:\Users\tadeo\ado\plus\i\ig_nbs.sthlp
+    C:\Users\tadeo\ado\plus\i\ig_nbsgamlss_hcfga.dta
+    C:\Users\tadeo\ado\plus\i\ig_nbsgamlss_lfga.dta
+    C:\Users\tadeo\ado\plus\i\ig_nbsgamlss_wfga.dta
+    C:\Users\tadeo\ado\plus\i\ig_png.sthlp
+    C:\Users\tadeo\ado\plus\w\wholms_acfa.dta
+    C:\Users\tadeo\ado\plus\w\wholms_bfa.dta
+    C:\Users\tadeo\ado\plus\w\wholms_hcfa.dta
+    C:\Users\tadeo\ado\plus\w\wholms_lhfa.dta
+    C:\Users\tadeo\ado\plus\w\wholms_ssfa.dta
+    C:\Users\tadeo\ado\plus\w\wholms_tsfa.dta
+    C:\Users\tadeo\ado\plus\w\wholms_wfa.dta
+    C:\Users\tadeo\ado\plus\w\wholms_wfh.dta
+    C:\Users\tadeo\ado\plus\w\wholms_wfl.dta
+    C:\Users\tadeo\ado\plus\w\who_gs.sthlp
+    C:\Users\tadeo\ado\plus\l\life6mo.sthlp
+
+installing into C:\Users\tadeo\ado\plus\...
+installation complete.
+
+. help gigs_classify_growth
+
+. help label
+
+. do "D:\Users\tadeo\Documents\gigs-stata\gigs_classify_growth.sthlp"
+
+. {smcl}
+program error:  code follows on the same line as open brace
+r(198);
+
+end of do-file
+
+r(198);
+
+. do "D:\Users\tadeo\Documents\gigs-stata\gigs_classify_growth.sthlp"
+
+. {smcl}
+program error:  code follows on the same line as open brace
+r(198);
+
+end of do-file
+
+r(198);
+
+. net install gigs, force
+checking gigs consistency and verifying not already installed...
+
+the following files will be replaced:
+    C:\Users\tadeo\ado\plus\_\_gig_fet.ado
+    C:\Users\tadeo\ado\plus\_\_gig_nbs.ado
+    C:\Users\tadeo\ado\plus\_\_gig_png.ado
+    C:\Users\tadeo\ado\plus\_\_gwho_gs.ado
+    C:\Users\tadeo\ado\plus\g\gigs_classify_growth.ado
+    C:\Users\tadeo\ado\plus\g\gigs_zscore.ado
+    C:\Users\tadeo\ado\plus\g\gigs_zscoring_lgls.ado
+    C:\Users\tadeo\ado\plus\g\gigs_categorise.ado
+    C:\Users\tadeo\ado\plus\g\gigs_ipolate_coeffs.mo
+    C:\Users\tadeo\ado\plus\g\gigs_classify_growth.sthlp
+    C:\Users\tadeo\ado\plus\g\gigs.sthlp
+    C:\Users\tadeo\ado\plus\i\ig_fet.sthlp
+    C:\Users\tadeo\ado\plus\i\ig_nbs.sthlp
+    C:\Users\tadeo\ado\plus\i\ig_nbsgamlss_hcfga.dta
+    C:\Users\tadeo\ado\plus\i\ig_nbsgamlss_lfga.dta
+    C:\Users\tadeo\ado\plus\i\ig_nbsgamlss_wfga.dta
+    C:\Users\tadeo\ado\plus\i\ig_png.sthlp
+    C:\Users\tadeo\ado\plus\w\wholms_acfa.dta
+    C:\Users\tadeo\ado\plus\w\wholms_bfa.dta
+    C:\Users\tadeo\ado\plus\w\wholms_hcfa.dta
+    C:\Users\tadeo\ado\plus\w\wholms_lhfa.dta
+    C:\Users\tadeo\ado\plus\w\wholms_ssfa.dta
+    C:\Users\tadeo\ado\plus\w\wholms_tsfa.dta
+    C:\Users\tadeo\ado\plus\w\wholms_wfa.dta
+    C:\Users\tadeo\ado\plus\w\wholms_wfh.dta
+    C:\Users\tadeo\ado\plus\w\wholms_wfl.dta
+    C:\Users\tadeo\ado\plus\w\who_gs.sthlp
+    C:\Users\tadeo\ado\plus\l\life6mo.sthlp
+
+installing into C:\Users\tadeo\ado\plus\...
+installation complete.
+
+. net install gigs, force
+checking gigs consistency and verifying not already installed...
+
+the following files will be replaced:
+    C:\Users\tadeo\ado\plus\_\_gig_fet.ado
+    C:\Users\tadeo\ado\plus\_\_gig_nbs.ado
+    C:\Users\tadeo\ado\plus\_\_gig_png.ado
+    C:\Users\tadeo\ado\plus\_\_gwho_gs.ado
+    C:\Users\tadeo\ado\plus\g\gigs_classify_growth.ado
+    C:\Users\tadeo\ado\plus\g\gigs_zscore.ado
+    C:\Users\tadeo\ado\plus\g\gigs_zscoring_lgls.ado
+    C:\Users\tadeo\ado\plus\g\gigs_categorise.ado
+    C:\Users\tadeo\ado\plus\g\gigs_ipolate_coeffs.mo
+    C:\Users\tadeo\ado\plus\g\gigs_classify_growth.sthlp
+    C:\Users\tadeo\ado\plus\g\gigs.sthlp
+    C:\Users\tadeo\ado\plus\i\ig_fet.sthlp
+    C:\Users\tadeo\ado\plus\i\ig_nbs.sthlp
+    C:\Users\tadeo\ado\plus\i\ig_nbsgamlss_hcfga.dta
+    C:\Users\tadeo\ado\plus\i\ig_nbsgamlss_lfga.dta
+    C:\Users\tadeo\ado\plus\i\ig_nbsgamlss_wfga.dta
+    C:\Users\tadeo\ado\plus\i\ig_png.sthlp
+    C:\Users\tadeo\ado\plus\w\wholms_acfa.dta
+    C:\Users\tadeo\ado\plus\w\wholms_bfa.dta
+    C:\Users\tadeo\ado\plus\w\wholms_hcfa.dta
+    C:\Users\tadeo\ado\plus\w\wholms_lhfa.dta
+    C:\Users\tadeo\ado\plus\w\wholms_ssfa.dta
+    C:\Users\tadeo\ado\plus\w\wholms_tsfa.dta
+    C:\Users\tadeo\ado\plus\w\wholms_wfa.dta
+    C:\Users\tadeo\ado\plus\w\wholms_wfh.dta
+    C:\Users\tadeo\ado\plus\w\wholms_wfl.dta
+    C:\Users\tadeo\ado\plus\w\who_gs.sthlp
+    C:\Users\tadeo\ado\plus\l\life6mo.sthlp
+
+installing into C:\Users\tadeo\ado\plus\...
+installation complete.
+
+. exit, clear
