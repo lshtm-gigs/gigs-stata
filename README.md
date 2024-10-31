@@ -8,9 +8,9 @@ Produced as part of the Guidance for International Growth Standards (GIGS)
 project, `gigs` provides a single, simple interface for working with the WHO 
 Child Growth Standards and outputs from the INTERGROWTH-21<sup>st</sup> project.
 You will find functions for converting between anthropometric measures (e.g. 
-weight or length) to z-scores and centiles, and the inverse. Also included are 
-functions for classifying newborn and infant growth according to 
-literature-based cut-offs.
+weight or length) to z-scores and centiles, and the inverse. Also included is a 
+command for classifying newborn and infant growth according to published 
+z-score/centile cut-offs.
 
 ## Installation
 The `gigs` package is available for Stata version 16 and over. You can install
@@ -150,78 +150,107 @@ in each of the WHO Child Growth Standards.
 
 ![](./readme/readme_whogs.png)
 
-### Classification functions
-These functions are used to classify infant growth according to published
-cut-offs. These publications are discussed in the attached [paper](). 
+### Classification command
+The `gigs_classify_growth` command is used to classify infant growth according to 
+published cut-offs. These publications are discussed in the attached [paper](). 
 
-#### Size for gestational age
-![](./readme/readme_csfga.png)
+![](./readme/readme_gigs_classify_growth.png)
 
-This function outputs a variable with the following values and labels. Severely
-SGA infants are only labelled if the `severe` option is specified:
+The **`outcome`** argument is used to pick specific growth analyses, or you can run
+all growth analyses by using **`all`**. 
 
-| Value | Meaning                               | Centile range                      |
-|-------|---------------------------------------|------------------------------------|
-| -2    | Severely small for gestational age    | <3<sup>rd</sup>                    |
-| -1    | Small for gestational age (SGA)       | <10<sup>th</sup>                   |
-| 0     | Appropriate for gestational age (AGA) | 10<sup>th</sup> to 90<sup>th</sup> |
-| 1     | Large for gestational age (LGA)       | \>90<sup>th</sup>                  |
+#### Available growth outcomes
 
-#### Small vulnerable newborns
-![](./readme/readme_csvn.png)
+* **`all`** - Generate variables for all growth outcomes
+* **`sfga`** - Generate variables for size for gestational age
+  <details>
+  <summary>
+  Values and labels for generated variables <code>sfga</code> and <code>sfga_severe</code>
+  </summary>
+  
+  | Value | Meaning                               | Centile range                      |
+  |-------|---------------------------------------|------------------------------------|
+  | -2    | Severely small for gestational age    | <3<sup>rd</sup>                    |
+  | -1    | Small for gestational age (SGA)       | <10<sup>th</sup>                   |
+  | 0     | Appropriate for gestational age (AGA) | 10<sup>th</sup> to 90<sup>th</sup> |
+  | 1     | Large for gestational age (LGA)       | \>90<sup>th</sup>                  |
 
-This function outputs a variable with the following values and labels:
+  </details>
+* **`svn`** - Generate variables for small vulnerable newborns
+  <details>
+  <summary>
+  Values and labels for generated variable <code>svn</code>
+  </summary>
+  
+  | Value | Meaning     | Term Status | Centile range                      |
+  |-------|-------------|-------------|------------------------------------|
+  | -4    | Preterm SGA | Preterm     | <10<sup>th</sup>                   |
+  | -3    | Preterm AGA | Preterm     | 10<sup>th</sup> to 90<sup>th</sup> |
+  | -2    | Preterm LGA | Preterm     | \>90<sup>th</sup>                  |
+  | -1    | Term    SGA | Term        | <10<sup>th</sup>                   |
+  | 0     | Term    AGA | Term        | 10<sup>th</sup> to 90<sup>th</sup> |
+  | 1     | Term    LGA | Term        | \>90<sup>th</sup>                  |
 
-| Value | Meaning     | Term Status | Centile range                      |
-|-------|-------------|-------------|------------------------------------|
-| -4    | Preterm SGA | Preterm     | <10<sup>th</sup>                   |
-| -3    | Preterm AGA | Preterm     | 10<sup>th</sup> to 90<sup>th</sup> |
-| -2    | Preterm LGA | Preterm     | \>90<sup>th</sup>                  |
-| -1    | Term    SGA | Term        | <10<sup>th</sup>                   |
-| 0     | Term    AGA | Term        | 10<sup>th</sup> to 90<sup>th</sup> |
-| 1     | Term    LGA | Term        | \>90<sup>th</sup>                  |
+  </details>
+* **`stunting`** - Generate variables for stunting
+  <details>
+  <summary>
+  Values and labels for generated variables <code>stunting</code> and <code>stunting_outliers</code>
+  </summary>
+  
+  | Value | Meaning         | Z-score range |
+  |-------|-----------------|---------------|
+  | -2    | Severe stunting | -5 to -3      |
+  | -1    | Stunting        | -3 to -2      |
+  | 0     | Not stunting    | -2 to 5       |
+  | -10   | Implausible     | \<-5 or \>5   |
 
+  </details>
+* **`wasting`** - Generate variables for wasting
+  <details>
+  <summary>
+  Values and labels for generated variables <code>wasting</code> and <code>wasting_outliers</code>
+  </summary>
+  
+  | Value | Meaning        | Z-score range |
+  |-------|----------------|---------------|
+  | -2    | Severe wasting | -5 to -3      |
+  | -1    | Wasting        | -3 to -2      |
+  | 0     | Not wasting    | -2 to 2       |
+  | 1     | Overweight     | 2 to 5        |
+  | -10   | Implausible    | \<-5 or \>5   |
 
-#### Stunting
-![](./readme/readme_cstunting.png)
+  </details>
+* **`wfa`** - Generate variables for weight-for-age
+  <details>
+  <summary>
+  Values and labels for generated variables <code>wfa</code> and <code>wfa_outliers</code>
+  </summary>
+  
+  | Value | Meaning              | Z-score range |
+  |-------|----------------------|---------------|
+  | -2    | Severely underweight | -6 to -3      |
+  | -1    | Underweight          | -3 to -2      |
+  | 0     | Normal weight        | -2 to 2       |
+  | 1     | Overweight           | 2 to 5        |
+  | -10   | Implausible          | \<-6 or \>5   |
 
-The function outputs a variable with the following values and labels. Outlier
-observations are only labelled if the `outliers` option is specified:
+  </details>
+* **`headsize`** - Generate variables for head size
+  <details>
+  <summary>
+  Values and labels for generated variable <code>headsize</code>
+  </summary>
+  
+  | Value | Meaning              | Z-score range |
+  |-------|----------------------|---------------|
+  | -2    | Severe microcephaly  |      <-3      |
+  | -1    | Microcephaly         | -3 to -2      |
+  |  0    | Normal weight        | -2 to  2      |
+  |  1    | Microcephaly         | -3 to -2      |
+  |  2    | Severe microcephaly  |       >3      |
 
-| Value | Meaning         | Z-score range |
-|-------|-----------------|---------------|
-| -2    | Severe stunting | -5 to -3      |
-| -1    | Stunting        | -3 to -2      |
-| 0     | Not stunting    | -2 to 5       |
-| -10   | Implausible     | \<-5 or \>5   |
-
-#### Wasting
-![](./readme/readme_cwasting.png)
-
-The function outputs a variable with the following values and labels. Outlier
-observations are only labelled if the `outliers` option is specified:
-
-| Value | Meaning        | Z-score range |
-|-------|----------------|---------------|
-| -2    | Severe wasting | -5 to -3      |
-| -1    | Wasting        | -3 to -2      |
-| 0     | Not wasting    | -2 to 2       |
-| 1     | Overweight     | 2 to 5        |
-| -10   | Implausible    | \<-5 or \>5   |
-
-#### Weight-for-age
-![](./readme/readme_cwfa.png)
-
-The function outputs a variable with the following values and labels. Outlier
-observations are only labelled if the `outliers` option is specified:
-
-| Value | Meaning              | Z-score range |
-|-------|----------------------|---------------|
-| -2    | Severely underweight | -6 to -3      |
-| -1    | Underweight          | -3 to -2      |
-| 0     | Normal weight        | -2 to 2       |
-| 1     | Overweight           | 2 to 5        |
-| -10   | Implausible          | \<-6 or \>5   |
+  </details>
 
 ## Examples
 This section illustrates a possible use case using `life6mo.dta`, an extract of
@@ -305,26 +334,37 @@ individual children.
 
 ### Classification
 This dataset contains information on weight at birth, so could be used to 
-calculate size-for-gestational age classifications. We can reload the data, then
-remove any observations which were not made at birth. We then use the 
-`classify_sfga()` command to give us our classifications:
+calculate size-for-gestational age classifications. The 
+`gigs_classify_growth` command will automatically pick out birth 
+observations, and compute size-for-GA in these observations:
 ```stata
 . use life6mo, clear
-. keep if age_days == 0
-(2,432 observations deleted)
-
-. egen sfga = classify_sfga(weight_g/1000), ///
->     gest_days(gestage) sex(sex) sexcode(m=1, f=2)
+. gen wt_kg = weight_g / 1000
+. gigs_classify_growth sfga, ///
+>     gest_days(gestage) sex(sex) sexcode(m=1, f=2) ///
+>     weight_kg(wt_kg) id(id)
+Requested outcomes:
+    Size-for-gestational age (sfga)
+NOTE: There were 231 birth observations where `age_days' > 0.5.
+NOTE: There was 1 birth measure where an infant was too old for the 
+      INTERGROWTH-21st Newborn Size standards (`gest_age' > 300).
+      This infant will be assessed with the WHO Growth Standards instead.
+Supplied data:
+    Weight in kg
+Running analyses. New/replaced variables:
+    Generated new variable birthweight_centile.
+    Generated new variable sfga.
+    Generated new variable sfga_severe.
 
 . tab sfga
 
        sfga |      Freq.     Percent        Cum.
 ------------+-----------------------------------
-        SGA |         39       68.42       68.42
-        AGA |         16       28.07       96.49
-        LGA |          2        3.51      100.00
+        SGA |        185       64.46       64.46
+        AGA |         88       30.66       95.12
+        LGA |         14        4.88      100.00
 ------------+-----------------------------------
-      Total |         57      100.00
+      Total |        287      100.00
 ```
 
 ## Known issues and bug reporting
@@ -335,7 +375,7 @@ Authors
 ------
   **S. R. Parker**  
   Maternal, Adolescent, Reproductive, and Child Health Centre  
-  London School of Hygiene and Tropical Medicine
+  London School of Hygiene & Tropical Medicine
 
   **Dr L. Vesel**  
   Ariadne Labs, Brigham and Women’s Hospital  
@@ -343,4 +383,4 @@ Authors
 
   **Professor E. O. Ohuma**  
   Maternal, Adolescent, Reproductive, and Child Health Centre  
-  London School of Hygiene and Tropical Medicine
+  London School of Hygiene & Tropical Medicine
