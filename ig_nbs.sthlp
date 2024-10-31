@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.4.1 23 April 2024}{...}
+{* *! version 0.5.0 31 Oct 2024}{...}
 {vieweralsosee "" "--"}{...}
 {vieweralsosee "gigs: Classification functions" "help classify_sfga"}{...}
 {viewerjumpto "Syntax" "ig_nbs##syntax"}{...}
@@ -23,6 +23,11 @@
 {title:Syntax}
 
 {p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
+{cmd:ig_fet}{cmd:(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
+{ifin}{cmd:,} 
+{cmdab:x:var}{cmd:(}{varname}{cmd:)}
+
+{p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
 {cmd:ig_nbs}{cmd:(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
 {ifin}{cmd:,} 
 {cmdab:gest:_days}{cmd:(}{varname}{cmd:)} {cmdab:sex}{cmd:(}{varname}{cmd:)}
@@ -33,11 +38,6 @@
 {ifin}{cmd:,} 
 {cmdab:x:var}{cmd:(}{varname}{cmd:)} {cmdab:sex}{cmd:(}{varname}{cmd:)}
 {cmdab:sexc:ode}{cmd:(}{cmdab:m:ale=}{it:code}{cmd:,} {cmdab:f:emale=}{it:code}{cmd:)}
-
-{p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
-{cmd:ig_fet}{cmd:(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
-{ifin}{cmd:,} 
-{cmdab:x:var}{cmd:(}{varname}{cmd:)}
 
 {p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
 {cmd:who_gs}{cmd:(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
@@ -69,6 +69,23 @@ also {it:fcn} dependent.
 {marker functions}{...}
 {title:Functions for egen}
 
+{p 4 4 2}{hi:ig_fet(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
+ converts between newborn anthropometric data and z-scores/centiles in
+ the INTERGROWTH-21st Fetal Growth standards. It has three arguments:
+
+{pmore}{varname} is the variable name in your dataset which you want to convert
+ to a z-score, centile or anthropometric measure (for example,
+ {cmd:headcirc_mm}, {cmd:weight_g}).
+
+{pmore}{it:acronym} defines the INTERGROWTH-21st Fetal Growth standard by
+ which to convert the values in {varname}, and should be one of the acronyms
+ listed in the {help ig_nbs##standards:Available Standards} section below.
+
+{pmore}{it:conversion} defines the type of conversion to be performed on
+ {varname}, and must be one of {cmd:"v2z"} (value-to-z-score), {cmd:"v2c"}
+ (value-to-centile), {cmd:"c2v"} (centile-to-value), or {cmd:"z2v"}
+ (z-score-to-value).
+
 {p 4 4 2}{hi:ig_nbs(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
  converts between newborn anthropometric data and z-scores/centiles in
  the INTERGROWTH-21st Newborn Size Standards. It has three arguments:
@@ -95,23 +112,6 @@ also {it:fcn} dependent.
  {cmd:weight_kg}, {cmd:headcirc_cm}).
 
 {pmore}{it:acronym} defines the INTERGROWTH-21st Postnatal Growth standard by
- which to convert the values in {varname}, and should be one of the acronyms
- listed in the {help ig_nbs##standards:Available Standards} section below.
-
-{pmore}{it:conversion} defines the type of conversion to be performed on
- {varname}, and must be one of {cmd:"v2z"} (value-to-z-score), {cmd:"v2c"}
- (value-to-centile), {cmd:"c2v"} (centile-to-value), or {cmd:"z2v"}
- (z-score-to-value).
-
-{p 4 4 2}{hi:ig_fet(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
- converts between newborn anthropometric data and z-scores/centiles in
- the INTERGROWTH-21st Fetal Growth standards. It has three arguments:
-
-{pmore}{varname} is the variable name in your dataset which you want to convert
- to a z-score, centile or anthropometric measure (for example,
- {cmd:headcirc_mm}, {cmd:weight_g}).
-
-{pmore}{it:acronym} defines the INTERGROWTH-21st Fetal Growth standard by
  which to convert the values in {varname}, and should be one of the acronyms
  listed in the {help ig_nbs##standards:Available Standards} section below.
 
@@ -214,6 +214,7 @@ also {it:fcn} dependent.
 {col 6}{cmd:flfga}{col 14}femur length-for-GA{col 76}mm{col 82}98-280 days
 {col 6}{cmd:ofdfga}{col 14}occipito-frontal diameter for-GA{col 76}mm{col 82}98-280 days
 {col 6}{cmd:efwfga}{col 14}estimated fetal weight-for-GA{col 76}g{col 82}154-280 days
+{col 6}{cmd:hefwfga}{col 14}Hadlock estimated fetal weight-for-GA{col 76}g{col 82}126-287 days
 {col 6}{cmd:sfhfga}{col 14}symphisis-fundal height-for-GA{col 76}mm{col 82}112-294 days
 {col 6}{cmd:crlfga}{col 14}crown-rump length-for-GA{col 76}mm{col 82}58-105 days
 {col 6}{cmd:gafcrl}{col 14}GA-for-crown-rump length{col 75}days{col 82}15-95 mm
@@ -228,7 +229,6 @@ also {it:fcn} dependent.
 {col 6}{cmd:avfga}{col 14}anterior horn of the lateral ventricle-for-GA{col 76}mm{col 82}105-252 days
 {col 6}{cmd:pvfga}{col 14}atrium of the posterior horn of the lateral ventricle-for-GA{col 76}mm{col 82}105-252 days
 {col 6}{cmd:cmfga}{col 14}cisterna magna-for-GA{col 76}mm{col 82}105-252 days
-{col 6}{cmd:hefwfga}{col 14}Hadlock estimated fetal weight-for-GA{col 76}g{col 82}126-187 days
 {col 5}{hline 90}
 
 {marker tab4}{...}
@@ -295,13 +295,18 @@ also {it:fcn} dependent.
 
 {pstd}Simon R. Parker{p_end}
 {pstd}Maternal, Adolescent, Reproductive, and Child Health (MARCH) Center{p_end}
-{pstd}London School of Hygiene and Tropical Medicine{p_end}
+{pstd}London School of Hygiene & Tropical Medicine{p_end}
 {pstd}London, U.K.{p_end}
 {pstd}simon.parker@lshtm.ac.uk{p_end}
 
+{pstd}Linda Vesel}{p_end}
+{pstd}Brigham and Women's Hospital, Boston{p_end}
+{pstd}Massachusetts, U.S.A.{p_end}
+{pstd}lvesel@ariadnelabs.org{p_end}
+
 {pstd}Eric O. Ohuma{p_end}
 {pstd}Maternal, Adolescent, Reproductive, and Child Health (MARCH) Center{p_end}
-{pstd}London School of Hygiene and Tropical Medicine{p_end}
+{pstd}London School of Hygiene & Tropical Medicine{p_end}
 {pstd}London, U.K.{p_end}
 {pstd}eric.ohuma@lshtm.ac.uk{p_end}
 
