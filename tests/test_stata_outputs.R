@@ -22,10 +22,12 @@ compare_ig_fet <- function(acronym, z_or_c) {
 
   # R implementation is already validated against z-score/centile tables
   z_or_c_r <- switch(z_or_c, z2v = "zscore", c2v = "centile")
-  fn <- get(paste0("ig_fet_", acronym, "_", z_or_c_r, "2value"),
+  fn <- get(paste0(z_or_c_r, "2value"),
             envir = loadNamespace("gigs"))
+
   reference <- lapply(dbl_z_or_c, \(X) {
-    round(fn(X, stata[[1]]), digits = roundto)
+    round(fn(X, stata[[1]], family = "ig_fet", acronym = acronym),
+          digits = roundto)
   }) |>
     do.call(what = "cbind") |>
     as.data.frame()
@@ -183,10 +185,10 @@ compare_who_gs <- function(acronym, sex, z_or_c) {
   }
 }
 
-compare_interpolation <- function(standard, acronym, sex) {
+compare_interpolation <- function(family, acronym, sex) {
   dta_dir <- file.path("tests", "outputs", "interpolation")
   dta_path <- file.path(dta_dir,
-                        paste(standard, acronym, sex, "interped.dta",
+                        paste(family, acronym, sex, "interped.dta",
                               sep = "_"))
   tbl <- if (file.exists(dta_path)) haven::read_dta(file = dta_path) else {
       cat("\t")
@@ -195,9 +197,10 @@ compare_interpolation <- function(standard, acronym, sex) {
   }
 
   gigs_expr <- str2expression(
-    text = paste0("gigs::",
-                  paste(standard, acronym, "zscore2value", sep = "_"),
-                  "(z = z, xvar, sex = sex)"))
+    text = glue::glue(paste0(
+      "gigs::zscore2value(z = z, x = xvar, sex = sex, family = \"{family}\", ",
+      "acronym = \"{acronym}\")")
+    ))[[1]]
 
   tbl <- tbl |>
     dplyr::rename(xvar = 1) |>
@@ -207,7 +210,7 @@ compare_interpolation <- function(standard, acronym, sex) {
   tolerance <- testthat::testthat_tolerance()
   stata <- tbl$stata_col
   reference <- tbl$r_col
-  nice_standard <- toupper(stringr::str_replace(standard, "_", " "))
+  nice_standard <- toupper(stringr::str_replace(family, "_", " "))
   nice_sex <- if (unique(tbl$sex) == "M") "males" else "females"
   consistent_lgl <- tryCatch(expr = {
     testthat::expect_equivalent(stata, reference,
@@ -239,15 +242,20 @@ compare_gigs_z_lgls <- function() {
   }
 
   stata <- stata |>
-    dplyr::mutate(ig_nbs = as.logical(ig_nbs),
+    dplyr::mutate(id = as.factor(id),
+                  ig_nbs = as.logical(ig_nbs),
                   ig_png = as.logical(ig_png),
                   who_gs = as.logical(who_gs),
                   .keep = "unused")
   r <- as.data.frame(gigs:::gigs_zscoring_lgls(age_days = stata$age_days,
-                                               gest_days = stata$gest_days))
+                                               gest_days = stata$gest_days,
+                                               id = as.factor(stata$id))) |>
+    dplyr::mutate(id = stata$id, .before = ig_nbs)
 
   consistent_lgl <- tryCatch(expr = {
-    testthat::expect_equivalent(r, stata[, c("ig_nbs", "ig_png", "who_gs")])
+    testthat::expect_equivalent(
+      r, stata[, c("id", "ig_nbs", "ig_png", "who_gs")]
+    )
     TRUE
   }, error = function(e) {
     FALSE
