@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.4.0 07 Dec 2023}{...}
+{* *! version 0.5.0 31 Oct 2024}{...}
 {vieweralsosee "" "--"}{...}
 {vieweralsosee "gigs: Classification functions" "help classify_sfga"}{...}
 {viewerjumpto "Syntax" "ig_nbs##syntax"}{...}
@@ -16,11 +16,16 @@
 {title:Title}
 
 {p2colset 5 17 19 2}{...}
-{p2col :{hi:gigs} {hline 2} Standardising child growth assessment with extensions to egen}
+{p2col :{hi:gigs} {hline 2} Fetal, neonatal, and infant growth assessment using international growth standards}
 {p2colreset}{...}
 
 {marker syntax}{...}
 {title:Syntax}
+
+{p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
+{cmd:ig_fet}{cmd:(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
+{ifin}{cmd:,} 
+{cmdab:x:var}{cmd:(}{varname}{cmd:)}
 
 {p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
 {cmd:ig_nbs}{cmd:(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
@@ -33,11 +38,6 @@
 {ifin}{cmd:,} 
 {cmdab:x:var}{cmd:(}{varname}{cmd:)} {cmdab:sex}{cmd:(}{varname}{cmd:)}
 {cmdab:sexc:ode}{cmd:(}{cmdab:m:ale=}{it:code}{cmd:,} {cmdab:f:emale=}{it:code}{cmd:)}
-
-{p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
-{cmd:ig_fet}{cmd:(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
-{ifin}{cmd:,} 
-{cmdab:gest:_days}{cmd:(}{varname}{cmd:)}
 
 {p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
 {cmd:who_gs}{cmd:(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
@@ -68,6 +68,23 @@ also {it:fcn} dependent.
 
 {marker functions}{...}
 {title:Functions for egen}
+
+{p 4 4 2}{hi:ig_fet(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
+ converts between newborn anthropometric data and z-scores/centiles in
+ the INTERGROWTH-21st Fetal Growth standards. It has three arguments:
+
+{pmore}{varname} is the variable name in your dataset which you want to convert
+ to a z-score, centile or anthropometric measure (for example,
+ {cmd:headcirc_mm}, {cmd:weight_g}).
+
+{pmore}{it:acronym} defines the INTERGROWTH-21st Fetal Growth standard by
+ which to convert the values in {varname}, and should be one of the acronyms
+ listed in the {help ig_nbs##standards:Available Standards} section below.
+
+{pmore}{it:conversion} defines the type of conversion to be performed on
+ {varname}, and must be one of {cmd:"v2z"} (value-to-z-score), {cmd:"v2c"}
+ (value-to-centile), {cmd:"c2v"} (centile-to-value), or {cmd:"z2v"}
+ (z-score-to-value).
 
 {p 4 4 2}{hi:ig_nbs(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
  converts between newborn anthropometric data and z-scores/centiles in
@@ -103,23 +120,6 @@ also {it:fcn} dependent.
  (value-to-centile), {cmd:"c2v"} (centile-to-value), or {cmd:"z2v"}
  (z-score-to-value).
 
-{p 4 4 2}{hi:ig_fet(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
- converts between newborn anthropometric data and z-scores/centiles in
- the INTERGROWTH-21st Fetal Growth standards. It has three arguments:
-
-{pmore}{varname} is the variable name in your dataset which you want to convert
- to a z-score, centile or anthropometric measure (for example,
- {cmd:headcirc_mm}, {cmd:weight_g}).
-
-{pmore}{it:acronym} defines the INTERGROWTH-21st Fetal Growth standard by
- which to convert the values in {varname}, and should be one of the acronyms
- listed in the {help ig_nbs##standards:Available Standards} section below.
-
-{pmore}{it:conversion} defines the type of conversion to be performed on
- {varname}, and must be one of {cmd:"v2z"} (value-to-z-score), {cmd:"v2c"}
- (value-to-centile), {cmd:"c2v"} (centile-to-value), or {cmd:"z2v"}
- (z-score-to-value).
-
 {p 4 4 2}{hi:who_gs(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
  converts between newborn anthropometric data and z-scores/centiles in
  the WHO Child Growth Standards. It has three arguments:
@@ -141,9 +141,9 @@ also {it:fcn} dependent.
 {title:Options}
 {dlgtab:Non-specific}
 
-{phang}{opt sex(varname)} specifies the sex variable. It can be int, byte, or
- string. The codes for {cmd:male} and {cmd:female} must be specified by the 
- {hi:sexcode()} option.
+{phang}{opt sex(varname)} specifies the sex variable. It must be an int, byte,
+ or string variable. The codes for {cmd:male} and {cmd:female} must be specified
+ by the {hi:sexcode()} option.
 
 {phang}{cmd:sexcode(male=}{it:code}{cmd:, female=}{it:code}{cmd:)}
  specifies the codes for {cmd:male} and {cmd:female}. The codes can be specified
@@ -153,17 +153,17 @@ also {it:fcn} dependent.
 {phang}{opt x:var(varname numeric)} specifies the variable used with supplied
  sex values to standardise the measure of interest. In the INTERGROWTH-21st
  Postnatal Growth standards ({cmd:ig_png()}) this is usually post-menstrual age
- in whole weeks, but may also be length in cm if using the {cmd:wfl} standard.
- In the INTERGROWTH-21st Fetal standards ({cmd:ig_fet()}), this is usually
- gestational age in days but can also be crown-rump length in mm or
- transcerebellar diameter in mm, if using either the {cmd:gafcrl} or
- {cmd:gaftcd} standards, respectively. In the WHO Child Growth standards,
- {cmd:xvar()} is usually age in days, but may also be length or height (in cm)
- if using either the {cmd:wfl} or {cmd:wfh} standards. See Tables
- {help ig_nbs##tab2:2}, {help ig_nbs##tab3:3}, or {help ig_nbs##tab4:4} for
- appropriate {cmd:{it:x}} values and units for each valid acronym. Any
- {cmd:{it:x}} variable values outside the ranges described below will return a
- missing value.
+ in weeks, but may also be length in cm if using the {cmd:wfl} standard. In the
+ INTERGROWTH-21st Fetal standards ({cmd:ig_fet()}), this is usually gestational 
+ age in days but can also be crown-rump length in mm or transcerebellar diameter
+ in mm, if using either the {cmd:gafcrl} or {cmd:gaftcd} standards, 
+ respectively. In the WHO Child Growth standards, {cmd:xvar()} is usually age in
+ days, but may also be length or height (in cm) if using either the {cmd:wfl} or
+ {cmd:wfh} standards. See Tables {help ig_nbs##tab2:2}, {help ig_nbs##tab3:3}, 
+ or {help ig_nbs##tab4:4} for appropriate {cmd:{it:x}} values and units for each
+ valid acronym. Any observations with {cmd:{it:x}} variable values outside the 
+ ranges described in these tables will have a missing value in the generated 
+ variable.
 
 {dlgtab:INTERGROWTH-21st Newborn Size standards}
 
@@ -214,6 +214,7 @@ also {it:fcn} dependent.
 {col 6}{cmd:flfga}{col 14}femur length-for-GA{col 76}mm{col 82}98-280 days
 {col 6}{cmd:ofdfga}{col 14}occipito-frontal diameter for-GA{col 76}mm{col 82}98-280 days
 {col 6}{cmd:efwfga}{col 14}estimated fetal weight-for-GA{col 76}g{col 82}154-280 days
+{col 6}{cmd:hefwfga}{col 14}Hadlock estimated fetal weight-for-GA{col 76}g{col 82}126-287 days
 {col 6}{cmd:sfhfga}{col 14}symphisis-fundal height-for-GA{col 76}mm{col 82}112-294 days
 {col 6}{cmd:crlfga}{col 14}crown-rump length-for-GA{col 76}mm{col 82}58-105 days
 {col 6}{cmd:gafcrl}{col 14}GA-for-crown-rump length{col 75}days{col 82}15-95 mm
@@ -251,12 +252,12 @@ also {it:fcn} dependent.
 {title:Remarks}
 
 {pstd}These functions will return missing values where values are outside the
- ranges given above, but otherwise will not automatically detect data
- errors. Ensure you check your data before using these functions or you may
- receive incorrect results. Additionally, when providing centiles to the
- function with {cmd: "c2v"}, ensure your inputs are between 0 and 1, or the
- function will return missing values (e.g. for 25th centile, use 0.25; for 95th
- centile, use 0.95).
+ ranges given in the above tables, but otherwise will not automatically detect 
+ data errors. Ensure you check your data before using these functions or you may
+ receive incorrect results, especially to make sure you have the correct units. 
+ Additionally, when providing centiles to these functions with {cmd: "c2v"}, 
+ ensure your inputs are between 0 and 1, or the function will return missing 
+ values (e.g. for 25th centile, use 0.25; for 95th centile, use 0.95).
 
 {marker examples}{...}
 {title:Examples}
@@ -264,49 +265,50 @@ also {it:fcn} dependent.
 {pstd}Getting centiles from values ({cmd: "v2c"}) in the INTERGROWTH-21st
  Newborn Size Standard for weight-for-gestational age ({cmd:"wfga"}), where 
  {cmd:sex} contains the codes {cmd:1} and {cmd:2}:{p_end}
-{phang2}{cmd:. egen z_wfga = ig_nbs(weight,"wfga","v2c"), gest_days(ga_weeks * 7) sex(sex) sexcode(male=1, female=2)}
+{phang2}{cmd:. egen z_wfga = ig_nbs(weight, "wfga", "v2c"), gest_days(ga_weeks * 7) sex(sex) sexcode(male=1, female=2)}
 
 {pstd}Getting z-scores from values ({cmd: "v2z"}) in the INTERGROWTH-21st
  Newborn Size Standard for weight-for-gestational age ({cmd:"wfga"}), where 
  {cmd:sex} contains the codes {cmd:M} and {cmd:F}:{p_end}
-{phang2}{cmd:. egen z_lfa = ig_png(len_cm,"lfa","v2z"), xvar(pma) sex(sex) sexcode(male=M, female=F)}
+{phang2}{cmd:. egen z_lfa = ig_png(len_cm, "lfa" , "v2z"), xvar(pma) sex(sex) sexcode(male=M, female=F)}
 
 {pstd}Getting values for specific centiles ({cmd: "v2c"}) in the
  INTERGROWTH-21st Fetal Standard for abdominal circumference-for-gestational age
  ({cmd:"acfga"}):{p_end}
-{phang2}{cmd:. egen abdocirc_mm = ig_fet(centile,"acfga","v2c"), xvar(ga_days)}
+{phang2}{cmd:. egen abdocirc_mm = ig_fet(centile, "acfga", "v2c"), xvar(ga_days)}
 
 {pstd}Getting values for z-scores ({cmd: "v2c"}) in the WHO Child Growth
  Standard for arm circumference-for-age ({cmd:"acfa"}), where 
  {cmd:sex} contains the codes {cmd:Male} and {cmd:Female}:{p_end}
-{phang2}{cmd:. egen z_acfa = who_gs(zscores,"acfa","z2v"), xvar(age_days) sex(sex) sexcode(male=Male, female=Female)}
+{phang2}{cmd:. egen z_acfa = who_gs(zscores, "acfa", "z2v"), xvar(age_days) sex(sex) sexcode(male=Male, female=Female)}
 
 {pstd}You can use just the first letter of the {cmd:sexcode()} arguments{p_end}
-{phang2}{cmd:. egen z_acfa = who_gs(zscores,"acfa","z2v"), xvar(age_days) sex(sex) sexcode(m=Male, f=Female)}
+{phang2}{cmd:. egen z_acfa = who_gs(zscores, "acfa", "z2v"), xvar(age_days) sex(sex) sexcode(m=Male, f=Female)}
 
 {pstd}Codes given to {cmd: sexcode()} cannot be abbreviated. They must be 
  typed exactly as they appear in your dataset. You can, however, swap the order
  and/or omit the comma in the {hi:sexcode()} option:{p_end}
-{phang2}{cmd:. egen z_acfa = who_gs(zscores,"acfa","z2v"), xvar(age_days) sex(sex) sexcode(f=Female, m=Male)}
-
-{phang2}{cmd:. egen z_acfa = who_gs(zscores,"acfa","z2v"), xvar(age_days) sex(sex) sexcode(f=Female m=Male)}{p_end}
-
+{phang2}{cmd:. egen z_acfa = who_gs(zscores, "acfa", "z2v"), xvar(age_days) sex(sex) sexcode(f=Female m=Male)}{p_end}
 
 {marker authors}{...}
 {title:Authors}
 
 {pstd}Simon R. Parker{p_end}
 {pstd}Maternal, Adolescent, Reproductive, and Child Health (MARCH) Center{p_end}
-{pstd}London School of Hygiene and Tropical Medicine{p_end}
+{pstd}London School of Hygiene & Tropical Medicine{p_end}
 {pstd}London, U.K.{p_end}
 {pstd}simon.parker@lshtm.ac.uk{p_end}
 
+{pstd}Linda Vesel}{p_end}
+{pstd}Brigham and Women's Hospital, Boston{p_end}
+{pstd}Massachusetts, U.S.A.{p_end}
+{pstd}lvesel@ariadnelabs.org{p_end}
+
 {pstd}Eric O. Ohuma{p_end}
 {pstd}Maternal, Adolescent, Reproductive, and Child Health (MARCH) Center{p_end}
-{pstd}London School of Hygiene and Tropical Medicine{p_end}
+{pstd}London School of Hygiene & Tropical Medicine{p_end}
 {pstd}London, U.K.{p_end}
 {pstd}eric.ohuma@lshtm.ac.uk{p_end}
-
 
 {title:Also see}
 

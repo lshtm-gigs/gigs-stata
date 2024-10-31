@@ -1,5 +1,5 @@
 capture program drop _gig_fet
-*! version 0.2.0 (SJxx-x: dmxxxx)
+*! version 0.2.2 (SJxx-x: dmxxxx)
 program define _gig_fet
  	version 16
 	preserve
@@ -27,18 +27,18 @@ program define _gig_fet
 	            */        "ofdfga", "efwfga", "sfhfga", "crlfga", "gafcrl") | /*
 				*/ inlist("`acronym'", "gwgfga", "pifga", "rifga", "sdrfga", /*
 				*/ 		  "tcdfga", "gaftcd", "poffga", "sffga", "avfga") | /*
-	            */ inlist("`acronym'", "pvfga", "cmfga")
-	if _rc {
+	            */ inlist("`acronym'", "pvfga", "cmfga", "hefwfga")
+	if _rc == 9 {
 		di as text "`acronym'" as error " is an invalid acronym. The only " /*
 		*/ as error "valid choices are " as text "hcfga, bpdfga, acfga," /*
 		*/ as text " flfga, ofdfga, efwfga, sfhfga, crlfga, gafcrl, gwgfga" /*
 		*/ as text " pifga, rifga, sdrfga, tcdfga, gaftcd, poffga, sffga" /*
-		*/ as text " avfga, pvfga" as error " or " as text " cmfga" /*
+		*/ as text " avfga, pvfga, cmfga" as error " or " as text " hefwfga" /*
 		*/ as error "."
 		exit 198
 	}
 	capture assert inlist("`conversion'", "v2c", "v2z", "c2v", "z2v")
-	if _rc {
+	if _rc == 9 {
 		di as text "`conversion'" as error " is an invalid conversion code. " /*
 		*/ as error "The only valid choices are " as text "v2c, v2z, c2v," as /*
 		*/ error " or " as text "z2v" as error "."
@@ -57,15 +57,31 @@ program define _gig_fet
 	tempvar check_x GA TCD CRL q p z // GA, CRL, TCD all used as x variables
 	qui {
 		gen double `GA' = `xvar' / 7
-		if "`acronym'" == "efwfga" {
-			tempvar L M S
-			gen double `L' = -4.257629 - 2162.234 * `GA'^-2 /*
-				*/ + 0.0002301829 * `GA'^3
+		if inlist("`acronym'", "efwfga", "hefwfga") {
+			tempvar L M S GA_cubed
+			gen double `GA_cubed' = `GA'^3
+			if "`acronym'" == "efwfga" {
+				tempvar efwfga_coeff
+				gen double `efwfga_coeff' = log(`GA') * `GA_cubed'
+				gen double `L' = -4.257629 - 2162.234 * `GA'^-2 /*
+					*/ + 0.0002301829 * `GA_cubed'
+				gen double `M' = 4.956737 + 0.0005019687 * `GA_cubed' /*
+					*/ - 0.0001227065 * `efwfga_coeff'
+				gen double `S' = 1e-04 * (-6.997171 + 0.057559 * `GA_cubed' - /*
+					*/ 0.01493946 * `efwfga_coeff')
+			}
+			else {
+				tempvar GA_10 hefwfga_coeff
+				gen double `GA_10' = `GA' / 10
+				gen double `hefwfga_coeff' = log(`GA_10') * (`GA_10')^(-2)
+				gen double `L' = 9.43643 + 9.41579 * (`GA_10')^(-2) - /*
+					*/ 83.54220 * `hefwfga_coeff'
+				gen double `M' = -2.42272 + 1.86478 * `GA'^0.5 - /*
+					*/ 1.93299e-5 * `GA_cubed'
+				gen double `S' = 0.0193557  + 0.0310716 * (`GA_10')^(-2) - /*
+					*/ 0.0657587 * `hefwfga_coeff'
+			}
 			replace `L' = 0 if abs(`L') < 1.414 * 10^-16
-			gen double `M' = 4.956737 + 0.0005019687 * `GA'^3 /*
-				*/ - 0.0001227065 * `GA'^3 * log(`GA') 
-			gen double `S' = 10^-4 * (-6.997171 + 0.057559 * `GA'^3 - /*
-				*/ 0.01493946 * `GA'^3 * log(`GA'))
 			if "`conversion'" == "v2c" | "`conversion'" == "v2z" {
 				tempvar log_efw
 				gen double `log_efw' = log(`input')
@@ -280,6 +296,9 @@ program define _gig_fet
 		}
 		else if "`acronym'" == "gaftcd" {
 			gen `check_x' = `xvar' >= 12 & `xvar' <= 55
+		}
+		else if "`acronym'" == "hefwfga" {
+			gen `check_x' = `xvar' >= 126 & `xvar' <= 287
 		}
 		else {	// for hcfga, bpdfga, acfga, flfga, ofdfga, tcdfga, gwgfga
 			gen `check_x' = `xvar' >= 98 & `xvar' <= 280
