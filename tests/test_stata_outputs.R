@@ -369,7 +369,6 @@ interpolation <- mapply(FUN = compare_interpolation, standards, acronyms, sexes)
 if (!interactive()) Sys.sleep(wait_time_secs)
 
 cli::cli_h1(text = "GIGS z-scoring logicals")
-interpolation <- compare_gigs_z_lgls()
 gigs_zscoring <- compare_gigs_z_lgls()
 if (!interactive()) Sys.sleep(wait_time_secs)
 
