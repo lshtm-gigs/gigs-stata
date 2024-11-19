@@ -127,9 +127,16 @@ sex-specific growth standards cannot be applied.
 ### INTERGROWTH-21<sup>st</sup> Newborn Size standards, including very preterm
 This function can be used to convert between measurements and 
 z-scores/centiles in each of the INTERGROWTH-21<sup>st</sup> Newborn Size
-Standards. 
+Standards.
 
 ![](./readme/readme_ignbs.png)
+
+The **extend** option, when specified, allows the function to use extrapolated
+versions of these INTERGROWTH-21<sup>st</sup> standards which can take 
+gestational ages from 154 to 314 days (22<sup>+0</sup> to <sup>+6</sup> weeks) 
+when `acronym` is one of `"wfga"`, `"lfga"`, or `"hcfga"`. Our process for 
+extrapolating these standards is documented 
+[here](https://lshtm-gigs.github.io/gigs/articles/extending-ig-nbs.html).
 
 ### INTERGROWTH-21<sup>st</sup> Postnatal Growth standards
 This function can be used to convert between measurements and z-scores/centiles
