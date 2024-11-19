@@ -133,7 +133,7 @@ Standards.
 
 The **extend** option, when specified, allows the function to use extrapolated
 versions of these INTERGROWTH-21<sup>st</sup> standards which can take 
-gestational ages from 154 to 314 days (22<sup>+0</sup> to <sup>+6</sup> weeks) 
+gestational ages from 154 to 314 days (22<sup>+0</sup> to <sup>44+6</sup> weeks) 
 when `acronym` is one of `"wfga"`, `"lfga"`, or `"hcfga"`. Our process for 
 extrapolating these standards is documented 
 [here](https://lshtm-gigs.github.io/gigs/articles/extending-ig-nbs.html).
