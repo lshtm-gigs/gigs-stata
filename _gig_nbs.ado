@@ -1,7 +1,7 @@
 capture program drop _gig_nbs
 capture program drop Badsexvar_nbs
 capture program drop Badsyntax_nbs
-*! version 0.3.2 (SJxx-x: dmxxxx)
+*! version 0.4.0 (SJxx-x: dmxxxx)
 program define _gig_nbs
  	version 16
 	preserve
@@ -41,11 +41,26 @@ program define _gig_nbs
 	}
 	
 	syntax [if] [in], GEST_days(varname numeric) sex(varname) SEXCode(string) /*
-		*/ [BY(string)]
+		*/ [extend BY(string)]
 	
 	if `"`by'"' != "" {
 		_egennoby ig_nbs() `"`by'"'
 		/* NOTREACHED */
+	}
+	
+	if `"`extend'"' != "" {
+		capture assert inlist("`acronym'", "wfga", "lfga", "hcfga")
+		if _rc == 9 {
+			di as text "`acronym'" as error " is an invalid acronym when " /*
+			*/ "using the extended INTERGROWTH-21st Newborn Size standards." /*
+			*/ "The only valid choices are " as text "wfga" as error ", " /* 
+			*/ as text "lfga" as error ", or " as text "hcfga" as error "."
+		exit 198
+		}
+		local use_extended =  1
+	}
+	else {
+		local use_extended =  0
 	}
 	
 	local 1 `sexcode'
@@ -91,7 +106,12 @@ program define _gig_nbs
 	tempvar check_ga check_sex
 	if inlist("`acronym'", "wfga", "lfga", "hcfga") {
 		// Find reference GAMLSS coeffecients
-		local basename = "ig_nbsGAMLSS_" + "`acronym'" + ".dta"
+		if (`use_extended' == 1) {
+			local basename = "ig_nbs_extGAMLSS_" + "`acronym'" + ".dta"
+		}
+		else {
+			local basename = "ig_nbsGAMLSS_" + "`acronym'" + ".dta"
+		}
 		qui findfile "`basename'"
 		local filepath = "`r(fn)'"
 		tempvar n
@@ -117,6 +137,7 @@ program define _gig_nbs
 			gen `n' = _n
 			gen `need_interp' = 0
 			replace `need_interp' = `appended' == 0
+			li nbsMSNT_*
 			mata gigs_ipolate_coeffs(
 				"nbsMSNT_gest_age", ///
 				"nbsMSNT_sex", ///
@@ -140,7 +161,15 @@ program define _gig_nbs
 			generate byte `sex_as_numeric' = 1 if `sex' == "`male'"
 			replace `sex_as_numeric' = 0 if `sex' == "`female'"
 			generate double `gest_age_weeks' = .
-			replace `gest_age_weeks' = `gest_days' / 7  if `gest_days' >= 168
+			if (`use_extended' == 1) {
+				replace `gest_age_weeks' = ///
+					`gest_days' / 7  if `gest_days' >= 154
+			}
+			else {
+				replace `gest_age_weeks' = ///
+					`gest_days' / 7  if `gest_days' >= 168
+			}
+			
 				
 			gen double `vpns_median' = .
 			replace `vpns_median' = ///
@@ -199,7 +228,8 @@ program define _gig_nbs
 					invt(`tau', `p' * (1 + `nu' ^ 2) / 2) ///
 					if `p' < (1 / (1 + `nu' ^ 2))
 				replace `q_qST3' = `mu' + (`sigma' * `nu') * ///
-					invt(`tau', (`p' * (1 + `nu'^2) - 1) / (2 * `nu'^2) + 0.5) ///
+					invt(`tau', (`p' * (1 + `nu'^2) - 1) / ///
+					(2 * `nu'^2) + 0.5) ///
 					if `p' >= (1 / (1 + `nu'^2))
 			}
 			
@@ -327,8 +357,13 @@ program define _gig_nbs
 		}
 	}
 	qui {
-		cap gen `check_ga' = `gest_days' >= 168 & `gest_days' <= 300
-        	gen `check_sex' = `sex' == "`male'" | `sex' == "`female'"
+		if (`use_extended' == 1) {
+			cap gen `check_ga' = `gest_days' >= 154 & `gest_days' <= 314
+		}
+		else {
+			cap gen `check_ga' = `gest_days' >= 168 & `gest_days' <= 300
+		}
+		gen `check_sex' = `sex' == "`male'" | `sex' == "`female'"
 		if "`sex_was_str'" == "0" destring(`sex'), replace
 		replace `return' = . ///
   	        if `check_ga' == 0 | `check_sex' == 0 | `touse' == 0

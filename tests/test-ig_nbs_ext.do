@@ -1,5 +1,6 @@
-capture program drop make_ig_nbs_tbl
-program define make_ig_nbs_tbl
+clear all
+capture program drop make_ig_nbs_ext_tbl
+program define make_ig_nbs_ext_tbl
  	args _ga_days sex acronym conversion
 	tempvar _sex round
 	generate `_sex' = "`sex'" 
@@ -31,8 +32,9 @@ program define make_ig_nbs_tbl
 			qui gen `_SD' = `SD'
 			egen double measure = ///
 				ig_nbs(`_SD', "`acronym'", "`conversion'"), ///
-				gest_days(`_ga_days') sex(`_sex') sexcode(m=male, f=female)
-			if ("`acronym'" == "wfga" | "`acronym'" == "wlrfga") {
+				gest_days(`_ga_days') sex(`_sex') sexcode(m=male, f=female) ///
+				extend
+			if ("`acronym'" == "wfga") {
 				replace measure = round(measure, 0.01)
 			} 
 			else {
@@ -77,53 +79,41 @@ program define make_ig_nbs_tbl
 			gen double `_cent' = `cent'
 			egen double measure = ///
 				ig_nbs(`_cent', "`acronym'", "`conversion'"), ///
-				gest_days(`_ga_days') sex(`_sex') sexcode(m=male, f=female)
-			if ("`acronym'" == "wfga" | "`acronym'" == "wlrfga" | /*
-			    */ "`acronym'" == "bfpfga") {
+				gest_days(`_ga_days') sex(`_sex') sexcode(m=male, f=female) ///
+				extend
+			if ("`acronym'" == "wfga") {
 				replace measure = round(measure, 0.01)
 			} 
 			else {
 				replace measure = round(measure, 0.1)
-			}
-			if ("`acronym'" == "fmfga" | "`acronym'" == "ffmfga") {
-				replace measure = round(measure, 1)
-				recast int measure
 			}
 			rename measure `colname'
 		}
 	}
 end
 
-foreach acronym in "wfga" "lfga" "hcfga" "wlrfga" "bfpfga" "ffmfga" "fmfga" {
+foreach acronym in "wfga" "lfga" "hcfga" {
 	foreach sex in "male" "female" {
 		foreach conversion in "z2v" "c2v" {
-			local _frame = "ig_nbs_`acronym'_`conversion'_`sex'"
+			local _frame = "ig_nbs_ext`acronym'_`conversion'_`sex'"
 			cap frame drop `_frame'
 			cap frame create `_frame'
 			cap frame change `_frame'
 			capture clear
-			if inlist("`acronym'", "bfpfga", "ffmfga", "fmfga") {
-				if "`conversion'" == "z2v" {
-					continue
-				}
-				qui set obs 5
-				range gest_age 266 294
-			}
-			else {
-				qui set obs 133
-				range gest_age 168 300
-			}
-			recast int gest_age	
+			qui set obs 161 // 24 to 42+6 weeks
+			range gest_age 154 314
+			recast int gest_age
 			local _sex = "`sex'"
-			qui make_ig_nbs_tbl gest_age "`sex'" "`acronym'" "`conversion'"
+			qui make_ig_nbs_ext_tbl gest_age "`sex'" "`acronym'" "`conversion'"
 			
 			local path = ///
-				"tests/outputs/ig_nbs/`acronym'_`conversion'_`_sex'.dta"
+				"tests/outputs/ig_nbs_ext/`acronym'_`conversion'_`_sex'.dta"
+			di "`path'"
 			cap confirm file `path'
 			if _rc == 601 { // i.e. file does not exist
 				qui save "`path'", replace
-				di as text "IG NBS: `acronym'; `sex': Disk file not found; " ///
-					"saving."
+				di as text "IG NBS EXT: `acronym'; `sex': Disk file not " ///
+					"found; saving."
 				continue
 			}
 			
@@ -157,19 +147,13 @@ foreach acronym in "wfga" "lfga" "hcfga" "wlrfga" "bfpfga" "ffmfga" "fmfga" {
 }
 
 // Test that conversions work in both directions
-foreach acronym in "wfga" "lfga" "hcfga" "wlrfga" "ffmfga" "bfpfga" "fmfga" {
+foreach acronym in "wfga" "lfga" "hcfga" {
 	cap frame change default
 	cap clear
 	// Set x variable
 	cap drop ga_days
-	if inlist("`acronym'", "wfga", "lfga", "hcfga", "wlrfga") {
-		qui set obs 133 // 24 to 42 weeks
-		range ga_days 168 300
-	}
-	else if inlist("`acronym'", "ffmfga", "bfpfga", "fmfga") {
-		qui set obs 5 // 15 to 36 weeks
-		range ga_days 266 294
-	}
+	qui set obs 161 // 24 to 42+6 weeks
+	range ga_days 154 314
 	recast int ga_days
 	
 	foreach sex in "M" "F" {
@@ -179,19 +163,19 @@ foreach acronym in "wfga" "lfga" "hcfga" "wlrfga" "ffmfga" "bfpfga" "fmfga" {
 		
 		gen double z = -1
 		egen double y_from_z = ig_nbs(z, "`acronym'", "z2v"), /* 
-			*/ gest(ga_days) sex(sex) sexcode(m=M, f=F)
+			*/ gest(ga_days) sex(sex) sexcode(m=M, f=F) extend
 		egen double p_from_y = ig_nbs(y_from_z, "`acronym'", "v2c"), /* 
-			*/ gest(ga_days) sex(sex) sexcode(m=M, f=F)
+			*/ gest(ga_days) sex(sex) sexcode(m=M, f=F) extend
 		egen double y_from_p = ig_nbs(p_from_y, "`acronym'", "c2v"), /* 
-			*/ gest(ga_days) sex(sex) sexcode(m=M, f=F)
+			*/ gest(ga_days) sex(sex) sexcode(m=M, f=F) extend
 		egen double z_from_y = ig_nbs(y_from_p, "`acronym'", "v2z"), /* 
-			*/ gest(ga_days) sex(sex) sexcode(m=M, f=F)
+			*/ gest(ga_days) sex(sex) sexcode(m=M, f=F) extend
 		
 		gen double z_diffs  = z - z_from_y
 		gen double y_diffs  = y_from_z - y_from_p
 		gen byte z_equal = abs(z_diffs) < 10^-14
 		gen byte y_equal = abs(y_diffs) < 10^-14
-		
+			
 		assert z_equal == 1 & y_equal == 1
 	}
 }

@@ -72,7 +72,7 @@ compare_ig_nbs <- function(acronym, sex, z_or_c) {
   }
 
   z_or_p_r <- if (stringr::str_detect(z_or_c, pattern = "z")) {
-    "z-scores"
+    "zscores"
   } else {
     "centiles"
   }
@@ -88,6 +88,48 @@ compare_ig_nbs <- function(acronym, sex, z_or_c) {
                         fmfga = 0,
                         ffmfga = 1,
                         bfpfga = 0.11,
+                        0.003)
+  }
+
+  if (!all(is.na(stata)) & !is.null(reference)) {
+    cat("\t")
+    tryCatch(expr = {
+      testthat::expect_equivalent(stata, reference, tolerance = tolerance)
+      cli::cli_alert_success(paste0(tools::toTitleCase(sex_str), " ", z_or_p_r,
+                                    " in ", acronym,  ": ",
+                                    cli::col_green("succeeded")))
+      return(TRUE)
+    }, error = function(e) {
+      cli::cli_alert_danger(paste0(tools::toTitleCase(sex_str), " ", z_or_p_r,
+                                   " in ", acronym,  ": ",
+                                   cli_redbold(text = "failed")))
+      return(FALSE)
+    })
+  }
+}
+
+compare_ig_nbs_ext <- function(acronym, sex, z_or_c) {
+  sex_str <- if (sex == "M") "male" else if (sex == "F") "female"
+
+  z_or_c_stata <- if (z_or_c == "z") "z2v" else if (z_or_c == "c") "c2v"
+  dta <- file.path("tests", "outputs", "ig_nbs_ext",
+            paste0(acronym, "_", z_or_c_stata, "_", sex_str, ".dta"))
+
+  stata <- if (file.exists(dta)) haven::read_dta(file = dta) else {
+    cli::cli_alert_danger(text = "File not found: {.file {dta}}")
+  }
+
+  z_or_p_r <- if (stringr::str_detect(z_or_c, pattern = "z")) {
+    "zscores"
+  } else {
+    "centiles"
+  }
+  reference <- gigs::ig_nbs_ext[[acronym]][[sex_str]][[z_or_p_r]]
+  if (sex == "M") {
+    tolerance <- switch(acronym,
+                        0.003)
+  } else if (sex == "F") {
+    tolerance <- switch(acronym,
                         0.003)
   }
 
@@ -250,7 +292,8 @@ compare_gigs_z_lgls <- function() {
   r <- as.data.frame(gigs:::gigs_zscoring_lgls(age_days = stata$age_days,
                                                gest_days = stata$gest_days,
                                                id = as.factor(stata$id))) |>
-    dplyr::mutate(id = stata$id, .before = ig_nbs)
+    dplyr::mutate(id = stata$id, .before = ig_nbs) |>
+    dplyr::select(!birth)
 
   consistent_lgl <- tryCatch(expr = {
     testthat::expect_equivalent(
@@ -348,6 +391,13 @@ acronyms <- rep.int(names(gigs::ig_nbs), times = rep(4, length(names(gigs::ig_nb
 sexes <- rep_len(c("M", "M", "F", "F"), length.out = length(acronyms))
 zc <- rep_len(c("z", "c", "z", "c"), length.out = length(acronyms))
 ig_nbs <- mapply(FUN = compare_ig_nbs, acronyms, sexes, zc)
+if (!interactive()) Sys.sleep(wait_time_secs)
+
+cli::cli_h1(text = "Extended INTERGROWTH-21st Newborn Size Standards")
+acronyms <- rep.int(names(gigs::ig_nbs_ext), times = rep(4, length(names(gigs::ig_nbs_ext))))
+sexes <- rep_len(c("M", "M", "F", "F"), length.out = length(acronyms))
+zc <- rep_len(c("z", "c", "z", "c"), length.out = length(acronyms))
+ig_nbs_ext <- mapply(FUN = compare_ig_nbs_ext, acronyms, sexes, zc)
 if (!interactive()) Sys.sleep(wait_time_secs)
 
 cli::cli_h1(text = "INTERGROWTH-21st Postnatal Growth Standards")

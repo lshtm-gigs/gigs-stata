@@ -1,7 +1,7 @@
-v 1.0.0
+v 1.1.0
 d Materials by S. R. Parker
 d London School of Hygiene & Tropical Medicine
-d simon.parker@lshtm.ac.uk
+d simon.parker1471@outlook.com
 d https://github.com/lshtm-gigs/gigs-stata
 
 d gigs provides a single, simple interface for working with outputs from the INTERGROWTH-21st project and the WHO Child Growth standards. You will find functions for converting anthropometric measures (e.g. weight or length) to z-scores and centiles, and the inverse. Also included are functions for classifying newborn and infant growth according to published cut-offs.

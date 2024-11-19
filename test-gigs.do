@@ -15,8 +15,8 @@ log using test-gigs.log, replace text name("GIGS Testing")
 //     and with .dta files to be tested against R dataframes
 local outputs "tests/outputs"
 cap mkdir "`outputs'"
-foreach aspect in "who_gs" "ig_nbs" "ig_png" "ig_fet" "interpolation" ///
-    "z_lgls" "classification" {
+foreach aspect in "who_gs" "ig_nbs" "ig_nbs_ext" "ig_png" "ig_fet" ///
+    "interpolation" "z_lgls" "classification" {
 	cap mkdir "`outputs'/`aspect'"
 	noi di "Running .dta file generation for `aspect'"
 	frames reset

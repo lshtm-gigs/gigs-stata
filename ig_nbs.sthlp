@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.5.0 31 Oct 2024}{...}
+{* *! version 0.6.0 31 Oct 2024}{...}
 {vieweralsosee "" "--"}{...}
 {vieweralsosee "gigs: Classification functions" "help classify_sfga"}{...}
 {viewerjumpto "Syntax" "ig_nbs##syntax"}{...}
@@ -32,6 +32,7 @@
 {ifin}{cmd:,} 
 {cmdab:gest:_days}{cmd:(}{varname}{cmd:)} {cmdab:sex}{cmd:(}{varname}{cmd:)}
 {cmdab:sexc:ode}{cmd:(}{cmdab:m:ale=}{it:code}{cmd:,} {cmdab:f:emale=}{it:code}{cmd:)}
+[{cmd:extend}]
 
 {p 8 17 2}{cmd:egen} [{it:{help datatype:type}}] {newvar} {cmd:=}
 {cmd:ig_png}{cmd:(}{varname}{cmd:,}{it: acronym}{cmd:,}{it: conversion}{cmd:)}
@@ -171,6 +172,11 @@ also {it:fcn} dependent.
  newborns. Any value outside the range of valid gestational ages as specified by
  the acronym argument (see Table {help ig_nbs##tab1:1}) will return a missing
  value.
+ 
+{phang}{opt extend} should be specified if you want to use an extrapolated
+ version of the INTERGROWTH-21st Newborn Size standards which accepts 
+ gestational ages from 154 to 314 days (22+0 to 44+6 wks). This option can only 
+ be used when {it:acronym} is one of {bf:wfga}, {bf:lfga}, or {bf:hcfga}.
 
 {marker standards}{...}
 {title:Available Standards}
