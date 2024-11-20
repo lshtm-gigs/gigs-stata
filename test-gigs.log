@@ -2,7 +2,7 @@
       name:  GIGS Testing
        log:  D:\Users\tadeo\Documents\gigs-stata\test-gigs.log
   log type:  text
- opened on:  19 Nov 2024, 09:38:21
+ opened on:  20 Nov 2024, 13:50:06
 
 . 
 . //  1. Generate .dta files with standards using "z2v/c2v" conversions,
@@ -231,6 +231,4 @@ r(606);
 end of do-file
 
 r(606);
-
-. view "D:\Users\tadeo\Documents\gigs-stata\test-gigs.log"
 

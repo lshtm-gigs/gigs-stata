@@ -1,5 +1,5 @@
 capture program drop gigs_classify_growth
-*! version 0.2.0 (SJxx-x: dmxxxx)
+*! version 0.2.1 (SJxx-x: dmxxxx)
 program define gigs_classify_growth
 	version 16
 	preserve
@@ -48,6 +48,11 @@ program define gigs_classify_growth
 			local sex_was_str = 0
 			qui tostring(`sex'), replace
 		}
+	}
+	
+	if ("`id'" == "") {
+		tempvar id
+		gen byte `id' = 1
 	}
 	
 	local id_type = "`:type `id''"
