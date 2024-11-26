@@ -1,5 +1,5 @@
 capture prog drop gigs_zscore
-*! version 0.2.0 (SJxx-x: dmxxxx)
+*! version 0.2.1 (SJxx-x: dmxxxx)
 program gigs_zscore
 	version 16
 	preserve
@@ -67,7 +67,6 @@ program gigs_zscore
 		tempvar use_ig_nbs use_ig_png use_who_gs
 		gigs_zscoring_lgls `use_ig_nbs' `use_ig_png' `use_who_gs' ///
 			if `touse', age_days(`age_days') gest_days(`gest_days') id(`id')
-		noi di "`use_ig_nbs' `use_ig_png' `use_who_gs'"
 	}
 	else {	
 		local use_ig_nbs : word 1 of `gigs_lgls'

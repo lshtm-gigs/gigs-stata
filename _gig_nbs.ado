@@ -1,7 +1,7 @@
 capture program drop _gig_nbs
 capture program drop Badsexvar_nbs
 capture program drop Badsyntax_nbs
-*! version 0.4.0 (SJxx-x: dmxxxx)
+*! version 0.4.1 (SJxx-x: dmxxxx)
 program define _gig_nbs
  	version 16
 	preserve
@@ -88,7 +88,7 @@ program define _gig_nbs
  	} 
 	else Badsyntax_nbs
 
-    marksample touse
+	marksample touse
 
 	local sex_type = "`:type `sex''"
 	if !regexm("`sex_type'", "byte|str|int") {
@@ -133,11 +133,10 @@ program define _gig_nbs
 		// Append, then interpolate in Mata (see gigs_ipolate_coeffs.mata)
 		qui {
 			tempvar n appended need_interp
-			qui append using "`filepath'", gen(`appended')
+			append using "`filepath'", gen(`appended')
 			gen `n' = _n
 			gen `need_interp' = 0
 			replace `need_interp' = `appended' == 0
-			li nbsMSNT_*
 			mata gigs_ipolate_coeffs(
 				"nbsMSNT_gest_age", ///
 				"nbsMSNT_sex", ///
@@ -320,8 +319,8 @@ program define _gig_nbs
 		}
 		
 		qui {
-		    gen nbsBC_sexacronym = "`acronym'_M" if `sex' == "`male'"
-            replace nbsBC_sexacronym = "`acronym'_F" if `sex' == "`female'"
+			gen nbsBC_sexacronym = "`acronym'_M" if `sex' == "`male'"
+			replace nbsBC_sexacronym = "`acronym'_F" if `sex' == "`female'"
 			merge m:1 nbsBC_sexacronym using "`filepath'", ///
 				nogenerate keep(1 3)
 			sort `n'
@@ -358,10 +357,10 @@ program define _gig_nbs
 	}
 	qui {
 		if (`use_extended' == 1) {
-			cap gen `check_ga' = `gest_days' >= 154 & `gest_days' <= 314
+			cap gen byte `check_ga' = `gest_days' >= 154 & `gest_days' <= 314
 		}
 		else {
-			cap gen `check_ga' = `gest_days' >= 168 & `gest_days' <= 300
+			cap gen byte `check_ga' = `gest_days' >= 168 & `gest_days' <= 300
 		}
 		gen `check_sex' = `sex' == "`male'" | `sex' == "`female'"
 		if "`sex_was_str'" == "0" destring(`sex'), replace

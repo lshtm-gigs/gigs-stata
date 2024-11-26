@@ -1,7 +1,7 @@
 {smcl}
-{* *! version 0.6.0 31 Oct 2024}{...}
+{* *! version 0.6.1 26 Nov 2024}{...}
 {vieweralsosee "" "--"}{...}
-{vieweralsosee "gigs: Classification functions" "help classify_sfga"}{...}
+{vieweralsosee "gigs: Classification command" "help gigs_classify_growth"}{...}
 {viewerjumpto "Syntax" "ig_nbs##syntax"}{...}
 {viewerjumpto "Description" "ig_nbs##description"}{...}
 {viewerjumpto "Functions" "ig_nbs##functions"}{...}
