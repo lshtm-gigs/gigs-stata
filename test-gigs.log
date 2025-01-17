@@ -1,8 +1,8 @@
------------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------
       name:  GIGS Testing
        log:  D:\Users\tadeo\Documents\gigs-stata\test-gigs.log
   log type:  text
- opened on:  20 Nov 2024, 13:50:06
+ opened on:  17 Jan 2025, 08:58:04
 
 . 
 . //  1. Generate .dta files with standards using "z2v/c2v" conversions,
@@ -232,3 +232,2180 @@ end of do-file
 
 r(606);
 
+. do "D:\Users\tadeo\Documents\gigs-stata\benchmarking\benchmark.do"
+
+. /* 
+>   The benchmarking code here is used to compare and contrast different versions
+>   of the Stata code with each other, and with R implementations. 
+> 
+>   The benchmarking table used is the same used to compare the R/SAS 
+>   implementations of these growth standards against each other. The generation
+>   process for this table can be checked out on the R package website in the 
+>   benchmarking article 
+>   (https://docs.ropensci.org/gigs/articles/benchmarking.html).
+>   
+>   It is assumed that a user running this script has gigs installed, either as a 
+>   stable release or dev version from GitHub.
+> */
+. 
+. clear all
+
+. 
+. local bench_folder = "D:\Users\tadeo\Documents\gigs-stata\benchmarking"
+
+. log using "`bench_folder'\statabench.log", replace text nomsg
+(file D:\Users\tadeo\Documents\gigs-stata\benchmarking\statabench.log not found)
+
+. 
+. // WHO Child Growth Standards
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_who_gs.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "Number of inputs: `i'"
+  5.         bench, reps(25) restore last: ///
+>                 qui egen double z_gigs = who_gs(y, "wfa", "v2z"), ///
+>                         xvar(x) sex(sex) sexcode(m=M, f=F)
+  6. }
+Number of inputs: 1
+Average over 25 runs: 0.010 seconds
+Number of inputs: 10
+Average over 25 runs: 0.009 seconds
+Number of inputs: 100
+Average over 25 runs: 0.010 seconds
+Number of inputs: 500
+Average over 25 runs: 0.010 seconds
+Number of inputs: 1000
+Average over 25 runs: 0.012 seconds
+Number of inputs: 5000
+Average over 25 runs: 0.025 seconds
+Number of inputs: 10000
+Average over 25 runs: 0.041 seconds
+Number of inputs: 25000
+Average over 25 runs: 0.088 seconds
+Number of inputs: 50000
+Average over 25 runs: 0.169 seconds
+Number of inputs: 75000
+Average over 25 runs: 0.256 seconds
+Number of inputs: 100000
+Average over 25 runs: 0.351 seconds
+
+. 
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_who_gs.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "Number of inputs: `i'"
+  5.         bench, reps(25) restore last: ///
+>                 qui egen z_anthro = zanthro(y, wa, WHO), xvar(x) gender(sex) ///
+>                         gencode(male=M, female=F) ageunit(day)
+  6. }
+Number of inputs: 1
+Average over 25 runs: 0.008 seconds
+Number of inputs: 10
+Average over 25 runs: 0.008 seconds
+Number of inputs: 100
+Average over 25 runs: 0.009 seconds
+Number of inputs: 500
+Average over 25 runs: 0.013 seconds
+Number of inputs: 1000
+Average over 25 runs: 0.018 seconds
+Number of inputs: 5000
+Average over 25 runs: 0.060 seconds
+Number of inputs: 10000
+Average over 25 runs: 0.111 seconds
+Number of inputs: 25000
+Average over 25 runs: 0.268 seconds
+Number of inputs: 50000
+Average over 25 runs: 0.541 seconds
+Number of inputs: 75000
+Average over 25 runs: 1.243 seconds
+Number of inputs: 100000
+Average over 25 runs: 1.349 seconds
+
+. 
+. // IG-21st Newborn Size Standards
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_ig_nbs.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "Number of inputs: `i'"
+  5.         bench, reps(25) restore last: ///
+>                 qui egen double z_gigs = ig_nbs(y, "wfga", "v2z"), ///
+>                         gest_days(gest_days) sex(sex) sexcode(m=M, f=F)
+  6. }
+Number of inputs: 1
+variable gest_days not found
+(error in option gest_days())
+r(111);
+
+end of do-file
+
+r(111);
+
+. use life6mo
+no; dataset in memory has changed since last saved
+r(4);
+
+. log close
+
+. di "`bench_folder'\statabench.log"
+\statabench.log
+
+. cd
+D:\Users\tadeo\Documents\gigs-stata
+
+. 
+
+. do "C:\Users\tadeo\AppData\Local\Temp\STDfbc_000001.tmp"
+
+. local bench_folder "D:\Users\tadeo\Documents\gigs-stata\benchmarking"
+
+. 
+end of do-file
+
+. di "`bench_folder'"
+
+
+. local bench_folder = "D:\Users\tadeo\Documents\gigs-stata\benchmarking"
+
+. di "`bench_folder'"
+D:\Users\tadeo\Documents\gigs-stata\benchmarking
+
+. 
+
+. do "D:\Users\tadeo\Documents\gigs-stata\benchmarking\benchmark.do"
+
+. /* 
+>   The benchmarking code here is used to compare and contrast different versions
+>   of the Stata code with each other, and with R implementations. 
+> 
+>   The benchmarking table used is the same used to compare the R/SAS 
+>   implementations of these growth standards against each other. The generation
+>   process for this table can be checked out on the R package website in the 
+>   benchmarking article 
+>   (https://docs.ropensci.org/gigs/articles/benchmarking.html).
+>   
+>   It is assumed that a user running this script has gigs installed, either as a 
+>   stable release or dev version from GitHub.
+> */
+. 
+. clear all
+
+. 
+. local bench_folder "D:\Users\tadeo\Documents\gigs-stata\benchmarking"
+
+. log using "`bench_folder'\statabench.log", replace text nomsg
+
+. 
+. // WHO Child Growth Standards
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_who_gs.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "Number of inputs: `i'"
+  5.         bench, reps(50) restore last: ///
+>                 qui egen double z_gigs = who_gs(y, "wfa", "v2z"), ///
+>                         xvar(x) sex(sex) sexcode(m=M, f=F)
+  6. }
+Number of inputs: 1
+Average over 50 runs: 0.009 seconds
+Number of inputs: 10
+Average over 50 runs: 0.009 seconds
+Number of inputs: 100
+Average over 50 runs: 0.009 seconds
+Number of inputs: 500
+Average over 50 runs: 0.010 seconds
+Number of inputs: 1000
+Average over 50 runs: 0.011 seconds
+Number of inputs: 5000
+Average over 50 runs: 0.024 seconds
+Number of inputs: 10000
+Average over 50 runs: 0.040 seconds
+Number of inputs: 25000
+Average over 50 runs: 0.089 seconds
+Number of inputs: 50000
+Average over 50 runs: 0.171 seconds
+Number of inputs: 75000
+Average over 50 runs: 0.257 seconds
+Number of inputs: 100000
+Average over 50 runs: 0.349 seconds
+
+. 
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_who_gs.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "Number of inputs: `i'"
+  5.         bench, reps(50) restore last: ///
+>                 qui egen z_anthro = zanthro(y, wa, WHO), xvar(x) gender(sex) ///
+>                         gencode(male=M, female=F) ageunit(day)
+  6. }
+Number of inputs: 1
+Average over 50 runs: 0.008 seconds
+Number of inputs: 10
+Average over 50 runs: 0.008 seconds
+Number of inputs: 100
+Average over 50 runs: 0.009 seconds
+Number of inputs: 500
+Average over 50 runs: 0.013 seconds
+Number of inputs: 1000
+Average over 50 runs: 0.018 seconds
+Number of inputs: 5000
+Average over 50 runs: 0.060 seconds
+Number of inputs: 10000
+Average over 50 runs: 0.114 seconds
+Number of inputs: 25000
+Average over 50 runs: 0.279 seconds
+Number of inputs: 50000
+Average over 50 runs: 0.545 seconds
+Number of inputs: 75000
+Average over 50 runs: 0.800 seconds
+Number of inputs: 100000
+Average over 50 runs: 1.104 seconds
+
+. 
+. // IG-21st Newborn Size Standards
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_ig_nbs.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "Number of inputs: `i'"
+  5.         bench, reps(50) restore last: ///
+>                 qui egen double z_gigs = ig_nbs(y, "wfga", "v2z"), ///
+>                         gest_days(x) sex(sex) sexcode(m=M, f=F)
+  6. }
+Number of inputs: 1
+Average over 50 runs: 0.004 seconds
+Number of inputs: 10
+Average over 50 runs: 0.004 seconds
+Number of inputs: 100
+Average over 50 runs: 0.005 seconds
+Number of inputs: 500
+Average over 50 runs: 0.006 seconds
+Number of inputs: 1000
+Average over 50 runs: 0.007 seconds
+Number of inputs: 5000
+Average over 50 runs: 0.022 seconds
+Number of inputs: 10000
+Average over 50 runs: 0.041 seconds
+Number of inputs: 25000
+Average over 50 runs: 0.095 seconds
+Number of inputs: 50000
+Average over 50 runs: 0.187 seconds
+Number of inputs: 75000
+Average over 50 runs: 0.282 seconds
+Number of inputs: 100000
+Average over 50 runs: 0.383 seconds
+
+. 
+. // IG-21st Postnatal Growth Standards
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_ig_png.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "Number of inputs: `i'"
+  5.         bench, reps(50) restore last: ///
+>                 qui egen double z_gigs = ig_png(y, "wfa", "v2z"), ///
+>                         xvar(x) sex(sex) sexcode(m=M, f=F)
+  6. }
+Number of inputs: 1
+Average over 50 runs: 0.002 seconds
+Number of inputs: 10
+Average over 50 runs: 0.003 seconds
+Number of inputs: 100
+Average over 50 runs: 0.003 seconds
+Number of inputs: 500
+Average over 50 runs: 0.003 seconds
+Number of inputs: 1000
+Average over 50 runs: 0.003 seconds
+Number of inputs: 5000
+Average over 50 runs: 0.008 seconds
+Number of inputs: 10000
+Average over 50 runs: 0.014 seconds
+Number of inputs: 25000
+Average over 50 runs: 0.030 seconds
+Number of inputs: 50000
+Average over 50 runs: 0.057 seconds
+Number of inputs: 75000
+Average over 50 runs: 0.081 seconds
+Number of inputs: 100000
+Average over 50 runs: 0.109 seconds
+
+. 
+. // IG-21st Fetal Standards
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_ig_fet.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "Number of inputs: `i'"
+  5.         bench, reps(50) restore last: ///
+>                 qui egen double z_gigs = ig_fet(y, "ofdfga", "v2z"), xvar(x)
+  6. }
+Number of inputs: 1
+Average over 50 runs: 0.002 seconds
+Number of inputs: 10
+Average over 50 runs: 0.002 seconds
+Number of inputs: 100
+Average over 50 runs: 0.002 seconds
+Number of inputs: 500
+Average over 50 runs: 0.003 seconds
+Number of inputs: 1000
+Average over 50 runs: 0.003 seconds
+Number of inputs: 5000
+Average over 50 runs: 0.005 seconds
+Number of inputs: 10000
+Average over 50 runs: 0.008 seconds
+Number of inputs: 25000
+Average over 50 runs: 0.017 seconds
+Number of inputs: 50000
+Average over 50 runs: 0.030 seconds
+Number of inputs: 75000
+Average over 50 runs: 0.042 seconds
+Number of inputs: 100000
+Average over 50 runs: 0.058 seconds
+
+. 
+. log close
+
+. 
+. 
+. 
+. // OLD VERSIONS OF GIGS --------------------------------------------------------
+. // Kept to note how development is progressing
+. 
+. 
+. 
+. // gigs 0.4.0
+. // Number of inputs: 1
+. // Average over 25 runs: 0.009 seconds
+. // Number of inputs: 10
+. // Average over 25 runs: 0.008 seconds
+. // Number of inputs: 100
+. // Average over 25 runs: 0.009 seconds
+. // Number of inputs: 500
+. // Average over 25 runs: 0.010 seconds
+. // Number of inputs: 1000
+. // Average over 25 runs: 0.012 seconds
+. // Number of inputs: 5000
+. // Average over 25 runs: 0.028 seconds
+. // Number of inputs: 10000
+. // Average over 25 runs: 0.047 seconds
+. // Number of inputs: 25000
+. // Average over 25 runs: 0.104 seconds
+. // Number of inputs: 50000
+. // Average over 25 runs: 0.198 seconds
+. // Number of inputs: 75000
+. // Average over 25 runs: 0.296 seconds
+. // Number of inputs: 100000
+. // Average over 25 runs: 0.405 seconds
+. 
+. // gigs 0.3.2:
+. // Number of inputs: 1
+. // Average over 25 runs: 0.008 seconds
+. // Number of inputs: 10
+. // Average over 25 runs: 0.009 seconds
+. // Number of inputs: 100
+. // Average over 25 runs: 0.009 seconds
+. // Number of inputs: 500
+. // Average over 25 runs: 0.010 seconds
+. // Number of inputs: 1000
+. // Average over 25 runs: 0.012 seconds
+. // Number of inputs: 5000
+. // Average over 25 runs: 0.027 seconds
+. // Number of inputs: 10000
+. // Average over 25 runs: 0.045 seconds
+. // Number of inputs: 25000
+. // Average over 25 runs: 0.101 seconds
+. // Number of inputs: 50000
+. // Average over 25 runs: 0.195 seconds
+. // Number of inputs: 75000
+. // Average over 25 runs: 0.294 seconds
+. // Number of inputs: 100000
+. // Average over 25 runs: 0.405 seconds
+. 
+. // gigs 0.3.1:
+. // Number of inputs: 1
+. // Average over 25 runs: 0.008 seconds
+. // Number of inputs: 10
+. // Average over 25 runs: 0.009 seconds
+. // Number of inputs: 100
+. // Average over 25 runs: 0.009 seconds
+. // Number of inputs: 500
+. // Average over 25 runs: 0.010 seconds
+. // Number of inputs: 1000
+. // Average over 25 runs: 0.012 seconds
+. // Number of inputs: 5000
+. // Average over 25 runs: 0.028 seconds
+. // Number of inputs: 10000
+. // Average over 25 runs: 0.047 seconds
+. // Number of inputs: 25000
+. // Average over 25 runs: 0.106 seconds
+. // Number of inputs: 50000
+. // Average over 25 runs: 0.204 seconds
+. // Number of inputs: 75000
+. // Average over 25 runs: 0.310 seconds
+. // Number of inputs: 100000
+. // Average over 25 runs: 0.410 seconds
+. 
+. // gigs 0.3.0:
+. // Number of inputs: 1
+. // Average over 25 runs: 0.008 seconds
+. // Number of inputs: 10
+. // Average over 25 runs: 0.010 seconds
+. // Number of inputs: 100
+. // Average over 25 runs: 0.010 seconds
+. // Number of inputs: 500
+. // Average over 25 runs: 0.011 seconds
+. // Number of inputs: 1000
+. // Average over 25 runs: 0.013 seconds
+. // Number of inputs: 5000
+. // Average over 25 runs: 0.028 seconds
+. // Number of inputs: 10000
+. // Average over 25 runs: 0.048 seconds
+. // Number of inputs: 25000
+. // Average over 25 runs: 0.107 seconds
+. // Number of inputs: 50000
+. // Average over 25 runs: 0.205 seconds
+. // Number of inputs: 75000
+. // Average over 25 runs: 0.313 seconds
+. // Number of inputs: 100000
+. // Average over 25 runs: 0.431 seconds
+. 
+. // gigs 0.2.4:
+. // Number of inputs: 1
+. // Average over 25 runs: 0.016 seconds
+. // Number of inputs: 10
+. // Average over 25 runs: 0.015 seconds
+. // Number of inputs: 100
+. // Average over 25 runs: 0.017 seconds
+. // Number of inputs: 500
+. // Average over 25 runs: 0.039 seconds
+. // Number of inputs: 1000
+. // Average over 25 runs: 0.079 seconds
+. // Number of inputs: 5000
+. // Average over 25 runs: 1.007 seconds
+. // --> Crashed on 10000 or more inputs
+. 
+end of do-file
+
+. clear all
+
+. do "C:\Users\tadeo\AppData\Local\Temp\STDfbc_000002.tmp"
+
+. local bench_folder "D:\Users\tadeo\Documents\gigs-stata\benchmarking"
+
+. 
+end of do-file
+
+. do "C:\Users\tadeo\AppData\Local\Temp\STDfbc_000003.tmp"
+
+. clear all
+
+. 
+. local bench_folder "D:\Users\tadeo\Documents\gigs-stata\benchmarking"
+
+. 
+end of do-file
+
+. do "C:\Users\tadeo\AppData\Local\Temp\STDfbc_000004.tmp"
+
+. local benchmarking_rscript "`bench_folder'\statabench2csv.R"
+
+. if "`c(os)'"=="MacOSX" | "`c(os)'"=="UNIX" {
+.     noi rsource using "`benchmarking_rscript'", ///
+>                 noloutput ///
+>                 rpath("/usr/local/bin/R") ///
+>                 roptions(`"--vanilla"')
+. }
+
+. else if "`c(os)'"=="Windows" { 
+.         // Windows
+.         // n.b. Set `rversion' to that of own system - n.b. gigs needs R >=4.1.0
+.         local rversion "4.3.3" 
+.         noi rsource using "`benchmarking_rscript'", ///
+>                 noloutput ///
+>                 rpath("C:\Program Files\R\R-`rversion'\bin\x64\Rterm.exe") ///
+>                 roptions("--vanilla")
+file \statabench2csv.R not found
+r(601);
+. }
+r(601);
+
+end of do-file
+
+r(601);
+
+. di "`benchmarking_rscript'"
+
+
+. local benchmarking_rscript = "`bench_folder'\statabench2csv.R"
+
+. di "`benchmarking_rscript'"
+D:\Users\tadeo\Documents\gigs-stata\benchmarking\statabench2csv.R
+
+. do "C:\Users\tadeo\AppData\Local\Temp\STDfbc_000005.tmp"
+
+. local benchmarking_rscript = "`bench_folder'\statabench2csv.R"
+
+. if "`c(os)'"=="MacOSX" | "`c(os)'"=="UNIX" {
+.     noi rsource using "`benchmarking_rscript'", ///
+>                 noloutput ///
+>                 rpath("/usr/local/bin/R") ///
+>                 roptions(`"--vanilla"')
+. }
+
+. else if "`c(os)'"=="Windows" { 
+.         // Windows
+.         // n.b. Set `rversion' to that of own system - n.b. gigs needs R >=4.1.0
+.         local rversion "4.3.3" 
+.         noi rsource using "`benchmarking_rscript'", ///
+>                 noloutput ///
+>                 rpath("C:\Program Files\R\R-`rversion'\bin\x64\Rterm.exe") ///
+>                 roptions("--vanilla")
+file \statabench2csv.R not found
+r(601);
+. }
+r(601);
+
+end of do-file
+
+r(601);
+
+. di "`benchmarking_rscript'"
+D:\Users\tadeo\Documents\gigs-stata\benchmarking\statabench2csv.R
+
+. set trace on
+
+. "`benchmarking_rscript'"
+"D:\Users\tadeo\Documents\gigs-stata\benchmarking\statabench2csv.R is not a valid command name
+r(199);
+
+. do "C:\Users\tadeo\AppData\Local\Temp\STDfbc_000006.tmp"
+
+. if "`c(os)'"=="MacOSX" | "`c(os)'"=="UNIX" {
+.     noi rsource using "`benchmarking_rscript'", ///
+>                 noloutput ///
+>                 rpath("/usr/local/bin/R") ///
+>                 roptions(`"--vanilla"')
+. }
+
+. else if "`c(os)'"=="Windows" { 
+.         // Windows
+.         // n.b. Set `rversion' to that of own system - n.b. gigs needs R >=4.1.0
+.         local rversion "4.3.3" 
+.         noi rsource using "`benchmarking_rscript'", ///
+>                 noloutput ///
+>                 rpath("C:\Program Files\R\R-`rversion'\bin\x64\Rterm.exe") ///
+>                 roptions("--vanilla")
+  --------------------------------------------------------------------------------------------------------------------------- begin rsource ---
+  - version 10.0
+  - syntax [ using/ ] [ , TErminator(string) MAXlines(numlist min=1 max=1 >=0) RPath(string) ROptions(string) noLOutput LSource ]
+invalid file specification
+  ----------------------------------------------------------------------------------------------------------------------------- end rsource ---
+r(198);
+. }
+r(198);
+
+end of do-file
+
+r(198);
+
+. set trace off
+
+. do "C:\Users\tadeo\AppData\Local\Temp\STDfbc_000007.tmp"
+
+. if "`c(os)'"=="MacOSX" | "`c(os)'"=="UNIX" {
+.     noi rsource using "`benchmarking_rscript'", ///
+>                 noloutput ///
+>                 rpath("/usr/local/bin/R") ///
+>                 roptions(`"--vanilla"')
+. }
+
+. else if "`c(os)'"=="Windows" { 
+.         // Windows
+.         // n.b. Set `rversion' to that of own system - n.b. gigs needs R >=4.1.0
+.         local rversion "4.3.3" 
+.         noi rsource using "`benchmarking_rscript'", ///
+>                 noloutput ///
+>                 rpath("C:\Program Files\R\R-`rversion'\bin\x64\Rterm.exe") ///
+>                 roptions("--vanilla")
+invalid file specification
+r(198);
+. }
+r(198);
+
+end of do-file
+
+r(198);
+
+. do "C:\Users\tadeo\AppData\Local\Temp\STDfbc_000008.tmp"
+
+.         noi rsource using "`benchmarking_rscript'", ///
+
+end of do-file
+
+. noi rsource using "`benchmarking_rscript'", noloutput  rpath("C:\Program Files\R\R-`rversion'\bin\x64\Rterm.exe")  roptions("--vanilla")
+Assumed R program path: "C:\Program Files\R\R-\bin\x64\Rterm.exe"
+The system cannot find the path specified.
+
+. local rversion "4.3.3"
+
+. noi rsource using "`benchmarking_rscript'", noloutput  rpath("C:\Program Files\R\R-`rversion'\bin\x64\Rterm.exe")  roptions("--vanilla")
+Assumed R program path: "C:\Program Files\R\R-4.3.3\bin\x64\Rterm.exe"
+Error in `map()`:
+ℹ In index: 1.
+Caused by error in `data.frame()`:
+! arguments imply differing number of rows: 0, 1
+Backtrace:
+     ▆
+  1. ├─purrr::map_dfr(...)
+  2. │ └─purrr::map(.x, .f, ...)
+  3. │   └─purrr:::map_("list", .x, .f, ..., .progress = .progress)
+  4. │     ├─purrr:::with_indexed_errors(...)
+  5. │     │ └─base::withCallingHandlers(...)
+  6. │     ├─purrr:::call_with_cleanup(...)
+  7. │     └─global .f(.x[[i]], ...)
+  8. │       └─global logfile_to_df(logfile, acronym)
+  9. │         └─base::data.frame(...)
+ 10. │           └─base::stop(...)
+ 11. └─base::.handleSimpleError(...)
+ 12.   └─purrr (local) h(simpleError(msg, call))
+ 13.     └─cli::cli_abort(...)
+ 14.       └─rlang::abort(...)
+Execution halted
+
+. noi rsource using "`benchmarking_rscript'", noloutput  rpath("C:\Program Files\R\R-`rversion'\bin\x64\Rterm.exe")  roptions("--vanilla")
+Assumed R program path: "C:\Program Files\R\R-4.3.3\bin\x64\Rterm.exe"
+Error in `map()`:
+ℹ In index: 1.
+Caused by error in `data.frame()`:
+! arguments imply differing number of rows: 0, 1
+Backtrace:
+     ▆
+  1. ├─purrr::map_dfr(...)
+  2. │ └─purrr::map(.x, .f, ...)
+  3. │   └─purrr:::map_("list", .x, .f, ..., .progress = .progress)
+  4. │     ├─purrr:::with_indexed_errors(...)
+  5. │     │ └─base::withCallingHandlers(...)
+  6. │     ├─purrr:::call_with_cleanup(...)
+  7. │     └─global .f(.x[[i]], ...)
+  8. │       └─global logfile_to_df(logfile, acronym)
+  9. │         └─base::data.frame(...)
+ 10. │           └─base::stop(...)
+ 11. └─base::.handleSimpleError(...)
+ 12.   └─purrr (local) h(simpleError(msg, call))
+ 13.     └─cli::cli_abort(...)
+ 14.       └─rlang::abort(...)
+Execution halted
+
+. noi rsource using "`benchmarking_rscript'", noloutput  rpath("C:\Program Files\R\R-`rversion'\bin\x64\Rterm.exe")  roptions("--vanilla")
+Assumed R program path: "C:\Program Files\R\R-4.3.3\bin\x64\Rterm.exe"
+→ D:/Users/tadeo/Documents/gigs-stata
+Error in `map()`:
+ℹ In index: 1.
+Caused by error in `data.frame()`:
+! arguments imply differing number of rows: 0, 1
+Backtrace:
+     ▆
+  1. ├─purrr::map_dfr(...)
+  2. │ └─purrr::map(.x, .f, ...)
+  3. │   └─purrr:::map_("list", .x, .f, ..., .progress = .progress)
+  4. │     ├─purrr:::with_indexed_errors(...)
+  5. │     │ └─base::withCallingHandlers(...)
+  6. │     ├─purrr:::call_with_cleanup(...)
+  7. │     └─global .f(.x[[i]], ...)
+  8. │       └─global logfile_to_df(logfile, acronym)
+  9. │         └─base::data.frame(...)
+ 10. │           └─base::stop(...)
+ 11. └─base::.handleSimpleError(...)
+ 12.   └─purrr (local) h(simpleError(msg, call))
+ 13.     └─cli::cli_abort(...)
+ 14.       └─rlang::abort(...)
+Execution halted
+
+. noi rsource using "`benchmarking_rscript'", noloutput  rpath("C:\Program Files\R\R-`rversion'\bin\x64\Rterm.exe")  roptions("--vanilla")
+Assumed R program path: "C:\Program Files\R\R-4.3.3\bin\x64\Rterm.exe"
+Error in `map()`:
+ℹ In index: 1.
+Caused by error in `data.frame()`:
+! arguments imply differing number of rows: 0, 1
+Backtrace:
+     ▆
+  1. ├─purrr::map_dfr(...)
+  2. │ └─purrr::map(.x, .f, ...)
+  3. │   └─purrr:::map_("list", .x, .f, ..., .progress = .progress)
+  4. │     ├─purrr:::with_indexed_errors(...)
+  5. │     │ └─base::withCallingHandlers(...)
+  6. │     ├─purrr:::call_with_cleanup(...)
+  7. │     └─global .f(.x[[i]], ...)
+  8. │       └─global logfile_to_df(logfile, acronym)
+  9. │         └─base::data.frame(...)
+ 10. │           └─base::stop(...)
+ 11. └─base::.handleSimpleError(...)
+ 12.   └─purrr (local) h(simpleError(msg, call))
+ 13.     └─cli::cli_abort(...)
+ 14.       └─rlang::abort(...)
+Execution halted
+
+. noi rsource using "`benchmarking_rscript'", noloutput  rpath("C:\Program Files\R\R-`rversion'\bin\x64\Rterm.exe")  roptions("--vanilla")
+Assumed R program path: "C:\Program Files\R\R-4.3.3\bin\x64\Rterm.exe"
+Warning message:
+. . // WHO Child Growth Standards. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {  2.         use "`bench_folder'/bench_d
+> s_who_gs.dta", clear  3.         qui drop if _n > `i'  4.         di "Number of inputs: `i'"  5.         bench, reps(50) restore last: ///>  
+>                qui egen double z_gigs = who_gs(y, "wfa", "v2z"), ///>                         xvar(x) sex(sex) sexcode(m=M, f=F)  6. }Number 
+> of inputs: 1Average over 50 runs: 0.009 secondsNumber of inputs: 10Average over 50 runs: 0.009 secondsNumber of inputs: 100Average over 50 ru
+> ns: 0.009 secondsNumber of inputs: 500Average over 50 runs: 0.010 secondsNumber of inputs: 1000Average over 50 runs: 0.011 secondsNumber of i
+> nputs: 5000Average over 50 runs: 0.024 secondsNumber of inputs: 10000Average over 50 runs: 0.040 secondsNumber of inputs: 25000Average over 5
+> 0 runs: 0.089 secondsNumber of inputs: 50000Average over 50 runs: 0.171 secondsNumber of inputs: 75000Average over 50 runs: 0.257 secondsNumb
+> er of input [... truncated] 
+Error in `map()`:
+ℹ In index: 1.
+Caused by error in `data.frame()`:
+! arguments imply differing number of rows: 0, 1
+Backtrace:
+     ▆
+  1. ├─purrr::map_dfr(...)
+  2. │ └─purrr::map(.x, .f, ...)
+  3. │   └─purrr:::map_("list", .x, .f, ..., .progress = .progress)
+  4. │     ├─purrr:::with_indexed_errors(...)
+  5. │     │ └─base::withCallingHandlers(...)
+  6. │     ├─purrr:::call_with_cleanup(...)
+  7. │     └─global .f(.x[[i]], ...)
+  8. │       └─global logfile_to_df(logfile, acronym)
+  9. │         └─base::data.frame(...)
+ 10. │           └─base::stop(...)
+ 11. └─base::.handleSimpleError(...)
+ 12.   └─purrr (local) h(simpleError(msg, call))
+ 13.     └─cli::cli_abort(...)
+ 14.       └─rlang::abort(...)
+Execution halted
+
+. do "C:\Users\tadeo\AppData\Local\Temp\STDfbc_000009.tmp"
+
+. clear all
+
+. 
+. local bench_folder "D:\Users\tadeo\Documents\gigs-stata\benchmarking"
+
+. log using "`bench_folder'\statabench.log", replace text nomsg
+
+. 
+. // WHO Child Growth Standards
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_who_gs.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "For who_gs: Number of inputs: `i'"
+  5.         bench, reps(50) restore last: ///
+>                 qui egen double z_gigs = who_gs(y, "wfa", "v2z"), ///
+>                         xvar(x) sex(sex) sexcode(m=M, f=F)
+  6. }
+For who_gs: Number of inputs: 1
+Average over 50 runs: 0.008 seconds
+For who_gs: Number of inputs: 10
+Average over 50 runs: 0.009 seconds
+For who_gs: Number of inputs: 100
+Average over 50 runs: 0.009 seconds
+For who_gs: Number of inputs: 500
+Average over 50 runs: 0.010 seconds
+For who_gs: Number of inputs: 1000
+Average over 50 runs: 0.012 seconds
+For who_gs: Number of inputs: 5000
+Average over 50 runs: 0.024 seconds
+For who_gs: Number of inputs: 10000
+Average over 50 runs: 0.040 seconds
+For who_gs: Number of inputs: 25000
+--Break--
+r(1);
+
+end of do-file
+
+--Break--
+r(1);
+
+. do "C:\Users\tadeo\AppData\Local\Temp\STDfbc_00000a.tmp"
+
+. clear all
+
+. 
+. local bench_folder "D:\Users\tadeo\Documents\gigs-stata\benchmarking"
+
+. log using "`bench_folder'\statabench.log", replace text nomsg
+log file already open
+r(604);
+
+end of do-file
+
+r(604);
+
+. log close
+
+. do "C:\Users\tadeo\AppData\Local\Temp\STDfbc_00000a.tmp"
+
+. clear all
+
+. 
+. local bench_folder "D:\Users\tadeo\Documents\gigs-stata\benchmarking"
+
+. log using "`bench_folder'\statabench.log", replace text nomsg
+
+. 
+. // WHO Child Growth Standards
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_who_gs.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "For who_gs: Number of inputs: `i'"
+  5.         bench, reps(1) restore last: ///
+>                 qui egen double z_gigs = who_gs(y, "wfa", "v2z"), ///
+>                         xvar(x) sex(sex) sexcode(m=M, f=F)
+  6. }
+For who_gs: Number of inputs: 1
+0.077 seconds
+For who_gs: Number of inputs: 10
+0.009 seconds
+For who_gs: Number of inputs: 100
+0.011 seconds
+For who_gs: Number of inputs: 500
+0.009 seconds
+For who_gs: Number of inputs: 1000
+0.012 seconds
+For who_gs: Number of inputs: 5000
+0.024 seconds
+For who_gs: Number of inputs: 10000
+0.040 seconds
+For who_gs: Number of inputs: 25000
+0.095 seconds
+For who_gs: Number of inputs: 50000
+0.185 seconds
+For who_gs: Number of inputs: 75000
+0.282 seconds
+For who_gs: Number of inputs: 100000
+0.379 seconds
+
+. 
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_who_gs.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "For zanthro: Number of inputs: `i'"
+  5.         bench, reps(1) restore last: ///
+>                 qui egen z_anthro = zanthro(y, wa, WHO), xvar(x) gender(sex) ///
+>                         gencode(male=M, female=F) ageunit(day)
+  6. }
+For zanthro: Number of inputs: 1
+0.012 seconds
+For zanthro: Number of inputs: 10
+0.015 seconds
+For zanthro: Number of inputs: 100
+0.009 seconds
+For zanthro: Number of inputs: 500
+0.014 seconds
+For zanthro: Number of inputs: 1000
+0.028 seconds
+For zanthro: Number of inputs: 5000
+0.073 seconds
+For zanthro: Number of inputs: 10000
+0.125 seconds
+For zanthro: Number of inputs: 25000
+0.277 seconds
+For zanthro: Number of inputs: 50000
+0.537 seconds
+For zanthro: Number of inputs: 75000
+0.807 seconds
+For zanthro: Number of inputs: 100000
+1.070 seconds
+
+. 
+. // IG-21st Newborn Size Standards
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_ig_nbs.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "For ig_nbs: Number of inputs: `i'"
+  5.         bench, reps(1) restore last: ///
+>                 qui egen double z_gigs = ig_nbs(y, "wfga", "v2z"), ///
+>                         gest_days(x) sex(sex) sexcode(m=M, f=F)
+  6. }
+For ig_nbs: Number of inputs: 1
+0.004 seconds
+For ig_nbs: Number of inputs: 10
+0.004 seconds
+For ig_nbs: Number of inputs: 100
+0.004 seconds
+For ig_nbs: Number of inputs: 500
+0.006 seconds
+For ig_nbs: Number of inputs: 1000
+0.007 seconds
+For ig_nbs: Number of inputs: 5000
+0.022 seconds
+For ig_nbs: Number of inputs: 10000
+0.048 seconds
+For ig_nbs: Number of inputs: 25000
+0.102 seconds
+For ig_nbs: Number of inputs: 50000
+0.195 seconds
+For ig_nbs: Number of inputs: 75000
+0.288 seconds
+For ig_nbs: Number of inputs: 100000
+0.391 seconds
+
+. 
+. // IG-21st Postnatal Growth Standards
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_ig_png.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "For ig_png: Number of inputs: `i'"
+  5.         bench, reps(1) restore last: ///
+>                 qui egen double z_gigs = ig_png(y, "wfa", "v2z"), ///
+>                         xvar(x) sex(sex) sexcode(m=M, f=F)
+  6. }
+For ig_png: Number of inputs: 1
+0.003 seconds
+For ig_png: Number of inputs: 10
+0.002 seconds
+For ig_png: Number of inputs: 100
+0.002 seconds
+For ig_png: Number of inputs: 500
+0.003 seconds
+For ig_png: Number of inputs: 1000
+0.004 seconds
+For ig_png: Number of inputs: 5000
+0.008 seconds
+For ig_png: Number of inputs: 10000
+0.014 seconds
+For ig_png: Number of inputs: 25000
+0.030 seconds
+For ig_png: Number of inputs: 50000
+0.063 seconds
+For ig_png: Number of inputs: 75000
+0.089 seconds
+For ig_png: Number of inputs: 100000
+0.116 seconds
+
+. 
+. // IG-21st Fetal Standards
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_ig_fet.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "For ig_fet: Number of inputs: `i'"
+  5.         bench, reps(1) restore last: ///
+>                 qui egen double z_gigs = ig_fet(y, "ofdfga", "v2z"), xvar(x)
+  6. }
+For ig_fet: Number of inputs: 1
+0.003 seconds
+For ig_fet: Number of inputs: 10
+0.002 seconds
+For ig_fet: Number of inputs: 100
+0.003 seconds
+For ig_fet: Number of inputs: 500
+0.003 seconds
+For ig_fet: Number of inputs: 1000
+0.003 seconds
+For ig_fet: Number of inputs: 5000
+0.005 seconds
+For ig_fet: Number of inputs: 10000
+0.007 seconds
+For ig_fet: Number of inputs: 25000
+0.017 seconds
+For ig_fet: Number of inputs: 50000
+0.038 seconds
+For ig_fet: Number of inputs: 75000
+0.042 seconds
+For ig_fet: Number of inputs: 100000
+0.067 seconds
+
+. 
+. log close
+
+. 
+end of do-file
+
+. do "C:\Users\tadeo\AppData\Local\Temp\STDfbc_00000b.tmp"
+
+. clear all
+
+. 
+. local bench_folder "D:\Users\tadeo\Documents\gigs-stata\benchmarking"
+
+. log using "`bench_folder'\statabench.log", replace text nomsg
+
+. 
+. // WHO Child Growth Standards
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_who_gs.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "For who_gs: Number of inputs: `i'"
+  5.         bench, reps(5) restore last: ///
+>                 qui egen double z_gigs = who_gs(y, "wfa", "v2z"), ///
+>                         xvar(x) sex(sex) sexcode(m=M, f=F)
+  6. }
+For who_gs: Number of inputs: 1
+Average over 5 runs: 0.021 seconds
+For who_gs: Number of inputs: 10
+Average over 5 runs: 0.012 seconds
+For who_gs: Number of inputs: 100
+Average over 5 runs: 0.011 seconds
+For who_gs: Number of inputs: 500
+Average over 5 runs: 0.010 seconds
+For who_gs: Number of inputs: 1000
+Average over 5 runs: 0.013 seconds
+For who_gs: Number of inputs: 5000
+Average over 5 runs: 0.028 seconds
+For who_gs: Number of inputs: 10000
+Average over 5 runs: 0.043 seconds
+For who_gs: Number of inputs: 25000
+Average over 5 runs: 0.092 seconds
+For who_gs: Number of inputs: 50000
+Average over 5 runs: 0.175 seconds
+For who_gs: Number of inputs: 75000
+Average over 5 runs: 0.268 seconds
+For who_gs: Number of inputs: 100000
+Average over 5 runs: 0.357 seconds
+
+. 
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_who_gs.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "For zanthro: Number of inputs: `i'"
+  5.         bench, reps(5) restore last: ///
+>                 qui egen z_anthro = zanthro(y, wa, WHO), xvar(x) gender(sex) ///
+>                         gencode(male=M, female=F) ageunit(day)
+  6. }
+For zanthro: Number of inputs: 1
+Average over 5 runs: 0.010 seconds
+For zanthro: Number of inputs: 10
+Average over 5 runs: 0.010 seconds
+For zanthro: Number of inputs: 100
+Average over 5 runs: 0.010 seconds
+For zanthro: Number of inputs: 500
+Average over 5 runs: 0.014 seconds
+For zanthro: Number of inputs: 1000
+Average over 5 runs: 0.020 seconds
+For zanthro: Number of inputs: 5000
+Average over 5 runs: 0.061 seconds
+For zanthro: Number of inputs: 10000
+Average over 5 runs: 0.113 seconds
+For zanthro: Number of inputs: 25000
+Average over 5 runs: 0.276 seconds
+For zanthro: Number of inputs: 50000
+Average over 5 runs: 0.547 seconds
+For zanthro: Number of inputs: 75000
+Average over 5 runs: 0.799 seconds
+For zanthro: Number of inputs: 100000
+Average over 5 runs: 1.066 seconds
+
+. 
+. // IG-21st Newborn Size Standards
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_ig_nbs.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "For ig_nbs: Number of inputs: `i'"
+  5.         bench, reps(5) restore last: ///
+>                 qui egen double z_gigs = ig_nbs(y, "wfga", "v2z"), ///
+>                         gest_days(x) sex(sex) sexcode(m=M, f=F)
+  6. }
+For ig_nbs: Number of inputs: 1
+Average over 5 runs: 0.003 seconds
+For ig_nbs: Number of inputs: 10
+Average over 5 runs: 0.006 seconds
+For ig_nbs: Number of inputs: 100
+Average over 5 runs: 0.004 seconds
+For ig_nbs: Number of inputs: 500
+Average over 5 runs: 0.006 seconds
+For ig_nbs: Number of inputs: 1000
+Average over 5 runs: 0.007 seconds
+For ig_nbs: Number of inputs: 5000
+Average over 5 runs: 0.022 seconds
+For ig_nbs: Number of inputs: 10000
+Average over 5 runs: 0.040 seconds
+For ig_nbs: Number of inputs: 25000
+Average over 5 runs: 0.096 seconds
+For ig_nbs: Number of inputs: 50000
+Average over 5 runs: 0.185 seconds
+For ig_nbs: Number of inputs: 75000
+Average over 5 runs: 0.280 seconds
+For ig_nbs: Number of inputs: 100000
+Average over 5 runs: 0.387 seconds
+
+. 
+. // IG-21st Postnatal Growth Standards
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_ig_png.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "For ig_png: Number of inputs: `i'"
+  5.         bench, reps(5) restore last: ///
+>                 qui egen double z_gigs = ig_png(y, "wfa", "v2z"), ///
+>                         xvar(x) sex(sex) sexcode(m=M, f=F)
+  6. }
+For ig_png: Number of inputs: 1
+Average over 5 runs: 0.002 seconds
+For ig_png: Number of inputs: 10
+Average over 5 runs: 0.004 seconds
+For ig_png: Number of inputs: 100
+Average over 5 runs: 0.002 seconds
+For ig_png: Number of inputs: 500
+Average over 5 runs: 0.005 seconds
+For ig_png: Number of inputs: 1000
+Average over 5 runs: 0.003 seconds
+For ig_png: Number of inputs: 5000
+Average over 5 runs: 0.008 seconds
+For ig_png: Number of inputs: 10000
+Average over 5 runs: 0.013 seconds
+For ig_png: Number of inputs: 25000
+Average over 5 runs: 0.032 seconds
+For ig_png: Number of inputs: 50000
+Average over 5 runs: 0.056 seconds
+For ig_png: Number of inputs: 75000
+Average over 5 runs: 0.082 seconds
+For ig_png: Number of inputs: 100000
+Average over 5 runs: 0.110 seconds
+
+. 
+. // IG-21st Fetal Standards
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_ig_fet.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "For ig_fet: Number of inputs: `i'"
+  5.         bench, reps(5) restore last: ///
+>                 qui egen double z_gigs = ig_fet(y, "ofdfga", "v2z"), xvar(x)
+  6. }
+For ig_fet: Number of inputs: 1
+Average over 5 runs: 0.002 seconds
+For ig_fet: Number of inputs: 10
+Average over 5 runs: 0.004 seconds
+For ig_fet: Number of inputs: 100
+Average over 5 runs: 0.002 seconds
+For ig_fet: Number of inputs: 500
+Average over 5 runs: 0.002 seconds
+For ig_fet: Number of inputs: 1000
+Average over 5 runs: 0.003 seconds
+For ig_fet: Number of inputs: 5000
+Average over 5 runs: 0.005 seconds
+For ig_fet: Number of inputs: 10000
+Average over 5 runs: 0.008 seconds
+For ig_fet: Number of inputs: 25000
+Average over 5 runs: 0.016 seconds
+For ig_fet: Number of inputs: 50000
+Average over 5 runs: 0.031 seconds
+For ig_fet: Number of inputs: 75000
+Average over 5 runs: 0.045 seconds
+For ig_fet: Number of inputs: 100000
+Average over 5 runs: 0.060 seconds
+
+. 
+. log close
+
+. 
+end of do-file
+
+. do "C:\Users\tadeo\AppData\Local\Temp\STDfbc_00000c.tmp"
+
+. clear all
+
+. 
+. local bench_folder "D:\Users\tadeo\Documents\gigs-stata\benchmarking"
+
+. log using "`bench_folder'\statabench.log", replace text nomsg
+
+. 
+. // WHO Child Growth Standards
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_who_gs.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "For who_gs gigs_stata - Number of inputs: `i'"
+  5.         bench, reps(5) restore last: ///
+>                 qui egen double z_gigs = who_gs(y, "wfa", "v2z"), ///
+>                         xvar(x) sex(sex) sexcode(m=M, f=F)
+  6. }
+For who_gs gigs_stata - Number of inputs: 1
+Average over 5 runs: 0.021 seconds
+For who_gs gigs_stata - Number of inputs: 10
+Average over 5 runs: 0.010 seconds
+For who_gs gigs_stata - Number of inputs: 100
+Average over 5 runs: 0.009 seconds
+For who_gs gigs_stata - Number of inputs: 500
+Average over 5 runs: 0.015 seconds
+For who_gs gigs_stata - Number of inputs: 1000
+Average over 5 runs: 0.012 seconds
+For who_gs gigs_stata - Number of inputs: 5000
+Average over 5 runs: 0.027 seconds
+For who_gs gigs_stata - Number of inputs: 10000
+Average over 5 runs: 0.040 seconds
+For who_gs gigs_stata - Number of inputs: 25000
+Average over 5 runs: 0.091 seconds
+For who_gs gigs_stata - Number of inputs: 50000
+Average over 5 runs: 0.178 seconds
+For who_gs gigs_stata - Number of inputs: 75000
+Average over 5 runs: 0.266 seconds
+For who_gs gigs_stata - Number of inputs: 100000
+Average over 5 runs: 0.356 seconds
+
+. 
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_who_gs.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "For who_gs zanthro - Number of inputs: `i'"
+  5.         bench, reps(5) restore last: ///
+>                 qui egen z_anthro = zanthro(y, wa, WHO), xvar(x) gender(sex) ///
+>                         gencode(male=M, female=F) ageunit(day)
+  6. }
+For who_gs zanthro - Number of inputs: 1
+Average over 5 runs: 0.009 seconds
+For who_gs zanthro - Number of inputs: 10
+Average over 5 runs: 0.010 seconds
+For who_gs zanthro - Number of inputs: 100
+Average over 5 runs: 0.011 seconds
+For who_gs zanthro - Number of inputs: 500
+Average over 5 runs: 0.015 seconds
+For who_gs zanthro - Number of inputs: 1000
+Average over 5 runs: 0.020 seconds
+For who_gs zanthro - Number of inputs: 5000
+Average over 5 runs: 0.066 seconds
+For who_gs zanthro - Number of inputs: 10000
+Average over 5 runs: 0.118 seconds
+For who_gs zanthro - Number of inputs: 25000
+Average over 5 runs: 0.270 seconds
+For who_gs zanthro - Number of inputs: 50000
+Average over 5 runs: 0.529 seconds
+For who_gs zanthro - Number of inputs: 75000
+Average over 5 runs: 0.793 seconds
+For who_gs zanthro - Number of inputs: 100000
+Average over 5 runs: 1.070 seconds
+
+. 
+. // IG-21st Newborn Size Standards
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_ig_nbs.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "For ig_nbs gigs_stata - Number of inputs: `i'"
+  5.         bench, reps(5) restore last: ///
+>                 qui egen double z_gigs = ig_nbs(y, "wfga", "v2z"), ///
+>                         gest_days(x) sex(sex) sexcode(m=M, f=F)
+  6. }
+For ig_nbs gigs_stata - Number of inputs: 1
+Average over 5 runs: 0.004 seconds
+For ig_nbs gigs_stata - Number of inputs: 10
+Average over 5 runs: 0.004 seconds
+For ig_nbs gigs_stata - Number of inputs: 100
+Average over 5 runs: 0.004 seconds
+For ig_nbs gigs_stata - Number of inputs: 500
+Average over 5 runs: 0.005 seconds
+For ig_nbs gigs_stata - Number of inputs: 1000
+Average over 5 runs: 0.008 seconds
+For ig_nbs gigs_stata - Number of inputs: 5000
+Average over 5 runs: 0.022 seconds
+For ig_nbs gigs_stata - Number of inputs: 10000
+Average over 5 runs: 0.042 seconds
+For ig_nbs gigs_stata - Number of inputs: 25000
+Average over 5 runs: 0.096 seconds
+For ig_nbs gigs_stata - Number of inputs: 50000
+Average over 5 runs: 0.185 seconds
+For ig_nbs gigs_stata - Number of inputs: 75000
+Average over 5 runs: 0.279 seconds
+For ig_nbs gigs_stata - Number of inputs: 100000
+Average over 5 runs: 0.385 seconds
+
+. 
+. // IG-21st Postnatal Growth Standards
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_ig_png.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "For ig_png gigs_stata - Number of inputs: `i'"
+  5.         bench, reps(5) restore last: ///
+>                 qui egen double z_gigs = ig_png(y, "wfa", "v2z"), ///
+>                         xvar(x) sex(sex) sexcode(m=M, f=F)
+  6. }
+For ig_png gigs_stata - Number of inputs: 1
+Average over 5 runs: 0.002 seconds
+For ig_png gigs_stata - Number of inputs: 10
+Average over 5 runs: 0.004 seconds
+For ig_png gigs_stata - Number of inputs: 100
+Average over 5 runs: 0.002 seconds
+For ig_png gigs_stata - Number of inputs: 500
+Average over 5 runs: 0.003 seconds
+For ig_png gigs_stata - Number of inputs: 1000
+Average over 5 runs: 0.004 seconds
+For ig_png gigs_stata - Number of inputs: 5000
+Average over 5 runs: 0.008 seconds
+For ig_png gigs_stata - Number of inputs: 10000
+Average over 5 runs: 0.014 seconds
+For ig_png gigs_stata - Number of inputs: 25000
+Average over 5 runs: 0.032 seconds
+For ig_png gigs_stata - Number of inputs: 50000
+Average over 5 runs: 0.056 seconds
+For ig_png gigs_stata - Number of inputs: 75000
+Average over 5 runs: 0.082 seconds
+For ig_png gigs_stata - Number of inputs: 100000
+Average over 5 runs: 0.110 seconds
+
+. 
+. // IG-21st Fetal Standards
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_ig_fet.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "For ig_fet gigs_stata - Number of inputs: `i'"
+  5.         bench, reps(5) restore last: ///
+>                 qui egen double z_gigs = ig_fet(y, "ofdfga", "v2z"), xvar(x)
+  6. }
+For ig_fet gigs_stata - Number of inputs: 1
+Average over 5 runs: 0.002 seconds
+For ig_fet gigs_stata - Number of inputs: 10
+Average over 5 runs: 0.005 seconds
+For ig_fet gigs_stata - Number of inputs: 100
+Average over 5 runs: 0.002 seconds
+For ig_fet gigs_stata - Number of inputs: 500
+Average over 5 runs: 0.003 seconds
+For ig_fet gigs_stata - Number of inputs: 1000
+Average over 5 runs: 0.003 seconds
+For ig_fet gigs_stata - Number of inputs: 5000
+Average over 5 runs: 0.006 seconds
+For ig_fet gigs_stata - Number of inputs: 10000
+Average over 5 runs: 0.010 seconds
+For ig_fet gigs_stata - Number of inputs: 25000
+Average over 5 runs: 0.018 seconds
+For ig_fet gigs_stata - Number of inputs: 50000
+Average over 5 runs: 0.029 seconds
+For ig_fet gigs_stata - Number of inputs: 75000
+Average over 5 runs: 0.044 seconds
+For ig_fet gigs_stata - Number of inputs: 100000
+Average over 5 runs: 0.062 seconds
+
+. 
+. log close
+
+. 
+end of do-file
+
+. do "C:\Users\tadeo\AppData\Local\Temp\STDfbc_00000d.tmp"
+
+. log close
+no log file open
+r(606);
+
+end of do-file
+
+r(606);
+
+. do "C:\Users\tadeo\AppData\Local\Temp\STDfbc_00000e.tmp"
+
+. local benchmarking_rscript = "`bench_folder'\statabench2csv.R"
+
+. if "`c(os)'"=="MacOSX" | "`c(os)'"=="UNIX" {
+.     noi rsource using "`benchmarking_rscript'", ///
+>                 noloutput ///
+>                 rpath("/usr/local/bin/R") ///
+>                 roptions(`"--vanilla"')
+. }
+
+. else if "`c(os)'"=="Windows" { 
+.         // Windows
+.         // n.b. Set `rversion' to that of own system - n.b. gigs needs R >=4.1.0
+.         local rversion "4.3.3" 
+.         noi rsource using "`benchmarking_rscript'", ///
+>                 noloutput ///
+>                 rpath("C:\Program Files\R\R-`rversion'\bin\x64\Rterm.exe") ///
+>                 roptions("--vanilla")
+file \statabench2csv.R not found
+r(601);
+. }
+r(601);
+
+end of do-file
+
+r(601);
+
+. do "C:\Users\tadeo\AppData\Local\Temp\STDfbc_00000f.tmp"
+
+. local bench_folder "D:\Users\tadeo\Documents\gigs-stata\benchmarking"
+
+. 
+end of do-file
+
+. do "C:\Users\tadeo\AppData\Local\Temp\STDfbc_00000g.tmp"
+
+. local benchmarking_rscript "`bench_folder'/statabench2csv.R"
+
+. 
+end of do-file
+
+. di "`benchmarking_rscript'"
+D:\Users\tadeo\Documents\gigs-stata\benchmarking\statabench2csv.R
+
+. do "C:\Users\tadeo\AppData\Local\Temp\STDfbc_00000h.tmp"
+
+. if "`c(os)'"=="MacOSX" | "`c(os)'"=="UNIX" {
+.     noi rsource using "`benchmarking_rscript'", ///
+>                 noloutput ///
+>                 rpath("/usr/local/bin/R") ///
+>                 roptions(`"--vanilla"')
+. }
+
+. else if "`c(os)'"=="Windows" { 
+.         // Windows
+.         // n.b. Set `rversion' to that of own system - n.b. gigs needs R >=4.1.0
+.         local rversion "4.3.3" 
+.         noi rsource using "`benchmarking_rscript'", ///
+>                 noloutput ///
+>                 rpath("C:\Program Files\R\R-`rversion'\bin\x64\Rterm.exe") ///
+>                 roptions("--vanilla")
+invalid file specification
+r(198);
+. }
+r(198);
+
+end of do-file
+
+r(198);
+
+. do "C:\Users\tadeo\AppData\Local\Temp\STDfbc_00000i.tmp"
+
+.         noi rsource using "`benchmarking_rscript'", ///
+>                 noloutput ///
+>                 rpath("C:\Program Files\R\R-`rversion'\bin\x64\Rterm.exe") ///
+>                 roptions("--vanilla")
+invalid file specification
+r(198);
+
+end of do-file
+
+r(198);
+
+. set trace on
+
+. do "C:\Users\tadeo\AppData\Local\Temp\STDfbc_00000j.tmp"
+
+. local benchmarking_rscript "`bench_folder'/statabench2csv.R"
+
+. if "`c(os)'"=="MacOSX" | "`c(os)'"=="UNIX" {
+.     noi rsource using "`benchmarking_rscript'", ///
+>                 noloutput ///
+>                 rpath("/usr/local/bin/R") ///
+>                 roptions(`"--vanilla"')
+. }
+
+. else if "`c(os)'"=="Windows" { 
+.         // Windows
+.         // n.b. Set `rversion' to that of own system - n.b. gigs needs R >=4.1.0
+.         local rversion "4.3.3" 
+.         noi rsource using "`benchmarking_rscript'", ///
+>                 noloutput ///
+>                 rpath("C:\Program Files\R\R-`rversion'\bin\x64\Rterm.exe") ///
+>                 roptions("--vanilla")
+  --------------------------------------------------------------------------------------------------------------------------- begin rsource ---
+  - version 10.0
+  - syntax [ using/ ] [ , TErminator(string) MAXlines(numlist min=1 max=1 >=0) RPath(string) ROptions(string) noLOutput LSource ]
+  - if "`maxlines'"=="" {
+  = if ""=="" {
+  - local maxlines=1024
+  - }
+  - if `"`rpath'"'=="" {
+  = if `"C:\Program Files\R\R-4.3.3\bin\x64\Rterm.exe"'=="" {
+    local rpath `"$Rterm_path"'
+    if `"`rpath'"'=="" {
+    local rpath = cond(c(os) == "Windows", "Rterm.exe", "/usr/bin/r")
+    }
+    }
+  - if `"`roptions'"'=="" {
+  = if `"--vanilla"'=="" {
+    local roptions `"$Rterm_options"'
+    }
+  - tempname sterminator scurline
+  - mata: st_strscalar("`sterminator'",strtrim(st_local("terminator")))
+  = mata: st_strscalar("__000000",strtrim(st_local("terminator")))
+  - if `"`using'"'=="" & `sterminator'=="" {
+  = if `"/statabench2csv.R"'=="" & __000000=="" {
+    disp as error "You must specify either using <filename> or a terminator() string "
+    error 498
+    }
+  - tempfile tempsource
+  - tempname tempbf
+  - qui file open `tempbf' using `"`tempsource'"', write text replace
+  = qui file open __000002 using `"C:\Users\tadeo\AppData\Local\Temp\ST_fbc_000001.tmp"', write text replace
+  - if `sterminator'!="" {
+  = if __000000!="" {
+    qui disp _request2(_curline)
+    mata: st_strscalar("`scurline'",st_local("curline"))
+    local nline=0
+    while `scurline'!=`sterminator' & `nline'<`maxlines' {
+    file write `tempbf' (`scurline') _n
+    local nline=`nline'+1
+    qui disp _request2(_curline)
+    mata: st_strscalar("`scurline'",st_local("curline"))
+    }
+    }
+  - if `"`using'"'!="" {
+  = if `"/statabench2csv.R"'!="" {
+  - tempname inbuff
+  - file open `inbuff' using `"`using'"', read text
+  = file open __000003 using `"/statabench2csv.R"', read text
+file /statabench2csv.R not found
+    file read `inbuff' curline
+    while !r(eof) {
+    mata: st_strscalar("`scurline'",st_local("curline"))
+    file write `tempbf' (`scurline') _n
+    file read `inbuff' curline
+    }
+    file close `inbuff'
+    }
+  ----------------------------------------------------------------------------------------------------------------------------- end rsource ---
+r(601);
+. }
+r(601);
+
+end of do-file
+
+r(601);
+
+. do "C:\Users\tadeo\AppData\Local\Temp\STDfbc_00000k.tmp"
+
+. local bench_folder "D:\Users\tadeo\Documents\gigs-stata\benchmarking"
+
+. local benchmarking_rscript "`bench_folder'/statabench2csv.R"
+
+. if "`c(os)'"=="MacOSX" | "`c(os)'"=="UNIX" {
+.     noi rsource using "`benchmarking_rscript'", ///
+>                 noloutput ///
+>                 rpath("/usr/local/bin/R") ///
+>                 roptions(`"--vanilla"')
+. }
+
+. else if "`c(os)'"=="Windows" { 
+.         // Windows
+.         // n.b. Set `rversion' to that of own system - n.b. gigs needs R >=4.1.0
+.         local rversion "4.3.3" 
+.         noi rsource using "`benchmarking_rscript'", ///
+>                 noloutput ///
+>                 rpath("C:\Program Files\R\R-`rversion'\bin\x64\Rterm.exe") ///
+>                 roptions("--vanilla")
+  --------------------------------------------------------------------------------------------------------------------------- begin rsource ---
+  - version 10.0
+  - syntax [ using/ ] [ , TErminator(string) MAXlines(numlist min=1 max=1 >=0) RPath(string) ROptions(string) noLOutput LSource ]
+  - if "`maxlines'"=="" {
+  = if ""=="" {
+  - local maxlines=1024
+  - }
+  - if `"`rpath'"'=="" {
+  = if `"C:\Program Files\R\R-4.3.3\bin\x64\Rterm.exe"'=="" {
+    local rpath `"$Rterm_path"'
+    if `"`rpath'"'=="" {
+    local rpath = cond(c(os) == "Windows", "Rterm.exe", "/usr/bin/r")
+    }
+    }
+  - if `"`roptions'"'=="" {
+  = if `"--vanilla"'=="" {
+    local roptions `"$Rterm_options"'
+    }
+  - tempname sterminator scurline
+  - mata: st_strscalar("`sterminator'",strtrim(st_local("terminator")))
+  = mata: st_strscalar("__000000",strtrim(st_local("terminator")))
+  - if `"`using'"'=="" & `sterminator'=="" {
+  = if `"D:\Users\tadeo\Documents\gigs-stata\benchmarking/statabench2csv.R"'=="" & __000000=="" {
+    disp as error "You must specify either using <filename> or a terminator() string "
+    error 498
+    }
+  - tempfile tempsource
+  - tempname tempbf
+  - qui file open `tempbf' using `"`tempsource'"', write text replace
+  = qui file open __000002 using `"C:\Users\tadeo\AppData\Local\Temp\ST_fbc_000001.tmp"', write text replace
+  - if `sterminator'!="" {
+  = if __000000!="" {
+    qui disp _request2(_curline)
+    mata: st_strscalar("`scurline'",st_local("curline"))
+    local nline=0
+    while `scurline'!=`sterminator' & `nline'<`maxlines' {
+    file write `tempbf' (`scurline') _n
+    local nline=`nline'+1
+    qui disp _request2(_curline)
+    mata: st_strscalar("`scurline'",st_local("curline"))
+    }
+    }
+  - if `"`using'"'!="" {
+  = if `"D:\Users\tadeo\Documents\gigs-stata\benchmarking/statabench2csv.R"'!="" {
+  - tempname inbuff
+  - file open `inbuff' using `"`using'"', read text
+  = file open __000003 using `"D:\Users\tadeo\Documents\gigs-stata\benchmarking/statabench2csv.R"', read text
+  - file read `inbuff' curline
+  = file read __000003 curline
+  - while !r(eof) {
+  - mata: st_strscalar("`scurline'",st_local("curline"))
+  = mata: st_strscalar("__000001",st_local("curline"))
+  - file write `tempbf' (`scurline') _n
+  = file write __000002 (__000001) _n
+  - file read `inbuff' curline
+  = file read __000003 curline
+  - }
+  - while !r(eof) {
+  - mata: st_strscalar("`scurline'",st_local("curline"))
+  = mata: st_strscalar("__000001",st_local("curline"))
+  - file write `tempbf' (`scurline') _n
+  = file write __000002 (__000001) _n
+  - file read `inbuff' curline
+  = file read __000003 curline
+  - }
+  - while !r(eof) {
+  - mata: st_strscalar("`scurline'",st_local("curline"))
+  = mata: st_strscalar("__000001",st_local("curline"))
+  - file write `tempbf' (`scurline') _n
+  = file write __000002 (__000001) _n
+  - file read `inbuff' curline
+  = file read __000003 curline
+  - }
+  - while !r(eof) {
+  - mata: st_strscalar("`scurline'",st_local("curline"))
+  = mata: st_strscalar("__000001",st_local("curline"))
+  - file write `tempbf' (`scurline') _n
+  = file write __000002 (__000001) _n
+  - file read `inbuff' curline
+  = file read __000003 curline
+  - }
+  - while !r(eof) {
+  - mata: st_strscalar("`scurline'",st_local("curline"))
+  = mata: st_strscalar("__000001",st_local("curline"))
+  - file write `tempbf' (`scurline') _n
+  = file write __000002 (__000001) _n
+  - file read `inbuff' curline
+  = file read __000003 curline
+  - }
+  - while !r(eof) {
+  - mata: st_strscalar("`scurline'",st_local("curline"))
+  = mata: st_strscalar("__000001",st_local("curline"))
+  - file write `tempbf' (`scurline') _n
+  = file write __000002 (__000001) _n
+  - file read `inbuff' curline
+  = file read __000003 curline
+  - }
+  - while !r(eof) {
+  - mata: st_strscalar("`scurline'",st_local("curline"))
+  = mata: st_strscalar("__000001",st_local("curline"))
+  - file write `tempbf' (`scurline') _n
+  = file write __000002 (__000001) _n
+  - file read `inbuff' curline
+  = file read __000003 curline
+  - }
+  - while !r(eof) {
+  - mata: st_strscalar("`scurline'",st_local("curline"))
+  = mata: st_strscalar("__000001",st_local("curline"))
+  - file write `tempbf' (`scurline') _n
+  = file write __000002 (__000001) _n
+  - file read `inbuff' curline
+  = file read __000003 curline
+  - }
+  - while !r(eof) {
+  - mata: st_strscalar("`scurline'",st_local("curline"))
+  = mata: st_strscalar("__000001",st_local("curline"))
+  - file write `tempbf' (`scurline') _n
+  = file write __000002 (__000001) _n
+  - file read `inbuff' curline
+  = file read __000003 curline
+  - }
+  - while !r(eof) {
+  - mata: st_strscalar("`scurline'",st_local("curline"))
+  = mata: st_strscalar("__000001",st_local("curline"))
+  - file write `tempbf' (`scurline') _n
+  = file write __000002 (__000001) _n
+  - file read `inbuff' curline
+  = file read __000003 curline
+  - }
+  - while !r(eof) {
+  - mata: st_strscalar("`scurline'",st_local("curline"))
+  = mata: st_strscalar("__000001",st_local("curline"))
+  - file write `tempbf' (`scurline') _n
+  = file write __000002 (__000001) _n
+  - file read `inbuff' curline
+  = file read __000003 curline
+  - }
+  - while !r(eof) {
+  - mata: st_strscalar("`scurline'",st_local("curline"))
+  = mata: st_strscalar("__000001",st_local("curline"))
+  - file write `tempbf' (`scurline') _n
+  = file write __000002 (__000001) _n
+  - file read `inbuff' curline
+  = file read __000003 curline
+  - }
+  - while !r(eof) {
+  - mata: st_strscalar("`scurline'",st_local("curline"))
+  = mata: st_strscalar("__000001",st_local("curline"))
+  - file write `tempbf' (`scurline') _n
+  = file write __000002 (__000001) _n
+  - file read `inbuff' curline
+  = file read __000003 curline
+  - }
+  - while !r(eof) {
+  - mata: st_strscalar("`scurline'",st_local("curline"))
+  = mata: st_strscalar("__000001",st_local("curline"))
+  - file write `tempbf' (`scurline') _n
+  = file write __000002 (__000001) _n
+  - file read `inbuff' curline
+  = file read __000003 curline
+  - }
+  - while !r(eof) {
+  - mata: st_strscalar("`scurline'",st_local("curline"))
+  = mata: st_strscalar("__000001",st_local("curline"))
+  - file write `tempbf' (`scurline') _n
+  = file write __000002 (__000001) _n
+  - file read `inbuff' curline
+  = file read __000003 curline
+  - }
+  - while !r(eof) {
+  - mata: st_strscalar("`scurline'",st_local("curline"))
+  = mata: st_strscalar("__000001",st_local("curline"))
+  - file write `tempbf' (`scurline') _n
+  = file write __000002 (__000001) _n
+  - file read `inbuff' curline
+  = file read __000003 curline
+  - }
+  - while !r(eof) {
+  - mata: st_strscalar("`scurline'",st_local("curline"))
+  = mata: st_strscalar("__000001",st_local("curline"))
+  - file write `tempbf' (`scurline') _n
+  = file write __000002 (__000001) _n
+  - file read `inbuff' curline
+  = file read __000003 curline
+  - }
+  - while !r(eof) {
+  - mata: st_strscalar("`scurline'",st_local("curline"))
+  = mata: st_strscalar("__000001",st_local("curline"))
+  - file write `tempbf' (`scurline') _n
+  = file write __000002 (__000001) _n
+  - file read `inbuff' curline
+  = file read __000003 curline
+  - }
+  - while !r(eof) {
+  - mata: st_strscalar("`scurline'",st_local("curline"))
+  = mata: st_strscalar("__000001",st_local("curline"))
+  - file write `tempbf' (`scurline') _n
+  = file write __000002 (__000001) _n
+  - file read `inbuff' curline
+  = file read __000003 curline
+  - }
+  - while !r(eof) {
+  - mata: st_strscalar("`scurline'",st_local("curline"))
+  = mata: st_strscalar("__000001",st_local("curline"))
+  - file write `tempbf' (`scurline') _n
+  = file write __000002 (__000001) _n
+  - file read `inbuff' curline
+  = file read __000003 curline
+  - }
+  - while !r(eof) {
+  - mata: st_strscalar("`scurline'",st_local("curline"))
+  = mata: st_strscalar("__000001",st_local("curline"))
+  - file write `tempbf' (`scurline') _n
+  = file write __000002 (__000001) _n
+  - file read `inbuff' curline
+  = file read __000003 curline
+  - }
+  - while !r(eof) {
+  - mata: st_strscalar("`scurline'",st_local("curline"))
+  = mata: st_strscalar("__000001",st_local("curline"))
+  - file write `tempbf' (`scurline') _n
+  = file write __000002 (__000001) _n
+  - file read `inbuff' curline
+  = file read __000003 curline
+  - }
+  - while !r(eof) {
+  - mata: st_strscalar("`scurline'",st_local("curline"))
+  = mata: st_strscalar("__000001",st_local("curline"))
+  - file write `tempbf' (`scurline') _n
+  = file write __000002 (__000001) _n
+  - file read `inbuff' curline
+  = file read __000003 curline
+  - }
+  - while !r(eof) {
+  - mata: st_strscalar("`scurline'",st_local("curline"))
+  = mata: st_strscalar("__000001",st_local("curline"))
+  - file write `tempbf' (`scurline') _n
+  = file write __000002 (__000001) _n
+  - file read `inbuff' curline
+  = file read __000003 curline
+  - }
+  - while !r(eof) {
+  - mata: st_strscalar("`scurline'",st_local("curline"))
+  = mata: st_strscalar("__000001",st_local("curline"))
+  - file write `tempbf' (`scurline') _n
+  = file write __000002 (__000001) _n
+  - file read `inbuff' curline
+  = file read __000003 curline
+  - }
+  - while !r(eof) {
+  - mata: st_strscalar("`scurline'",st_local("curline"))
+  = mata: st_strscalar("__000001",st_local("curline"))
+  - file write `tempbf' (`scurline') _n
+  = file write __000002 (__000001) _n
+  - file read `inbuff' curline
+  = file read __000003 curline
+  - }
+  - while !r(eof) {
+  - mata: st_strscalar("`scurline'",st_local("curline"))
+  = mata: st_strscalar("__000001",st_local("curline"))
+  - file write `tempbf' (`scurline') _n
+  = file write __000002 (__000001) _n
+  - file read `inbuff' curline
+  = file read __000003 curline
+  - }
+  - while !r(eof) {
+    mata: st_strscalar("`scurline'",st_local("curline"))
+    file write `tempbf' (`scurline') _n
+    file read `inbuff' curline
+    }
+  - file close `inbuff'
+  = file close __000003
+  - }
+  - qui file close `tempbf'
+  = qui file close __000002
+  - disp as text "Assumed R program path: " as result `""`rpath'""'
+  = disp as text "Assumed R program path: " as result `""C:\Program Files\R\R-4.3.3\bin\x64\Rterm.exe""'
+Assumed R program path: "C:\Program Files\R\R-4.3.3\bin\x64\Rterm.exe"
+  - if "`lsource'"=="lsource" {
+  = if ""=="lsource" {
+    disp as text "Beginning of listing of R source code "
+    type `"`tempsource'"'
+    disp as text "End of listing of R source code "
+    }
+  - tempfile templis
+  - local Rcommand `""`rpath'" `roptions' < "`tempsource'" > "`templis'""'
+  = local Rcommand `""C:\Program Files\R\R-4.3.3\bin\x64\Rterm.exe" --vanilla < "C:\Users\tadeo\AppData\Local\Temp\ST_fbc_000001.tmp" > "C:\Use
+> rs\tadeo\AppData\Local\Temp\ST_fbc_000002.tmp""'
+  - shell `Rcommand'
+  = shell "C:\Program Files\R\R-4.3.3\bin\x64\Rterm.exe" --vanilla < "C:\Users\tadeo\AppData\Local\Temp\ST_fbc_000001.tmp" > "C:\Users\tadeo\Ap
+> pData\Local\Temp\ST_fbc_000002.tmp"
+  - if "`loutput'"!="noloutput" {
+  = if "noloutput"!="noloutput" {
+    disp as text "Beginning of R output"
+    type `"`templis'"'
+    disp as text "End of R output"
+    }
+  ----------------------------------------------------------------------------------------------------------------------------- end rsource ---
+. }
+
+. 
+end of do-file
+
+. set trace off
+
+. do "D:\Users\tadeo\Documents\gigs-stata\benchmarking\statabench.do"
+
+. /* 
+>   The benchmarking code here is used to compare and contrast different versions
+>   of the Stata code with each other, and with R implementations. 
+> 
+>   The benchmarking tables used are the same used to benchmark the various R/SAS 
+>   implementations of these growth standards against each other. The generation
+>   process for these tables can be checked out on the R package website in the 
+>   benchmarking article 
+>   (https://docs.ropensci.org/gigs/articles/benchmarking.html), and you can go to
+>   GitHub and run the source code yourself.
+>   
+>   It is assumed that a user running this script has 'gigs' and 'zanthro' for
+>   installed in Stata, as stable releases or for 'gigs', the dev version from 
+>   GitHub.
+> */
+. 
+. clear all
+
+. 
+. local bench_folder "D:\Users\tadeo\Documents\gigs-stata\benchmarking"
+
+. log using "`bench_folder'\statabench.log", replace text nomsg
+
+. 
+. // WHO Child Growth Standards
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_who_gs.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "For who_gs gigs_stata - Number of inputs: `i'"
+  5.         bench, reps(50) restore last: ///
+>                 qui egen double z_gigs = who_gs(y, "wfa", "v2z"), ///
+>                         xvar(x) sex(sex) sexcode(m=M, f=F)
+  6. }
+For who_gs gigs_stata - Number of inputs: 1
+Average over 50 runs: 0.008 seconds
+For who_gs gigs_stata - Number of inputs: 10
+Average over 50 runs: 0.009 seconds
+For who_gs gigs_stata - Number of inputs: 100
+Average over 50 runs: 0.009 seconds
+For who_gs gigs_stata - Number of inputs: 500
+Average over 50 runs: 0.010 seconds
+For who_gs gigs_stata - Number of inputs: 1000
+Average over 50 runs: 0.012 seconds
+For who_gs gigs_stata - Number of inputs: 5000
+Average over 50 runs: 0.024 seconds
+For who_gs gigs_stata - Number of inputs: 10000
+Average over 50 runs: 0.040 seconds
+For who_gs gigs_stata - Number of inputs: 25000
+Average over 50 runs: 0.087 seconds
+For who_gs gigs_stata - Number of inputs: 50000
+Average over 50 runs: 0.169 seconds
+For who_gs gigs_stata - Number of inputs: 75000
+Average over 50 runs: 0.256 seconds
+For who_gs gigs_stata - Number of inputs: 100000
+Average over 50 runs: 0.351 seconds
+
+. 
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_who_gs.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "For who_gs zanthro - Number of inputs: `i'"
+  5.         bench, reps(50) restore last: ///
+>                 qui egen z_anthro = zanthro(y, wa, WHO), xvar(x) gender(sex) ///
+>                         gencode(male=M, female=F) ageunit(day)
+  6. }
+For who_gs zanthro - Number of inputs: 1
+Average over 50 runs: 0.007 seconds
+For who_gs zanthro - Number of inputs: 10
+Average over 50 runs: 0.008 seconds
+For who_gs zanthro - Number of inputs: 100
+Average over 50 runs: 0.008 seconds
+For who_gs zanthro - Number of inputs: 500
+Average over 50 runs: 0.013 seconds
+For who_gs zanthro - Number of inputs: 1000
+Average over 50 runs: 0.018 seconds
+For who_gs zanthro - Number of inputs: 5000
+Average over 50 runs: 0.060 seconds
+For who_gs zanthro - Number of inputs: 10000
+Average over 50 runs: 0.111 seconds
+For who_gs zanthro - Number of inputs: 25000
+Average over 50 runs: 0.266 seconds
+For who_gs zanthro - Number of inputs: 50000
+Average over 50 runs: 0.525 seconds
+For who_gs zanthro - Number of inputs: 75000
+Average over 50 runs: 0.789 seconds
+For who_gs zanthro - Number of inputs: 100000
+Average over 50 runs: 1.063 seconds
+
+. 
+. // IG-21st Newborn Size Standards
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_ig_nbs.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "For ig_nbs gigs_stata - Number of inputs: `i'"
+  5.         bench, reps(50) restore last: ///
+>                 qui egen double z_gigs = ig_nbs(y, "wfga", "v2z"), ///
+>                         gest_days(x) sex(sex) sexcode(m=M, f=F)
+  6. }
+For ig_nbs gigs_stata - Number of inputs: 1
+Average over 50 runs: 0.004 seconds
+For ig_nbs gigs_stata - Number of inputs: 10
+Average over 50 runs: 0.004 seconds
+For ig_nbs gigs_stata - Number of inputs: 100
+Average over 50 runs: 0.004 seconds
+For ig_nbs gigs_stata - Number of inputs: 500
+Average over 50 runs: 0.006 seconds
+For ig_nbs gigs_stata - Number of inputs: 1000
+Average over 50 runs: 0.008 seconds
+For ig_nbs gigs_stata - Number of inputs: 5000
+Average over 50 runs: 0.022 seconds
+For ig_nbs gigs_stata - Number of inputs: 10000
+Average over 50 runs: 0.040 seconds
+For ig_nbs gigs_stata - Number of inputs: 25000
+Average over 50 runs: 0.093 seconds
+For ig_nbs gigs_stata - Number of inputs: 50000
+Average over 50 runs: 0.183 seconds
+For ig_nbs gigs_stata - Number of inputs: 75000
+Average over 50 runs: 0.277 seconds
+For ig_nbs gigs_stata - Number of inputs: 100000
+Average over 50 runs: 0.382 seconds
+
+. 
+. // IG-21st Postnatal Growth Standards
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_ig_png.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "For ig_png gigs_stata - Number of inputs: `i'"
+  5.         bench, reps(50) restore last: ///
+>                 qui egen double z_gigs = ig_png(y, "wfa", "v2z"), ///
+>                         xvar(x) sex(sex) sexcode(m=M, f=F)
+  6. }
+For ig_png gigs_stata - Number of inputs: 1
+Average over 50 runs: 0.002 seconds
+For ig_png gigs_stata - Number of inputs: 10
+Average over 50 runs: 0.002 seconds
+For ig_png gigs_stata - Number of inputs: 100
+Average over 50 runs: 0.002 seconds
+For ig_png gigs_stata - Number of inputs: 500
+Average over 50 runs: 0.003 seconds
+For ig_png gigs_stata - Number of inputs: 1000
+Average over 50 runs: 0.003 seconds
+For ig_png gigs_stata - Number of inputs: 5000
+Average over 50 runs: 0.008 seconds
+For ig_png gigs_stata - Number of inputs: 10000
+Average over 50 runs: 0.014 seconds
+For ig_png gigs_stata - Number of inputs: 25000
+Average over 50 runs: 0.030 seconds
+For ig_png gigs_stata - Number of inputs: 50000
+Average over 50 runs: 0.054 seconds
+For ig_png gigs_stata - Number of inputs: 75000
+Average over 50 runs: 0.080 seconds
+For ig_png gigs_stata - Number of inputs: 100000
+Average over 50 runs: 0.108 seconds
+
+. 
+. // IG-21st Fetal Standards
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_ig_fet.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "For ig_fet gigs_stata - Number of inputs: `i'"
+  5.         bench, reps(50) restore last: ///
+>                 qui egen double z_gigs = ig_fet(y, "ofdfga", "v2z"), xvar(x)
+  6. }
+For ig_fet gigs_stata - Number of inputs: 1
+Average over 50 runs: 0.002 seconds
+For ig_fet gigs_stata - Number of inputs: 10
+Average over 50 runs: 0.002 seconds
+For ig_fet gigs_stata - Number of inputs: 100
+Average over 50 runs: 0.002 seconds
+For ig_fet gigs_stata - Number of inputs: 500
+Average over 50 runs: 0.002 seconds
+For ig_fet gigs_stata - Number of inputs: 1000
+Average over 50 runs: 0.003 seconds
+For ig_fet gigs_stata - Number of inputs: 5000
+Average over 50 runs: 0.005 seconds
+For ig_fet gigs_stata - Number of inputs: 10000
+Average over 50 runs: 0.008 seconds
+For ig_fet gigs_stata - Number of inputs: 25000
+Average over 50 runs: 0.016 seconds
+For ig_fet gigs_stata - Number of inputs: 50000
+Average over 50 runs: 0.030 seconds
+For ig_fet gigs_stata - Number of inputs: 75000
+Average over 50 runs: 0.042 seconds
+For ig_fet gigs_stata - Number of inputs: 100000
+Average over 50 runs: 0.058 seconds
+
+. 
+. log close
+
+. 
+. // Convert benchmarking log to a CSV file used in R benchmarking article
+. // n.b. Install rsource (R from Stata) if not already installed:
+. //              . cap ssc install rsource, replace
+. local bench_folder "D:\Users\tadeo\Documents\gigs-stata\benchmarking"
+
+. local benchmarking_rscript "`bench_folder'/statabench2csv.R"
+
+. if "`c(os)'"=="MacOSX" | "`c(os)'"=="UNIX" {
+.     noi rsource using "`benchmarking_rscript'", ///
+>                 noloutput ///
+>                 rpath("/usr/local/bin/R") ///
+>                 roptions(`"--vanilla"')
+. }
+
+. else if "`c(os)'"=="Windows" { 
+.         // Windows
+.         // n.b. Set `rversion' to that of own system - n.b. gigs needs R >=4.1.0
+.         local rversion "4.3.3" 
+.         noi rsource using "`benchmarking_rscript'", ///
+>                 noloutput ///
+>                 rpath("C:\Program Files\R\R-`rversion'\bin\x64\Rterm.exe") ///
+>                 roptions("--vanilla")
+Assumed R program path: "C:\Program Files\R\R-4.3.3\bin\x64\Rterm.exe"
+. }
+
+. 
+. // OLD VERSIONS OF GIGS --------------------------------------------------------
+. // Kept to note how development is progressing
+. 
+. // All versions before 1.0.0 just benched on the WHO GS weight-for-age standard
+. 
+. // gigs 0.4.0
+. // Number of inputs: 1
+. // Average over 25 runs: 0.009 seconds
+. // Number of inputs: 10
+. // Average over 25 runs: 0.008 seconds
+. // Number of inputs: 100
+. // Average over 25 runs: 0.009 seconds
+. // Number of inputs: 500
+. // Average over 25 runs: 0.010 seconds
+. // Number of inputs: 1000
+. // Average over 25 runs: 0.012 seconds
+. // Number of inputs: 5000
+. // Average over 25 runs: 0.028 seconds
+. // Number of inputs: 10000
+. // Average over 25 runs: 0.047 seconds
+. // Number of inputs: 25000
+. // Average over 25 runs: 0.104 seconds
+. // Number of inputs: 50000
+. // Average over 25 runs: 0.198 seconds
+. // Number of inputs: 75000
+. // Average over 25 runs: 0.296 seconds
+. // Number of inputs: 100000
+. // Average over 25 runs: 0.405 seconds
+. 
+. // gigs 0.3.2:
+. // Number of inputs: 1
+. // Average over 25 runs: 0.008 seconds
+. // Number of inputs: 10
+. // Average over 25 runs: 0.009 seconds
+. // Number of inputs: 100
+. // Average over 25 runs: 0.009 seconds
+. // Number of inputs: 500
+. // Average over 25 runs: 0.010 seconds
+. // Number of inputs: 1000
+. // Average over 25 runs: 0.012 seconds
+. // Number of inputs: 5000
+. // Average over 25 runs: 0.027 seconds
+. // Number of inputs: 10000
+. // Average over 25 runs: 0.045 seconds
+. // Number of inputs: 25000
+. // Average over 25 runs: 0.101 seconds
+. // Number of inputs: 50000
+. // Average over 25 runs: 0.195 seconds
+. // Number of inputs: 75000
+. // Average over 25 runs: 0.294 seconds
+. // Number of inputs: 100000
+. // Average over 25 runs: 0.405 seconds
+. 
+. // gigs 0.3.1:
+. // Number of inputs: 1
+. // Average over 25 runs: 0.008 seconds
+. // Number of inputs: 10
+. // Average over 25 runs: 0.009 seconds
+. // Number of inputs: 100
+. // Average over 25 runs: 0.009 seconds
+. // Number of inputs: 500
+. // Average over 25 runs: 0.010 seconds
+. // Number of inputs: 1000
+. // Average over 25 runs: 0.012 seconds
+. // Number of inputs: 5000
+. // Average over 25 runs: 0.028 seconds
+. // Number of inputs: 10000
+. // Average over 25 runs: 0.047 seconds
+. // Number of inputs: 25000
+. // Average over 25 runs: 0.106 seconds
+. // Number of inputs: 50000
+. // Average over 25 runs: 0.204 seconds
+. // Number of inputs: 75000
+. // Average over 25 runs: 0.310 seconds
+. // Number of inputs: 100000
+. // Average over 25 runs: 0.410 seconds
+. 
+. // gigs 0.3.0:
+. // Number of inputs: 1
+. // Average over 25 runs: 0.008 seconds
+. // Number of inputs: 10
+. // Average over 25 runs: 0.010 seconds
+. // Number of inputs: 100
+. // Average over 25 runs: 0.010 seconds
+. // Number of inputs: 500
+. // Average over 25 runs: 0.011 seconds
+. // Number of inputs: 1000
+. // Average over 25 runs: 0.013 seconds
+. // Number of inputs: 5000
+. // Average over 25 runs: 0.028 seconds
+. // Number of inputs: 10000
+. // Average over 25 runs: 0.048 seconds
+. // Number of inputs: 25000
+. // Average over 25 runs: 0.107 seconds
+. // Number of inputs: 50000
+. // Average over 25 runs: 0.205 seconds
+. // Number of inputs: 75000
+. // Average over 25 runs: 0.313 seconds
+. // Number of inputs: 100000
+. // Average over 25 runs: 0.431 seconds
+. 
+. // gigs 0.2.4:
+. // Number of inputs: 1
+. // Average over 25 runs: 0.016 seconds
+. // Number of inputs: 10
+. // Average over 25 runs: 0.015 seconds
+. // Number of inputs: 100
+. // Average over 25 runs: 0.017 seconds
+. // Number of inputs: 500
+. // Average over 25 runs: 0.039 seconds
+. // Number of inputs: 1000
+. // Average over 25 runs: 0.079 seconds
+. // Number of inputs: 5000
+. // Average over 25 runs: 1.007 seconds
+. // --> Crashed on 10000 or more inputs
+. 
+end of do-file
+
+. exit, clear
