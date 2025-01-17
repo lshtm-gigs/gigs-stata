@@ -1,7 +1,5 @@
 capture program drop _gig_nbs
-capture program drop Badsexvar_nbs
-capture program drop Badsyntax_nbs
-*! version 0.4.1 (SJxx-x: dmxxxx)
+*! version 0.4.2 (SJxx-x: dmxxxx)
 program define _gig_nbs
  	version 16
 	preserve
@@ -95,6 +93,9 @@ program define _gig_nbs
 		Badsexvar_nbs
 	}
 	else {
+		if "`: value label `sex''" != "" {
+			Badsexvar_nbs
+		}
 		local sex_was_str = .
 		if regexm("`sex_type'", "byte|int") {
 			local sex_was_str = 0
@@ -169,7 +170,6 @@ program define _gig_nbs
 					`gest_days' / 7  if `gest_days' >= 168
 			}
 			
-				
 			gen double `vpns_median' = .
 			replace `vpns_median' = ///
 				-7.00303 + (1.325911 * (`gest_age_weeks' ^ 0.5)) + ///
@@ -370,13 +370,17 @@ program define _gig_nbs
  	restore, not 
 end
 
+capture program drop Badsexvar_nbs
 program Badsexvar_nbs
-	di as err "sex() option should be a byte, int or str variable: see " /*
-	       */ "{help ig_nbs}"
+	di as err "Error in {bf:ig_nbs()}: the {bf:sex()} option should be an " /*
+		*/ "unlabelled byte, int or str variable. See {help ig_nbs} for " /* 
+		*/ "more information."
 	exit 109
 end
 
+capture program drop Badsyntax_nbs
 program Badsyntax_nbs
-	di as err "sexcode() option invalid: see {help ig_nbs}"
+	di as err "Error in {bf:ig_nbs()}: the {bf:sexcode()} option is " /*
+		*/ "invalid. See {help ig_nbs} for more information."
 	exit 198
 end

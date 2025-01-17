@@ -1,7 +1,5 @@
 capture program drop _gwho_gs
-capture program drop Badsexvar_who
-capture program drop Badsyntax_who
-*! version 0.3.2 (SJxx-x: dmxxxx)
+*! version 0.3.3 (SJxx-x: dmxxxx)
 program define _gwho_gs
 	version 16
 	preserve
@@ -79,6 +77,9 @@ program define _gwho_gs
 		Badsexvar_who
 	} 
 	else {
+		if "`: value label `sex''" != "" {
+			Badsexvar_nbs
+		}
 		local sex_was_str = .
 		if regexm("`sex_type'", "byte|int") {
 			local sex_was_str = 0
@@ -225,13 +226,17 @@ program define _gwho_gs
 	restore, not
 end
 
+capture program drop Badsexvar_who
 program Badsexvar_who
-	di as err "sex() option should be a byte, int or str variable: see " /*
-	       */ "{help who_gs}"
+	di as err "Error in {bf:who_gs()}: the {bf:sex()} option should be an " /*
+		*/ "unlabelled byte, int or str variable. See {help who_gs} for " /*
+		*/ "more information."
 	exit 109
 end
 
+capture program drop Badsyntax_who
 program Badsyntax_who
-	di as err "sexcode() option invalid: see {help who_gs}"
+	di as err "Error in {bf:who_gs()}: the {bf:sexcode()} option is " /*
+		*/ "invalid. See {help who_gs} for more information."
 	exit 198
 end

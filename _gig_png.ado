@@ -77,6 +77,9 @@ program define _gig_png
 		Badsexvar_png
 	} 
 	else {
+		if "`: value label `sex''" != "" {
+			Badsexvar_nbs
+		}
 		local sex_was_str = .
 		if regexm("`sex_type'", "byte|int") {
 			local sex_was_str = 0
@@ -160,12 +163,14 @@ program define _gig_png
 end
 
 program Badsexvar_png
-	di as err "sex() option should be a byte, int or str variable: see " /*
-	       */ "{help ig_png}"
+	di as err "Error in {bf:ig_png()}: the {bf:sex()} option should be an " /*
+		*/ "unlabelled byte, int or str variable. See {help ig_png} for " /*
+		*/ "more information."
 	exit 109
 end
 
 program Badsyntax_png
-	di as err "sexcode() option invalid: see {help ig_png}"
+	di as err "Error in {bf:ig_png()}: the {bf:sexcode()} option is " /*
+		*/ "invalid. See {help ig_png} for more information."
 	exit 198
 end

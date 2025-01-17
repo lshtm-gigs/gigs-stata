@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.6.1 26 Nov 2024}{...}
+{* *! version 0.6.2 16 Jan 2025}{...}
 {vieweralsosee "" "--"}{...}
 {vieweralsosee "gigs: Classification command" "help gigs_classify_growth"}{...}
 {viewerjumpto "Syntax" "ig_nbs##syntax"}{...}
@@ -142,9 +142,9 @@ also {it:fcn} dependent.
 {title:Options}
 {dlgtab:Non-specific}
 
-{phang}{opt sex(varname)} specifies the sex variable. It must be an int, byte,
- or string variable. The codes for {cmd:male} and {cmd:female} must be specified
- by the {hi:sexcode()} option.
+{phang}{opt sex(varname)} specifies the sex variable. It must be an unlabelled
+ int, byte, or string variable. The codes for {cmd:male} and {cmd:female} must 
+ be specified by the {hi:sexcode()} option.
 
 {phang}{cmd:sexcode(male=}{it:code}{cmd:, female=}{it:code}{cmd:)}
  specifies the codes for {cmd:male} and {cmd:female}. The codes can be specified
@@ -305,7 +305,7 @@ also {it:fcn} dependent.
 {pstd}London, U.K.{p_end}
 {pstd}simon.parker@lshtm.ac.uk{p_end}
 
-{pstd}Linda Vesel}{p_end}
+{pstd}Linda Vesel{p_end}
 {pstd}Brigham and Women's Hospital, Boston{p_end}
 {pstd}Massachusetts, U.S.A.{p_end}
 {pstd}lvesel@ariadnelabs.org{p_end}
