@@ -1,0 +1,166 @@
+
+. 
+. // WHO Child Growth Standards
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_who_gs.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "For who_gs gigs_stata - Number of inputs: `i'"
+  5.         bench, reps(50) restore last: ///
+>                 qui egen double z_gigs = who_gs(y, "wfa", "v2z"), ///
+>                         xvar(x) sex(sex) sexcode(m=M, f=F)
+  6. }
+For who_gs gigs_stata - Number of inputs: 1
+Average over 50 runs: 0.008 seconds
+For who_gs gigs_stata - Number of inputs: 10
+Average over 50 runs: 0.009 seconds
+For who_gs gigs_stata - Number of inputs: 100
+Average over 50 runs: 0.009 seconds
+For who_gs gigs_stata - Number of inputs: 500
+Average over 50 runs: 0.010 seconds
+For who_gs gigs_stata - Number of inputs: 1000
+Average over 50 runs: 0.012 seconds
+For who_gs gigs_stata - Number of inputs: 5000
+Average over 50 runs: 0.024 seconds
+For who_gs gigs_stata - Number of inputs: 10000
+Average over 50 runs: 0.040 seconds
+For who_gs gigs_stata - Number of inputs: 25000
+Average over 50 runs: 0.087 seconds
+For who_gs gigs_stata - Number of inputs: 50000
+Average over 50 runs: 0.169 seconds
+For who_gs gigs_stata - Number of inputs: 75000
+Average over 50 runs: 0.256 seconds
+For who_gs gigs_stata - Number of inputs: 100000
+Average over 50 runs: 0.351 seconds
+
+. 
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_who_gs.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "For who_gs zanthro - Number of inputs: `i'"
+  5.         bench, reps(50) restore last: ///
+>                 qui egen z_anthro = zanthro(y, wa, WHO), xvar(x) gender(sex) ///
+>                         gencode(male=M, female=F) ageunit(day)
+  6. }
+For who_gs zanthro - Number of inputs: 1
+Average over 50 runs: 0.007 seconds
+For who_gs zanthro - Number of inputs: 10
+Average over 50 runs: 0.008 seconds
+For who_gs zanthro - Number of inputs: 100
+Average over 50 runs: 0.008 seconds
+For who_gs zanthro - Number of inputs: 500
+Average over 50 runs: 0.013 seconds
+For who_gs zanthro - Number of inputs: 1000
+Average over 50 runs: 0.018 seconds
+For who_gs zanthro - Number of inputs: 5000
+Average over 50 runs: 0.060 seconds
+For who_gs zanthro - Number of inputs: 10000
+Average over 50 runs: 0.111 seconds
+For who_gs zanthro - Number of inputs: 25000
+Average over 50 runs: 0.266 seconds
+For who_gs zanthro - Number of inputs: 50000
+Average over 50 runs: 0.525 seconds
+For who_gs zanthro - Number of inputs: 75000
+Average over 50 runs: 0.789 seconds
+For who_gs zanthro - Number of inputs: 100000
+Average over 50 runs: 1.063 seconds
+
+. 
+. // IG-21st Newborn Size Standards
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_ig_nbs.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "For ig_nbs gigs_stata - Number of inputs: `i'"
+  5.         bench, reps(50) restore last: ///
+>                 qui egen double z_gigs = ig_nbs(y, "wfga", "v2z"), ///
+>                         gest_days(x) sex(sex) sexcode(m=M, f=F)
+  6. }
+For ig_nbs gigs_stata - Number of inputs: 1
+Average over 50 runs: 0.004 seconds
+For ig_nbs gigs_stata - Number of inputs: 10
+Average over 50 runs: 0.004 seconds
+For ig_nbs gigs_stata - Number of inputs: 100
+Average over 50 runs: 0.004 seconds
+For ig_nbs gigs_stata - Number of inputs: 500
+Average over 50 runs: 0.006 seconds
+For ig_nbs gigs_stata - Number of inputs: 1000
+Average over 50 runs: 0.008 seconds
+For ig_nbs gigs_stata - Number of inputs: 5000
+Average over 50 runs: 0.022 seconds
+For ig_nbs gigs_stata - Number of inputs: 10000
+Average over 50 runs: 0.040 seconds
+For ig_nbs gigs_stata - Number of inputs: 25000
+Average over 50 runs: 0.093 seconds
+For ig_nbs gigs_stata - Number of inputs: 50000
+Average over 50 runs: 0.183 seconds
+For ig_nbs gigs_stata - Number of inputs: 75000
+Average over 50 runs: 0.277 seconds
+For ig_nbs gigs_stata - Number of inputs: 100000
+Average over 50 runs: 0.382 seconds
+
+. 
+. // IG-21st Postnatal Growth Standards
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_ig_png.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "For ig_png gigs_stata - Number of inputs: `i'"
+  5.         bench, reps(50) restore last: ///
+>                 qui egen double z_gigs = ig_png(y, "wfa", "v2z"), ///
+>                         xvar(x) sex(sex) sexcode(m=M, f=F)
+  6. }
+For ig_png gigs_stata - Number of inputs: 1
+Average over 50 runs: 0.002 seconds
+For ig_png gigs_stata - Number of inputs: 10
+Average over 50 runs: 0.002 seconds
+For ig_png gigs_stata - Number of inputs: 100
+Average over 50 runs: 0.002 seconds
+For ig_png gigs_stata - Number of inputs: 500
+Average over 50 runs: 0.003 seconds
+For ig_png gigs_stata - Number of inputs: 1000
+Average over 50 runs: 0.003 seconds
+For ig_png gigs_stata - Number of inputs: 5000
+Average over 50 runs: 0.008 seconds
+For ig_png gigs_stata - Number of inputs: 10000
+Average over 50 runs: 0.014 seconds
+For ig_png gigs_stata - Number of inputs: 25000
+Average over 50 runs: 0.030 seconds
+For ig_png gigs_stata - Number of inputs: 50000
+Average over 50 runs: 0.054 seconds
+For ig_png gigs_stata - Number of inputs: 75000
+Average over 50 runs: 0.080 seconds
+For ig_png gigs_stata - Number of inputs: 100000
+Average over 50 runs: 0.108 seconds
+
+. 
+. // IG-21st Fetal Standards
+. foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+  2.         use "`bench_folder'/bench_ds_ig_fet.dta", clear
+  3.         qui drop if _n > `i'
+  4.         di "For ig_fet gigs_stata - Number of inputs: `i'"
+  5.         bench, reps(50) restore last: ///
+>                 qui egen double z_gigs = ig_fet(y, "ofdfga", "v2z"), xvar(x)
+  6. }
+For ig_fet gigs_stata - Number of inputs: 1
+Average over 50 runs: 0.002 seconds
+For ig_fet gigs_stata - Number of inputs: 10
+Average over 50 runs: 0.002 seconds
+For ig_fet gigs_stata - Number of inputs: 100
+Average over 50 runs: 0.002 seconds
+For ig_fet gigs_stata - Number of inputs: 500
+Average over 50 runs: 0.002 seconds
+For ig_fet gigs_stata - Number of inputs: 1000
+Average over 50 runs: 0.003 seconds
+For ig_fet gigs_stata - Number of inputs: 5000
+Average over 50 runs: 0.005 seconds
+For ig_fet gigs_stata - Number of inputs: 10000
+Average over 50 runs: 0.008 seconds
+For ig_fet gigs_stata - Number of inputs: 25000
+Average over 50 runs: 0.016 seconds
+For ig_fet gigs_stata - Number of inputs: 50000
+Average over 50 runs: 0.030 seconds
+For ig_fet gigs_stata - Number of inputs: 75000
+Average over 50 runs: 0.042 seconds
+For ig_fet gigs_stata - Number of inputs: 100000
+Average over 50 runs: 0.058 seconds
+
+. 
+. log close

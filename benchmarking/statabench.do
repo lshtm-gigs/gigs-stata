@@ -2,31 +2,98 @@
   The benchmarking code here is used to compare and contrast different versions
   of the Stata code with each other, and with R implementations. 
 
-  It focuses on conversions in the WHO Growth Standards for two reasons:
-    1. These functions involve the slowest bits of code - loading in data and 
-       performing interpolation on the LMS coefficients. 
-    2. The WHO functions are common to all the tested Stata/R implementations, 
-	   so can be directly compared.  
-
-  The benchmarking table used is the same used to compare the different R 
-  implementations against each other. The generation process for this table can
-  be checked out on the R package website in the benchmarking article
-  (https://lshtm-gigs.github.io/gigs/).
+  The benchmarking tables used are the same used to benchmark the various R/SAS 
+  implementations of these growth standards against each other. The generation
+  process for these tables can be checked out on the R package website in the 
+  benchmarking article 
+  (https://docs.ropensci.org/gigs/articles/benchmarking.html), and you can go to
+  GitHub and run the source code yourself.
   
-  It is assumed that a user running this script has gigs installed, either as a 
-  stable release or dev version from GitHub.
+  It is assumed that a user running this script has 'gigs' and 'zanthro' for
+  installed in Stata, as stable releases or for 'gigs', the dev version from 
+  GitHub.
 */
+
 clear all
 
-local bench_dataset_path "benchmarking/bench_dataset.dta" // can change
+local bench_folder "D:\Users\tadeo\Documents\gigs-stata\benchmarking"
+log using "`bench_folder'\statabench.log", replace text nomsg
+
+// WHO Child Growth Standards
 foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
-	use "`bench_dataset_path'", clear
+	use "`bench_folder'/bench_ds_who_gs.dta", clear
 	qui drop if _n > `i'
-	di "Number of inputs: `i'"
-	bench, reps(25) restore last: ///
+	di "For who_gs gigs_stata - Number of inputs: `i'"
+	bench, reps(50) restore last: ///
 		qui egen double z_gigs = who_gs(y, "wfa", "v2z"), ///
-		xvar(x) sex(sex) sexcode(m=M, f=F)
+			xvar(x) sex(sex) sexcode(m=M, f=F)
 }
+
+foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+	use "`bench_folder'/bench_ds_who_gs.dta", clear
+	qui drop if _n > `i'
+	di "For who_gs zanthro - Number of inputs: `i'"
+	bench, reps(50) restore last: ///
+		qui egen z_anthro = zanthro(y, wa, WHO), xvar(x) gender(sex) ///
+			gencode(male=M, female=F) ageunit(day)
+}
+
+// IG-21st Newborn Size Standards
+foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+	use "`bench_folder'/bench_ds_ig_nbs.dta", clear
+	qui drop if _n > `i'
+	di "For ig_nbs gigs_stata - Number of inputs: `i'"
+	bench, reps(50) restore last: ///
+		qui egen double z_gigs = ig_nbs(y, "wfga", "v2z"), ///
+			gest_days(x) sex(sex) sexcode(m=M, f=F)
+}
+
+// IG-21st Postnatal Growth Standards
+foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+	use "`bench_folder'/bench_ds_ig_png.dta", clear
+	qui drop if _n > `i'
+	di "For ig_png gigs_stata - Number of inputs: `i'"
+	bench, reps(50) restore last: ///
+		qui egen double z_gigs = ig_png(y, "wfa", "v2z"), ///
+			xvar(x) sex(sex) sexcode(m=M, f=F)
+}
+
+// IG-21st Fetal Standards
+foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
+	use "`bench_folder'/bench_ds_ig_fet.dta", clear
+	qui drop if _n > `i'
+	di "For ig_fet gigs_stata - Number of inputs: `i'"
+	bench, reps(50) restore last: ///
+		qui egen double z_gigs = ig_fet(y, "ofdfga", "v2z"), xvar(x)
+}
+
+log close
+
+// Convert benchmarking log to a CSV file used in R benchmarking article
+// n.b. Install rsource (R from Stata) if not already installed:
+//		. cap ssc install rsource, replace
+local bench_folder "D:\Users\tadeo\Documents\gigs-stata\benchmarking"
+local benchmarking_rscript "`bench_folder'/statabench2csv.R"
+if "`c(os)'"=="MacOSX" | "`c(os)'"=="UNIX" {
+    noi rsource using "`benchmarking_rscript'", ///
+		noloutput ///
+		rpath("/usr/local/bin/R") ///
+		roptions(`"--vanilla"')
+}
+else if "`c(os)'"=="Windows" { 
+	// Windows
+	// n.b. Set `rversion' to that of own system - n.b. gigs needs R >=4.1.0
+	local rversion "4.3.3" 
+	noi rsource using "`benchmarking_rscript'", ///
+		noloutput ///
+		rpath("C:\Program Files\R\R-`rversion'\bin\x64\Rterm.exe") ///
+		roptions("--vanilla")
+}
+
+// OLD VERSIONS OF GIGS --------------------------------------------------------
+// Kept to note how development is progressing
+
+// All versions before 1.0.0 just benched on the WHO GS weight-for-age standard
 
 // gigs 0.4.0
 // Number of inputs: 1
@@ -51,50 +118,6 @@ foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
 // Average over 25 runs: 0.296 seconds
 // Number of inputs: 100000
 // Average over 25 runs: 0.405 seconds
-
-
-// zanthro 1.0.2:
-// foreach i in 1 10 100 500 1000 5000 10000 25000 50000 75000 100000 {
-// 	use "benchmarking/bench_dataset.dta", clear
-// 	qui drop if _n > `i'
-// 	di "Number of inputs: `i'"
-// 	bench, reps(25) restore last: ///
-// 		qui egen z_anthro = zanthro(y, wa, WHO), xvar(x) gender(sex) ///
-//                 gencode(male=M, female=F)  ageunit(day)
-// }
-
-// Number of inputs: 1
-// Average over 25 runs: 0.007 seconds
-// Number of inputs: 10
-// Average over 25 runs: 0.008 seconds
-// Number of inputs: 100
-// Average over 25 runs: 0.009 seconds
-// Number of inputs: 500
-// Average over 25 runs: 0.017 seconds
-// Number of inputs: 1000
-// Average over 25 runs: 0.027 seconds
-// Number of inputs: 5000
-// Average over 25 runs: 0.105 seconds
-// Number of inputs: 10000
-// Average over 25 runs: 0.203 seconds
-// Number of inputs: 25000
-// Average over 25 runs: 0.479 seconds
-// Number of inputs: 50000
-// Average over 25 runs: 0.951 seconds
-// Number of inputs: 75000
-// Average over 25 runs: 1.445 seconds
-// Number of inputs: 100000
-// Average over 25 runs: 2.046 seconds
-
-// Compare gigs outputs with zanthro outputs:
-use "benchmarking/bench_dataset.dta", clear
-egen double z_gigs = who_gs(y, "wfa", "v2z"), ///
-		xvar(x) sex(sex) sexcode(m=M, f=F)
-egen z_anthro = zanthro(y, wa, WHO), xvar(x) gender(sex) ///
-		gencode(male=M, female=F)  ageunit(day)
-
-// OLD VERSIONS OF GIGS --------------------------------------------------------
-// Kept to note how development is progressing
 
 // gigs 0.3.2:
 // Number of inputs: 1
