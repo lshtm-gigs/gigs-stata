@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.2.0 31 Oct 2024}{...}
+{* *! version 0.2.1 16 Jan 2025}{...}
 {vieweralsosee "" "--"}{...}
 {vieweralsosee "gigs: Conversion functions" "help ig_nbs"}{...}
 {viewerjumpto "Syntax" "gigs_classify_growth##syntax"}{...}
@@ -151,9 +151,9 @@
  each observation. This variable is used with {cmd:gest_days()} to determine 
  which growth standard is applied for each observation.
 
-{phang}{opt sex(varname)} specifies the sex variable. It can be int, byte, or
- string. The codes for {cmd:male} and {cmd:female} must be specified by the 
- {hi:sexcode()} option.
+{phang}{opt sex(varname)} specifies the sex variable. It must be an unlabelled
+ int, byte, or string variable. The codes for {cmd:male} and {cmd:female} must 
+ be specified by the {hi:sexcode()} option.
 
 {phang}{cmdab:sexc:ode}{cmd:(}{cmdab:m:ale=}{it:code}{cmd:,} 
  {cmdab:f:emale=}{it:code}{cmd:)} specifies the codes for {cmd:male} and 

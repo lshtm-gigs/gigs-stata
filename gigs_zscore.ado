@@ -1,5 +1,5 @@
 capture prog drop gigs_zscore
-*! version 0.2.1 (SJxx-x: dmxxxx)
+*! version 0.2.2 (SJxx-x: dmxxxx)
 program gigs_zscore
 	version 16
 	preserve
@@ -53,6 +53,9 @@ program gigs_zscore
 		Badsexvar_gigsz
 	}
 	else {
+		if "`: value label `sex''" != "" {
+			Badsexvar_gigsz
+		}
 		local sex_was_str = .
 		if regexm("`sex_type'", "byte|int") {
 			local sex_was_str = 0
@@ -176,19 +179,24 @@ end
 
 capture prog drop GigsZscore_Badsyntax
 program GigsZscore_Badsyntax
-	di as err "sexcode() option invalid in gigs_zscore"
+	di as err "Error in {bf:gigs_zscore}: the {bf:sexcode()} option is " /*
+		*/ "formatted incorrectly. This is an internal error, so contact " /*
+		*/ "the package maintainer for more information."
 	exit 198
 end
 
 capture prog drop Badsexvar_gigsz
 program Badsexvar_gigsz
-	di as err "sex() option should be a byte, int or str variable in " ///
-		"gigs_zscore"
+	di as err "Error in {bf:gigs_zscore}: the {bf:sex()} option should be " /*
+		*/ "an unlabelled byte, int or str variable. This is an internal " /*
+		*/ "error, so contact the package maintainer for more information."
 	exit 109
 end
 
 capture prog drop Badidvar_gigsz
 program Badidvar_gigsz
-	di as err "id() option should be a str variable in gigs_zscore"
+	di as err "Error in {bf:gigs_zscore}: the {bf:id()} option should be " /*
+		*/ "a str variable. This is an internal error, so contact the package " /*
+		*/ "maintainer for more information."
 	exit 109
 end
