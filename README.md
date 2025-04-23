@@ -378,6 +378,41 @@ Running analyses. New/replaced variables:
 We request that users note any bugs, issues, or feature requests on the GitHub 
 [issues page](https://github.com/lshtm-gigs/gigs-stata/issues).
 
+### Solving `gigs_ipolate_coeffs() not found`
+
+Some users have reported issues running the `who_gs()` and `ig_nbs()` functions, due to issues with Stata version compatability and `gigs_ipolate_coeffs.mo`. 
+This can happen when the `.mo` file is either too recent for your version of Stata. 
+Run the following command to see if the file is present, and if Stata can use it:
+
+```stata
+. mata: mata which gigs_ipolate_coeffs
+```
+
+Assuming you get a result which indicates version incompatability, you can take
+these steps to resolve the issue.
+
+1. Download `gigs_ipolate_coeffs.mata` to your computer, to either your working directory or somewhere you specify.
+2. In the downloaded version of `gigs_ipolate_coeffs.mata`:
+   1. Edit line 83 (`mata mosave gigs_ipolate_coeffs(), replace`) by adding the `dir()` option, so you save `gigs_ipolate_coeffs.mo` somewhere specific. It should look something like this: `mata mosave gigs_ipolate_coeffs(), replace dir("path/to/a/directory")`.
+   2. Remove line 2 (`version 16`) from the downloaded file.
+3. Open and run your edited version of `gigs_ipolate_coeffs.mata` in your Stata.
+   Stata should inform you that `file gigs_ipolate_coeffs.mo created`, or something similar.
+4. By default, the files for `gigs` are located in your Stata `PLUS` directory. Use `sysdir` to find the location of your `PLUS` directory.
+   On Windows, the output will look something like this:
+```stata
+. sysdir
+   STATA:  C:\Program Files\Stata18\
+    BASE:  C:\Program Files\Stata18\ado\base\
+    SITE:  C:\Program Files\Stata18\ado\site\
+    PLUS:  C:\Users\your_user\ado\plus\
+PERSONAL:  C:\Users\your_user\ado\personal\
+OLDPLACE:  c:\ado\
+```  
+5. Go to the `PLUS` directory and look at the `g` subdirectory. This should contain a copy of `gigs_ipolate_coeffs.mo`, but it is incompatible with your Stata version. Replace it with the version of `gigs_ipolate_coeffs.mo` you created in step 3, and restart Stata. The errors you've been getting should now stop appearing.
+
+If you reinstall `gigs` at any point, for example to retrieve package updates, you'll need to repeat these compilation + file replacement steps again. 
+If these instructions don't work or you need more specific guidance, let us know on the GitHub [issues page](https://github.com/lshtm-gigs/gigs-stata/issues).
+
 ## Authors
 
   **S. R. Parker**  
